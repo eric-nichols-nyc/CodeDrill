@@ -1,0 +1,5 @@
+[
+  { "id": "1", "front": "What is the capital of France?", "back": "Paris" },
+  { "id": "2", "front": "How many continents are there?", "back": "Seven" },
+  { "front": "What is 2 + 2?", "back": "4" }
+]

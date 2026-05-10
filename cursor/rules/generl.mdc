@@ -1,0 +1,15 @@
+---
+alwaysApply: true
+---
+
+This is a **Turbo monorepo** (next-forge) with multiple apps and shared packages.
+- **Node**: >=18 (Trunk uses 22)
+- **Package manager**: pnpm
+- **Linting**: Biome (run `pnpm check` / `pnpm fix` via Ultracite)
+
+**Apps** (`apps/*`): Next.js 16 App Router apps (apps/app, apps/ai-chatbots, etc.)
+**Packages** (`packages/*`): Shared code — `@repo/design-system`, `@repo/auth`, `@repo/database`, etc.
+
+- Prefer server components; add `"use client"` only when needed
+- Never use `any` — use `unknown` or proper generics
+- UI components live in `packages/design-system` — import from `@repo/design-system`, don't add new UI to individual apps

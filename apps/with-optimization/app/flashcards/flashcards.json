@@ -1,0 +1,24 @@
+[
+  {
+    "id": "1",
+    "front": "What is the virtual DOM?",
+    "back": "A lightweight JavaScript representation of the DOM kept in memory, used by React to compute minimal updates before applying changes to the real DOM."
+  },
+  {
+    "id": "2",
+    "front": "What does SWR stand for?",
+    "back": "Stale-While-Revalidate — a strategy that shows cached data first, then revalidates in the background and updates the UI when fresh data arrives."
+  },
+  {
+    "front": "What is code splitting?",
+    "back": "Splitting your bundle into smaller chunks that can be loaded on demand, reducing initial load time and improving performance."
+  },
+  {
+    "front": "What is the difference between SSR and SSG?",
+    "back": "SSR (Server-Side Rendering) generates HTML on each request. SSG (Static Site Generation) generates HTML at build time and serves the same pre-built page."
+  },
+  {
+    "front": "When should you use useMemo?",
+    "back": "When you have an expensive computation that you want to skip on re-renders unless specific dependencies change, to avoid recalculating every time."
+  }
+]

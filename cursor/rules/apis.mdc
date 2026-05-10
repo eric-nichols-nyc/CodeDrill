@@ -1,0 +1,27 @@
+---
+description: API conventions for Next.js Route Handlers
+globs: ["**/app/api/**/*.ts", "**/route.ts"]
+---
+
+## API Structure
+- **Route Handlers**: Next.js App Router — `app/api/[segment]/route.ts` exports `GET`, `POST`, `PUT`, `DELETE`, etc.
+- **Dedicated API app**: `apps/api` runs separately (port 3002) for webhooks, cron jobs — not user-facing. Add webhooks in `app/webhooks/`, cron in `app/cron/`.
+
+## Response Pattern
+```ts
+import { NextResponse } from "next/server";
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  // ... logic
+  return NextResponse.json({ data }, { status: 200 });
+}
+```
+
+## Conventions
+- Use `NextResponse.json()` for JSON responses
+- Dynamic segments: `params` is a Promise — use `const { id } = await params`
+- Validate input with Zod; use `@repo/rate-limit` for rate limiting
+- Shared webhook/cron logic: `@repo/webhooks`, `@repo/auth`
+- Mock APIs in tests: MSW (`msw`) — see `apps/testing-lab/mocks/handlers.ts`
+- Protect routes via middleware; read user from headers set by auth proxy when needed

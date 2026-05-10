@@ -1,0 +1,422 @@
+[
+  {
+    "id": 1,
+    "category": "fundamentals",
+    "difficulty": "medium",
+    "question": "In a TypeScript interview, how would you best explain when to prefer an interface over a type alias?",
+    "options": [
+      "Always use interface because it compiles faster than type aliases.",
+      "Use interface for object shape contracts and extension/merging; use type for unions, intersections, and mapped/conditional compositions.",
+      "Use type only for primitive values and interface only for classes.",
+      "There is no practical difference in any codebase."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Interfaces are often preferred for object contracts and declaration merging. Type aliases are more flexible for unions/intersections and advanced type composition.",
+    "codeSample": "interface User {\n  id: string;\n  name: string;\n}\n\ntype UserWithRole = User & {\n  role: \"admin\" | \"member\";\n};"
+  },
+  {
+    "id": 2,
+    "category": "safety",
+    "difficulty": "easy",
+    "question": "A service returns untrusted JSON. Which type is safest to use first in an interview-quality answer?",
+    "options": [
+      "any, because it avoids runtime checks and keeps code short",
+      "unknown, then narrow with type guards before use",
+      "never, because it prevents all assignment bugs",
+      "object, because it guarantees all keys exist"
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "unknown forces explicit narrowing before usage, preventing unsafe property access and making intent clear.",
+    "codeSample": "const payload: unknown = JSON.parse('{\"name\":\"Ada\"}');\n\nif (typeof payload === \"object\" && payload !== null && \"name\" in payload) {\n  console.log((payload as { name: string }).name);\n}"
+  },
+  {
+    "id": 3,
+    "category": "generics",
+    "difficulty": "medium",
+    "question": "You need a function that reads obj.id safely. What is the best generic signature?",
+    "options": [
+      "<T>(obj: T) => obj.id",
+      "<T extends { id: string | number }>(obj: T) => obj.id",
+      "<T = { id: string }>(obj: T) => obj.id",
+      "<T extends string>(obj: T) => obj.id"
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "A generic constraint guarantees the required property exists while keeping the rest of the type flexible.",
+    "codeSample": "function getId<T extends { id: string | number }>(obj: T) {\n  return obj.id;\n}\n\nconst id = getId({ id: 42, name: \"Lin\" });"
+  },
+  {
+    "id": 4,
+    "category": "fundamentals",
+    "difficulty": "easy",
+    "question": "How do enums work in TypeScript?",
+    "options": [
+      "Enums only support numbers and cannot hold string values.",
+      "Enums define a named set of constants; members can map to string or numeric values and can be referenced like UserType.Verified.",
+      "Enums are runtime-invalid and used for type checking only.",
+      "Enums are identical to interfaces at runtime."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Enums create a named set of values you can reuse safely in both types and runtime code.",
+    "codeSample": "enum UserType {\n  Guest = \"G\",\n  Verified = \"V\",\n  Admin = \"A\",\n}\n\nconst userType: UserType = UserType.Verified;"
+  },
+  {
+    "id": 5,
+    "category": "fundamentals",
+    "difficulty": "medium",
+    "question": "When do you use a return type of never and how does it differ from void?",
+    "options": [
+      "Use void when a function never finishes, and never when it returns undefined.",
+      "Use void when a function can return nothing (undefined). Use never when execution cannot continue, such as throwing an error or an infinite loop.",
+      "never and void are interchangeable and should be used based on style preference.",
+      "Use never for async functions and void for sync functions."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "void means the function completes without a useful return value. never means the function does not complete normally at all.",
+    "codeSample": "function printName(name: string): void {\n  console.log(name);\n}\n\nconst printer = printName(\"Will\");\nconsole.log(printer); // logs \"undefined\"\n\nconst error = (): never => {\n  throw new Error(\"\");\n};"
+  },
+  {
+    "id": 6,
+    "category": "generics",
+    "difficulty": "easy",
+    "question": "What are generics and how do you use them in TypeScript?",
+    "options": [
+      "Generics are runtime-only features that change JavaScript behavior.",
+      "Generics let you write reusable, type-safe code by parameterizing types and preserving input/output relationships.",
+      "Generics are only for arrays and cannot be used with functions.",
+      "Generics should be avoided because they always infer as any."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Use generics when you want one function/type to work with many types while keeping strong type information.",
+    "codeSample": "function updateUser<Type>(arg: Type): Type {\n  return arg;\n}"
+  },
+  {
+    "id": 7,
+    "category": "safety",
+    "difficulty": "medium",
+    "question": "When should you use the unknown type?",
+    "options": [
+      "Use unknown when you fully trust the value type and want faster coding.",
+      "Use unknown for values whose shape is not guaranteed yet, then narrow/check the type before using it.",
+      "Use unknown only in React components, not in plain TypeScript functions.",
+      "unknown automatically behaves like function, object, and array without checks."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "unknown is safer than any because it forces you to perform type checks before using a value.",
+    "codeSample": "function invokeCallback(callback: any): void {\n  callback();\n}\n\n// unknown requires narrowing before use\nfunction invokeCallbackSafely(callback: unknown): void {\n  if (typeof callback === \"function\") {\n    callback();\n  }\n}\n\ninvokeCallback(() => {\n  console.log(\"called via any\");\n});\n\ninvokeCallbackSafely(() => {\n  console.log(\"called via unknown after narrowing\");\n});\n\ninvokeCallbackSafely(\"not a function\"); // safely ignored"
+  },
+  {
+    "id": 8,
+    "category": "fundamentals",
+    "difficulty": "easy",
+    "question": "What is TypeScript and how does it differ from JavaScript?",
+    "options": [
+      "TypeScript is unrelated to JavaScript and runs directly in browsers without compilation.",
+      "TypeScript is a statically typed superset of JavaScript that compiles to JavaScript and adds type tooling.",
+      "JavaScript is a superset of TypeScript with stricter type rules.",
+      "TypeScript only works in Node.js and not in frontend apps."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "TypeScript extends JavaScript with types and tooling, then transpiles to standard JavaScript for runtime environments.",
+    "codeSample": "// typescript\nconst total: number = 5 + 7;\n\n// transpiles to javascript\nconst totalJs = 5 + 7;"
+  },
+  {
+    "id": 9,
+    "category": "fundamentals",
+    "difficulty": "easy",
+    "question": "What are the benefits of using TypeScript?",
+    "options": [
+      "Mainly smaller bundle size by default in every project.",
+      "Better type safety, editor tooling, maintainability, and earlier error detection during development.",
+      "No build step is needed because TypeScript runs natively in the browser.",
+      "It replaces tests by preventing all runtime bugs automatically."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "TypeScript improves correctness and developer experience through static analysis, autocomplete, and safer refactoring.",
+    "codeSample": "type User = { name: string; age: number };\n\nconst user: User = {\n  name: \"Sam\",\n  age: 20,\n  // ag: 20 // typo caught by TypeScript\n};"
+  },
+  {
+    "id": 10,
+    "category": "fundamentals",
+    "difficulty": "easy",
+    "question": "What are interfaces in TypeScript?",
+    "options": [
+      "Interfaces are runtime classes generated in JavaScript output.",
+      "Interfaces define object and contract shapes at type level to enforce consistent structure.",
+      "Interfaces can only be used with arrays.",
+      "Interfaces are deprecated in modern TypeScript."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Interfaces describe expected structure for objects and APIs, helping catch mismatches at compile time.",
+    "codeSample": "interface User {\n  name: string;\n  age: number;\n}\n\nconst user: User = {\n  name: \"Bob\",\n  age: 20,\n};"
+  },
+  {
+    "id": 11,
+    "category": "fundamentals",
+    "difficulty": "medium",
+    "question": "How do you create a new type using a subset of an interface?",
+    "options": [
+      "Use only class inheritance.",
+      "Use utility types like Pick or Omit to derive a new type from selected interface keys.",
+      "You cannot create subset types in TypeScript.",
+      "Use enum values to remove interface fields."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Utility types such as Pick and Omit let you reuse and transform existing interface shapes.",
+    "codeSample": "interface User {\n  name: string;\n  email: string;\n  age: number;\n}\n\ntype UserPreview = Omit<User, \"email\">;"
+  },
+  {
+    "id": 12,
+    "category": "fundamentals",
+    "difficulty": "easy",
+    "question": "What are arrow functions in TypeScript?",
+    "options": [
+      "Arrow functions are class-only methods and cannot be assigned to variables.",
+      "Arrow functions are concise function expressions that preserve lexical this behavior.",
+      "Arrow functions are only valid in TypeScript, not JavaScript.",
+      "Arrow functions cannot have return types."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Arrow functions provide concise syntax and lexical this binding, commonly used for callbacks.",
+    "codeSample": "const addNumbers = (x: number, y: number): number => {\n  return x + y;\n};\n\naddNumbers(1, 2); // 3"
+  },
+  {
+    "id": 13,
+    "category": "fundamentals",
+    "difficulty": "easy",
+    "question": "What are the differences between var, let, and const?",
+    "options": [
+      "They are fully identical and only differ in style.",
+      "var is function-scoped, let is block-scoped mutable, and const is block-scoped immutable binding.",
+      "const allows reassignment while let does not.",
+      "let variables are hoisted without temporal dead zone rules."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Scope and mutability behavior differs; modern TypeScript usually favors const and let over var.",
+    "codeSample": "var a = 1; // function scoped\nlet b = 2; // block scoped\nconst c = 3; // block scoped + cannot reassign"
+  },
+  {
+    "id": 14,
+    "category": "fundamentals",
+    "difficulty": "medium",
+    "question": "What access modifiers are supported by TypeScript?",
+    "options": [
+      "Only public and internal are supported.",
+      "public, private, and protected are supported to control class member visibility.",
+      "Access modifiers are runtime-enforced in plain JavaScript output.",
+      "TypeScript supports friend and package modifiers like C++."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Access modifiers help model encapsulation in class design at compile time.",
+    "codeSample": "class User {\n  private username = \"sam\";\n  protected updateUser(): void {}\n  public getUser() {\n    return this.username;\n  }\n}"
+  },
+  {
+    "id": 15,
+    "category": "safety",
+    "difficulty": "medium",
+    "question": "What is noImplicitAny and what is its purpose?",
+    "options": [
+      "It automatically converts all unknown values to any.",
+      "It reports an error when TypeScript would otherwise infer any implicitly, improving type safety.",
+      "It disables strict type checks to speed up compilation.",
+      "It is a runtime flag used in Node.js only."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "noImplicitAny prevents unintentional any usage and pushes explicit, safer typing.",
+    "codeSample": "// tsconfig.json\n// \"noImplicitAny\": true\n\nfunction logValue(value: string) {\n  console.log(value);\n}"
+  },
+  {
+    "id": 16,
+    "category": "advanced",
+    "difficulty": "medium",
+    "question": "What are conditional types in TypeScript?",
+    "options": [
+      "Runtime if statements for JavaScript values.",
+      "Type-level logic using T extends U ? X : Y to choose types based on relationships.",
+      "A replacement for union types.",
+      "Only available in .d.ts files."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Conditional types enable expressive type transformations and reusable utility types.",
+    "codeSample": "type IsString<T> = T extends string ? true : false;\n\ntype A = IsString<\"hello\">; // true\ntype B = IsString<number>; // false"
+  },
+  {
+    "id": 17,
+    "category": "advanced",
+    "difficulty": "medium",
+    "question": "What is the difference between union and intersection types?",
+    "options": [
+      "They are synonyms for the same operation.",
+      "Union means one of several types (A | B), intersection combines all required members (A & B).",
+      "Intersection can only be used with primitive types.",
+      "Union types are runtime collections."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Unions widen possibilities while intersections compose requirements from multiple types.",
+    "codeSample": "type HasName = { name: string };\ntype HasAge = { age: number };\n\ntype UnionType = HasName | HasAge;\ntype IntersectionType = HasName & HasAge;"
+  },
+  {
+    "id": 18,
+    "category": "advanced",
+    "difficulty": "medium",
+    "question": "What is the difference between extends and implements in TypeScript?",
+    "options": [
+      "Both keywords are interchangeable in every context.",
+      "extends is used for inheritance/type constraints, while implements ensures a class matches an interface contract.",
+      "implements is only for interfaces at runtime.",
+      "extends only works with primitive types."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "extends reuses and specializes types/classes; implements checks class conformance to interface shape.",
+    "codeSample": "interface Animal {\n  speak(): void;\n}\n\nclass Dog implements Animal {\n  speak() {\n    console.log(\"woof\");\n  }\n}\n\nclass ServiceDog extends Dog {}"
+  },
+  {
+    "id": 19,
+    "category": "advanced",
+    "difficulty": "easy",
+    "question": "Explain how optional chaining works in TypeScript.",
+    "options": [
+      "It throws immediately when encountering null values.",
+      "Optional chaining (?.) safely accesses nested values and returns undefined if a reference is nullish.",
+      "It replaces all null checks in business logic.",
+      "It can only be used with arrays."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Optional chaining reduces verbose null checks while safely short-circuiting on null/undefined.",
+    "codeSample": "type User = { profile?: { city?: string } };\n\nconst user: User = {};\nconsole.log(user.profile?.city); // undefined"
+  },
+  {
+    "id": 20,
+    "category": "advanced",
+    "difficulty": "medium",
+    "question": "What are abstract classes?",
+    "options": [
+      "Classes that can always be instantiated directly.",
+      "Base classes that cannot be instantiated and can define abstract members for subclasses to implement.",
+      "Interfaces with runtime constructors.",
+      "Deprecated syntax replaced by interfaces."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Abstract classes provide shared implementation and required contracts for derived classes.",
+    "codeSample": "abstract class Animal {\n  abstract speak(): void;\n}\n\nclass Dog extends Animal {\n  speak() {\n    console.log(\"woof\");\n  }\n}"
+  },
+  {
+    "id": 21,
+    "category": "advanced",
+    "difficulty": "medium",
+    "question": "What are type assertions in TypeScript?",
+    "options": [
+      "Runtime type conversion and validation.",
+      "Compile-time hints to tell the compiler to treat a value as a specific type (e.g., as SomeType).",
+      "A way to bypass JavaScript execution errors.",
+      "A mechanism to enforce database schema."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Type assertions do not change runtime values; they affect how TypeScript checks types.",
+    "codeSample": "const value: unknown = \"hello\";\nconst length = (value as string).length;"
+  },
+  {
+    "id": 22,
+    "category": "advanced",
+    "difficulty": "medium",
+    "question": "What is the difference between type inference and contextual typing?",
+    "options": [
+      "Both refer to exactly the same compiler behavior.",
+      "Inference derives types from assigned values; contextual typing derives from expected usage context.",
+      "Contextual typing only works in JSX files.",
+      "Inference is runtime and contextual typing is compile-time."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "TypeScript infers types both from declarations and from surrounding context where values are used.",
+    "codeSample": "const greeting = \"hello\"; // inferred as string\n\nwindow.addEventListener(\"click\", (event) => {\n  // event is contextually typed as MouseEvent\n  console.log(event.clientX);\n});"
+  },
+  {
+    "id": 23,
+    "category": "advanced",
+    "difficulty": "medium",
+    "question": "How do function overloads work in TypeScript?",
+    "options": [
+      "By defining multiple implementation bodies with the same name.",
+      "By declaring multiple call signatures and one compatible implementation handling all cases.",
+      "Overloads are only available for class constructors.",
+      "TypeScript overloads execute different runtime versions automatically."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Overloads model different valid call shapes while sharing one implementation function.",
+    "codeSample": "function format(value: string): string;\nfunction format(value: number): string;\nfunction format(value: string | number): string {\n  return `${value}`;\n}"
+  },
+  {
+    "id": 24,
+    "category": "safety",
+    "difficulty": "medium",
+    "question": "What are type guards?",
+    "options": [
+      "Type guards only work with primitive values.",
+      "Type guards are runtime checks that narrow a variable's type in a control-flow branch.",
+      "Type guards replace TypeScript interfaces at runtime.",
+      "Type guards are only available in classes."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Type guards let TypeScript narrow union/unknown types safely based on checks like typeof, in, instanceof, or custom predicates.",
+    "codeSample": "type Cat = { meow: () => void };\ntype Dog = { bark: () => void };\n\nfunction speak(pet: Cat | Dog) {\n  if (\"meow\" in pet) {\n    pet.meow();\n  } else {\n    pet.bark();\n  }\n}"
+  },
+  {
+    "id": 25,
+    "category": "advanced",
+    "difficulty": "medium",
+    "question": "What are .d.ts files?",
+    "options": [
+      ".d.ts files contain executable JavaScript logic.",
+      ".d.ts files provide type declarations for JavaScript code so TypeScript can type-check usage.",
+      ".d.ts files are only used by Node.js at runtime.",
+      ".d.ts files are generated only for CSS modules."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Declaration files describe shapes of modules, globals, and APIs without implementation code.",
+    "codeSample": "// math-lib.d.ts\ndeclare module \"math-lib\" {\n  export function sum(a: number, b: number): number;\n}\n\n// app.ts\nimport { sum } from \"math-lib\";\nconst result = sum(1, 2);"
+  },
+  {
+    "id": 26,
+    "category": "advanced",
+    "difficulty": "medium",
+    "question": "What are discriminated unions?",
+    "options": [
+      "A union where each member has a shared literal tag that enables safe narrowing.",
+      "A union that can only include string types.",
+      "A way to disable strict null checks.",
+      "A runtime enum replacement."
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "A common literal field (like type/kind) lets TypeScript narrow each union member predictably.",
+    "codeSample": "type Loading = { status: \"loading\" };\ntype Success = { status: \"success\"; data: string[] };\ntype ErrorState = { status: \"error\"; message: string };\n\ntype State = Loading | Success | ErrorState;\n\nfunction render(state: State) {\n  if (state.status === \"success\") {\n    return state.data.join(\", \");\n  }\n  return \"not ready\";\n}"
+  },
+  {
+    "id": 27,
+    "category": "advanced",
+    "difficulty": "hard",
+    "question": "How does the infer keyword work?",
+    "options": [
+      "infer extracts a type variable inside conditional types from a matched structure.",
+      "infer only works in runtime if statements.",
+      "infer is used to cast unknown to any.",
+      "infer is a replacement for generic constraints."
+    ],
+    "correctOptionIndex": 0,
+    "explanation": "infer lets you capture parts of a type pattern, such as function return types or tuple members.",
+    "codeSample": "type ReturnTypeOf<T> = T extends (...args: never[]) => infer R ? R : never;\n\ntype A = ReturnTypeOf<() => number>; // number\ntype B = ReturnTypeOf<(s: string) => Promise<boolean>>; // Promise<boolean>"
+  },
+  {
+    "id": 28,
+    "category": "architecture",
+    "difficulty": "medium",
+    "question": "How do you type Express middleware?",
+    "options": [
+      "Use any for req, res, and next in all middleware.",
+      "Use Request, Response, and NextFunction types from express to annotate middleware arguments.",
+      "Middleware cannot be typed in TypeScript.",
+      "Only response should be typed; request is always unknown."
+    ],
+    "correctOptionIndex": 1,
+    "explanation": "Typing middleware gives safer access to request/response fields and improves editor support.",
+    "codeSample": "import type { Request, Response, NextFunction } from \"express\";\n\nfunction logger(req: Request, res: Response, next: NextFunction) {\n  console.log(req.method, req.path);\n  next();\n}"
+  }
+]

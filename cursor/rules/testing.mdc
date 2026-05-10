@@ -1,0 +1,25 @@
+---
+description: Testing conventions for the monorepo
+globs: ["**/*.test.{ts,tsx}", "**/__tests__/**", "**/vitest.config*", "**/playwright.config*"]
+---
+
+## Test Stack
+- **Unit / Integration**: Vitest (jsdom environment)
+- **Component / Hook**: @testing-library/react
+- **E2E**: Playwright (apps/testing-lab)
+
+## File Placement
+- Unit tests: `__tests__/**/*.test.{ts,tsx}` or colocated `*.test.{ts,tsx}` next to source
+- Hook tests: `hooks/**/*.test.ts` (e.g. apps/testing-lab)
+
+## Commands
+- `pnpm test` — run all tests (Turbo)
+- `pnpm test:run` — single run
+- In apps/testing-lab: `test:coverage`, `test:e2e`, `test:e2e:ui`
+
+## Conventions
+- Use `describe`, `expect`, `it` from vitest (globals: true)
+- Wrap hook state updates in `act()` when testing with renderHook
+- Test utilities and pure functions with isolated unit tests
+- Test components with render + queries from @testing-library/react
+- Add `vitest.setup.ts` that imports `@testing-library/react` for auto-cleanup

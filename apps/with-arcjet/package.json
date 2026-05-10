@@ -1,0 +1,38 @@
+{
+  "name": "with-arcjet",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3022",
+    "build": "next build",
+    "start": "next start",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@arcjet/decorate": "1.1.0",
+    "@arcjet/env": "1.1.0",
+    "@arcjet/ip": "1.1.0",
+    "@arcjet/next": "1.1.0",
+    "@fontsource-variable/figtree": "5.2.10",
+    "@fontsource/ibm-plex-mono": "5.2.7",
+    "@hookform/resolvers": "5.2.2",
+    "@nosecone/next": "1.1.0",
+    "@oddbird/css-anchor-positioning": "0.8.0",
+    "@repo/design-system": "workspace:*",
+    "lucide-react": "^0.556.0",
+    "next": "16.0.10",
+    "next-themes": "^0.4.6",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.9.3"
+  }
+}

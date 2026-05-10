@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                 String       @id
+  name               String
+  email              String       @unique(map: "user_email_unique")
+  email_verified     Boolean
+  image              String?
+  created_at         DateTime     @db.Timestamp(6)
+  updated_at         DateTime     @db.Timestamp(6)
+  two_factor_enabled Boolean?
+  role               String?
+  banned             Boolean?
+  ban_reason         String?
+  ban_expires        DateTime?    @db.Timestamp(6)
+  account            Account[]
+  invitation         invitation[]
+  member             member[]
+  passkey            passkey[]
+  session            Session[]
+  two_factor         two_factor[]
+
+  @@map("user")
+}
+
+model Session {
+  id                     String   @id
+  expires_at             DateTime @db.Timestamp(6)
+  token                  String   @unique(map: "session_token_unique")
+  created_at             DateTime @db.Timestamp(6)
+  updated_at             DateTime @db.Timestamp(6)
+  ip_address             String?
+  user_agent             String?
+  user_id                String
+  impersonated_by        String?
+  active_organization_id String?
+  user                   User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "session_user_id_user_id_fk")
+
+  @@map("session")
+}
+
+model Account {
+  id                       String    @id
+  account_id               String
+  provider_id              String
+  user_id                  String
+  access_token             String?
+  refresh_token            String?
+  id_token                 String?
+  access_token_expires_at  DateTime? @db.Timestamp(6)
+  refresh_token_expires_at DateTime? @db.Timestamp(6)
+  scope                    String?
+  password                 String?
+  created_at               DateTime  @db.Timestamp(6)
+  updated_at               DateTime  @db.Timestamp(6)
+  user                     User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "account_user_id_user_id_fk")
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expires_at DateTime  @db.Timestamp(6)
+  created_at DateTime? @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+
+  @@map("verification")
+}
+
+model embeddings {
+  id          String                @id @db.VarChar(191)
+  resource_id String?               @db.VarChar(191)
+  content     String
+  embedding   Unsupported("vector")
+  created_at  DateTime              @default(now()) @db.Timestamp(6)
+  resources   resources?            @relation(fields: [resource_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "embeddings_resource_id_resources_id_fk")
+
+  @@index([embedding], map: "embeddingIndex")
+}
+
+model invitation {
+  id              String       @id
+  organization_id String
+  email           String
+  role            String?
+  status          String       @default("pending")
+  expires_at      DateTime     @db.Timestamp(6)
+  inviter_id      String
+  user            User         @relation(fields: [inviter_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "invitation_inviter_id_user_id_fk")
+  organization    organization @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "invitation_organization_id_organization_id_fk")
+}
+
+model member {
+  id              String       @id
+  organization_id String
+  user_id         String
+  role            String       @default("member")
+  created_at      DateTime     @db.Timestamp(6)
+  organization    organization @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "member_organization_id_organization_id_fk")
+  user            User         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "member_user_id_user_id_fk")
+}
+
+model oauth_access_token {
+  id                       String    @id
+  access_token             String?   @unique(map: "oauth_access_token_access_token_unique")
+  refresh_token            String?   @unique(map: "oauth_access_token_refresh_token_unique")
+  access_token_expires_at  DateTime? @db.Timestamp(6)
+  refresh_token_expires_at DateTime? @db.Timestamp(6)
+  client_id                String?
+  user_id                  String?
+  scopes                   String?
+  created_at               DateTime? @db.Timestamp(6)
+  updated_at               DateTime? @db.Timestamp(6)
+}
+
+model oauth_application {
+  id              String    @id
+  name            String?
+  icon            String?
+  metadata        String?
+  client_id       String?   @unique(map: "oauth_application_client_id_unique")
+  client_secret   String?
+  redirect_u_r_ls String?
+  type            String?
+  disabled        Boolean?
+  user_id         String?
+  created_at      DateTime? @db.Timestamp(6)
+  updated_at      DateTime? @db.Timestamp(6)
+}
+
+model oauth_consent {
+  id            String    @id
+  client_id     String?
+  user_id       String?
+  scopes        String?
+  created_at    DateTime? @db.Timestamp(6)
+  updated_at    DateTime? @db.Timestamp(6)
+  consent_given Boolean?
+}
+
+model organization {
+  id         String       @id
+  name       String
+  slug       String?      @unique(map: "organization_slug_unique")
+  logo       String?
+  created_at DateTime     @db.Timestamp(6)
+  metadata   String?
+  invitation invitation[]
+  member     member[]
+}
+
+model passkey {
+  id             String    @id
+  name           String?
+  public_key     String
+  user_id        String
+  credential_i_d String
+  counter        Int
+  device_type    String
+  backed_up      Boolean
+  transports     String?
+  created_at     DateTime? @db.Timestamp(6)
+  aaguid         String?
+  user           User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "passkey_user_id_user_id_fk")
+}
+
+model resources {
+  id         String       @id @db.VarChar(191)
+  content    String
+  created_at DateTime     @default(now()) @db.Timestamp(6)
+  updated_at DateTime     @default(now()) @db.Timestamp(6)
+  embeddings embeddings[]
+}
+
+model todo {
+  id        Int     @id @default(autoincrement())
+  text      String
+  completed Boolean @default(false)
+}
+
+model two_factor {
+  id           String @id
+  secret       String
+  backup_codes String
+  user_id      String
+  user         User   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "two_factor_user_id_user_id_fk")
+}
