@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@arcjet/decorate": "1.1.0",
-    "@arcjet/env": "1.1.0",
+    "@arcjet/env": "1.4.0",
     "@arcjet/ip": "1.1.0",
     "@arcjet/next": "1.1.0",
     "@fontsource-variable/figtree": "5.2.10",
