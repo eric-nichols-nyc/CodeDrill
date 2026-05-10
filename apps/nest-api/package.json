@@ -27,7 +27,7 @@
   "dependencies": {
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
-    "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/platform-express": "^11.1.19",
     "@prisma/adapter-pg": "7.1.0",
     "@prisma/client": "7.1.0",
     "@repo/schemas": "workspace:*",
