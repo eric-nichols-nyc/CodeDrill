@@ -1,9 +1,9 @@
-export type { SignInState, SignUpState } from "@repo/neon-auth";
-export {
-  signInAction,
-  signOutAction,
-  signUpAction,
-} from "@repo/neon-auth";
+"use server";
+
+import { redirect } from "next/navigation";
+import { z } from "zod";
+import { keys } from "./keys";
+import type { SignInState, SignUpState } from "./types";
 
 const signUpSchema = z.object({
   email: z
@@ -25,24 +25,7 @@ const signInSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-export type SignUpState = {
-  success: boolean;
-  message?: string;
-  errors?: {
-    email?: string[];
-    password?: string[];
-    name?: string[];
-  };
-};
-
-export type SignInState = {
-  success: boolean;
-  message?: string;
-  errors?: {
-    email?: string[];
-    password?: string[];
-  };
-};
+export type { SignInState, SignUpState } from "./types";
 
 export async function signUpAction(
   _prevState: SignUpState,
@@ -65,10 +48,10 @@ export async function signUpAction(
   }
 
   const { email, password, name } = validationResult.data;
+  const env = keys();
+  const baseUrl = env.NEXT_PUBLIC_SITE_URL || "http://localhost:3010";
 
   try {
-    // Call the auth API endpoint
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3010";
     const response = await fetch(`${baseUrl}/api/auth/sign-up`, {
       method: "POST",
       headers: {
@@ -125,10 +108,10 @@ export async function signInAction(
   }
 
   const { email, password } = validationResult.data;
+  const env = keys();
+  const baseUrl = env.NEXT_PUBLIC_SITE_URL || "http://localhost:3010";
 
   try {
-    // Call the auth API endpoint
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3010";
     const response = await fetch(`${baseUrl}/api/auth/sign-in`, {
       method: "POST",
       headers: {
@@ -149,7 +132,6 @@ export async function signInAction(
       };
     }
 
-    // Redirect on success
     redirect("/dashboard");
   } catch (error) {
     return {
@@ -163,8 +145,10 @@ export async function signInAction(
 }
 
 export async function signOutAction(): Promise<void> {
+  const env = keys();
+  const baseUrl = env.NEXT_PUBLIC_SITE_URL || "http://localhost:3010";
+
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3010";
     await fetch(`${baseUrl}/api/auth/sign-out`, {
       method: "POST",
       credentials: "include",
