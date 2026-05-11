@@ -1,11 +1,16 @@
-import { neonAuth } from "@neondatabase/neon-js/auth/next";
+import { getNeonAuth } from "@/lib/auth/server";
+import { redirect } from "next/navigation";
 
-export default async function ServerRenderedPage() {
-  const { session, user } = await neonAuth();
+export default async function DashboardPage() {
+  const { session, user } = await getNeonAuth();
+
+  if (!session) {
+    redirect("/auth/sign-in?next=/dashboard");
+  }
 
   return (
     <div className="mx-auto max-w-xl space-y-4 p-6">
-      <h1 className="font-semibold text-2xl">Server Rendered Page</h1>
+      <h1 className="font-semibold text-2xl">Dashboard</h1>
 
       <p className="text-gray-400">
         Authenticated:{" "}
@@ -14,7 +19,14 @@ export default async function ServerRenderedPage() {
         </span>
       </p>
 
-      {user ? <p className="text-gray-400">User ID: {user.id}</p> : null}
+      {user &&
+      typeof user === "object" &&
+      user !== null &&
+      "id" in user ? (
+        <p className="text-gray-400">
+          User ID: {String((user as { id: unknown }).id)}
+        </p>
+      ) : null}
 
       <p className="font-medium text-gray-700 dark:text-gray-200">
         Session and User Data:

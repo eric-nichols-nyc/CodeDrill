@@ -36,7 +36,7 @@ export default function RootLayout({
         <NeonAuthUIProvider
           authClient={authClient}
           emailOTP
-          redirectTo="/account/settings"
+          redirectTo="/dashboard"
         >
           <header className="flex h-16 items-center justify-end gap-4 p-4">
             <ModeToggle />

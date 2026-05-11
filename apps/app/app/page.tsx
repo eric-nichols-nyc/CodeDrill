@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@repo/design-system/components/ui/card";
 import { Database } from "lucide-react";
+import Link from "next/link";
 
 const HomePage = () => (
   <main className="flex min-h-screen items-center justify-center bg-background p-8">
@@ -18,17 +19,33 @@ const HomePage = () => (
         </div>
         <CardTitle className="text-2xl">Neon Auth</CardTitle>
         <CardDescription>
-          Authentication demo with Neon database
+          Authentication demo with Neon database.{" "}
+          <Link
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+            href="/dashboard"
+          >
+            Go to dashboard
+          </Link>
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <p className="text-center text-muted-foreground text-sm">
-          This app demonstrates authentication with Neon database integration.
+          Use Neon Auth (hosted UI), then open the dashboard (session + user JSON).
         </p>
         <div className="flex justify-center">
           <ModeToggle />
         </div>
-        <Button className="w-full">Get Started</Button>
+        <div className="flex flex-col gap-2">
+          <Button asChild className="w-full">
+            <Link href="/auth/sign-in">Sign in</Link>
+          </Button>
+          <Button asChild className="w-full" variant="outline">
+            <Link href="/auth/sign-up">Sign up</Link>
+          </Button>
+          <Button asChild className="w-full" variant="secondary">
+            <Link href="/dashboard">Dashboard</Link>
+          </Button>
+        </div>
       </CardContent>
     </Card>
   </main>

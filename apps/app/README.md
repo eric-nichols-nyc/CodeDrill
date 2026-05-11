@@ -5,7 +5,7 @@ A Next.js 16 application demonstrating authentication with Neon database integra
 ## Features
 
 - **Neon Auth Integration** - Complete authentication system powered by Neon Auth
-- **Server Actions** - Type-safe sign-up, sign-in, and sign-out actions with Zod validation
+- **Auth UI** - Sign-in, sign-up, and other flows via Neon `AuthView` at `/auth/[path]`
 - **Neon Database Integration** - Serverless PostgreSQL via `@repo/prisma-neon`
 - **Prisma ORM** - Type-safe database access via `@repo/database` package
 - **Theme Support** - Light/dark mode with `@repo/design-system`
@@ -35,9 +35,10 @@ apps/neon-auth/
 │   └── styles.css           # Global styles
 ├── lib/
 │   └── auth/
-│       ├── actions.ts       # Server actions (sign-up, sign-in, sign-out)
 │       ├── client.ts        # Client-side auth client
-│       └── server.ts        # Server-side auth helpers
+│       ├── keys.ts          # Env validation (NEON_AUTH_BASE_URL, etc.)
+│       ├── server.ts        # getNeonAuth / getSession for RSC
+│       └── session-cookie.ts # Cookie check for proxy.ts
 ├── next.config.ts           # Next.js configuration
 ├── package.json             # Dependencies and scripts
 └── tsconfig.json            # TypeScript configuration
@@ -89,95 +90,42 @@ pnpm start
 # Type checking
 pnpm typecheck
 
+# Unit tests (Vitest)
+pnpm test
+pnpm test:watch
+
+# E2E tests (Playwright — installs browsers on first run: pnpm exec playwright install)
+pnpm test:e2e
+pnpm test:e2e:ui
+
 # Clean build artifacts
 pnpm clean
 ```
 
 ## Authentication
 
-### Server Actions
+### Auth pages (`/auth/[path]`)
 
-The app includes type-safe server actions for authentication:
+Sign-in, sign-up, email OTP, and related flows use Neon’s **`AuthView`** (`app/auth/[path]/page.tsx`). Use **`/auth/sign-in`** and **`/auth/sign-up`** (and other paths your Neon project exposes). Sign out is available from the header **`UserButton`**.
 
-#### Sign Up
-
-```typescript
-import { useActionState } from "react";
-import { signUpAction } from "@/lib/auth/actions";
-
-const [state, formAction, isPending] = useActionState(signUpAction, {
-  success: false,
-});
-
-<form action={formAction}>
-  <input name="email" type="email" required />
-  <input name="password" type="password" required />
-  <input name="name" type="text" />
-  <button type="submit" disabled={isPending}>
-    Sign Up
-  </button>
-</form>
-```
-
-**Features:**
-- Zod schema validation for email, password, and optional name
-- Field-level error messages
-- Automatic email verification setup
-- Type-safe state management
-
-#### Sign In
-
-```typescript
-import { useActionState } from "react";
-import { signInAction } from "@/lib/auth/actions";
-
-const [state, formAction, isPending] = useActionState(signInAction, {
-  success: false,
-});
-
-<form action={formAction}>
-  <input name="email" type="email" required />
-  <input name="password" type="password" required />
-  <button type="submit" disabled={isPending}>
-    Sign In
-  </button>
-</form>
-```
-
-**Features:**
-- Zod schema validation
-- Automatic redirect to dashboard on success
-- Error handling with user-friendly messages
-
-#### Sign Out
-
-```typescript
-import { signOutAction } from "@/lib/auth/actions";
-
-<form action={signOutAction}>
-  <button type="submit">Sign Out</button>
-</form>
-```
-
-**Features:**
-- Clears session and redirects to home page
-- Handles errors gracefully
+`proxy.ts` sends unauthenticated visitors to **`/auth/sign-in`** when they hit **`/dashboard`** or **`/account/*`**.
 
 ### Server-Side Auth
 
 Get the current session and user on the server:
 
 ```typescript
-import { getSession } from "@/lib/auth/server";
+import { getNeonAuth } from "@/lib/auth/server";
+import { redirect } from "next/navigation";
 
 export default async function ProtectedPage() {
-  const { session, user } = await getSession();
+  const { session, user } = await getNeonAuth();
 
   if (!session) {
     redirect("/auth/sign-in");
   }
 
-  return <div>Welcome, {user?.email}</div>;
+  return <div>Welcome</div>;
 }
 ```
 
