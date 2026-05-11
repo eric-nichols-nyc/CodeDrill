@@ -13,7 +13,7 @@ export const keys = () =>
         (v) => (typeof v === "string" ? v.trim() : v),
         z
           .string({
-            required_error:
+            message:
               "Set NEON_AUTH_BASE_URL in apps/app/.env or .env.local (absolute URL from Neon Auth, or http://localhost:PORT for a local auth server).",
           })
           .min(1, "NEON_AUTH_BASE_URL cannot be empty.")
@@ -35,6 +35,19 @@ export const keys = () =>
         emptyToUndefined,
         z.string().optional()
       ),
+      /** Nest `neon-jwt-api` base URL (no trailing path). Used by admin BFF to POST /problems. */
+      NEON_JWT_API_URL: z.preprocess(
+        emptyToUndefined,
+        z.string().url().optional()
+      ),
+      /**
+       * Shared with `neon-jwt-api` `INTERNAL_PROBLEMS_SECRET`. Sent as `x-internal-problems-secret`
+       * after Neon session is verified so the Nest `/problems` routes accept the BFF without Better Auth cookies.
+       */
+      INTERNAL_PROBLEMS_SECRET: z.preprocess(
+        emptyToUndefined,
+        z.string().min(8).optional()
+      ),
     },
     client: {
       NEXT_PUBLIC_SITE_URL: z.preprocess(
@@ -48,5 +61,7 @@ export const keys = () =>
       NEON_AUTH_TEST_EMAIL: process.env.NEON_AUTH_TEST_EMAIL,
       NEON_AUTH_TEST_PASSWORD: process.env.NEON_AUTH_TEST_PASSWORD,
       NEON_AUTH_TEST_NAME: process.env.NEON_AUTH_TEST_NAME,
+      NEON_JWT_API_URL: process.env.NEON_JWT_API_URL,
+      INTERNAL_PROBLEMS_SECRET: process.env.INTERNAL_PROBLEMS_SECRET,
     },
   });
