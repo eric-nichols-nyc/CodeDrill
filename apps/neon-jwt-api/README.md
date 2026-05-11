@@ -77,7 +77,6 @@ Default URL: `http://localhost:3030` (or your `PORT`).
 - **Better Auth** — `POST /api/auth/sign-up/email`, `POST /api/auth/sign-in/email`, session cookies, etc. ([basic usage](https://www.better-auth.com/docs/basic-usage))
 - **`GET /`** — public (`@AllowAnonymous()`)
 - **`GET /me`** — requires a valid session cookie (example protected route)
-- **Demo Neon routes** — `GET /table`, `POST /create-table`, `POST /add-data` for the `playing_with_neon` sample table (public)
 
 ## curl examples
 

@@ -18,5 +18,18 @@
       "!apps/email/.react-email",
       "!packages/cms/basehub-types.d.ts"
     ]
-  }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "apps/neon-jwt-api/src/**/*.controller.ts",
+        "apps/neon-jwt-api/src/**/*.service.ts"
+      ],
+      "javascript": {
+        "parser": {
+          "unsafeParameterDecoratorsEnabled": true
+        }
+      }
+    }
+  ]
 }

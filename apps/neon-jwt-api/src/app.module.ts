@@ -4,11 +4,13 @@ import { auth } from "./auth";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { DatabaseModule } from "./database/database.module";
+import { ProblemsModule } from "./problems/problems.module";
 import { SessionController } from "./session.controller";
 
 @Module({
   imports: [
     DatabaseModule,
+    ProblemsModule,
     AuthModule.forRoot({
       auth,
       bodyParser: {
