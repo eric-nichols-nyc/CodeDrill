@@ -51,102 +51,98 @@ export class ProblemsService {
     assertUniqueLanguages(normalizedStarterCode, "starterCode");
     assertUniqueLanguages(normalizedSolutions, "solutions");
 
-    const createdProblem = await this.db.transaction(async (tx) => {
-      const [row] = await tx
-        .insert(problems)
-        .values({
-          title: dto.title,
-          slug: dto.slug,
-          difficulty: dto.difficulty,
-          description: dto.description,
-          constraints: dto.constraints,
-          isPublished: dto.isPublished ?? false,
-          patternSlug: dto.patternSlug,
-          loopStructure: dto.loopStructure,
-          skillFocus: dto.skillFocus,
-          tutorLevel: dto.tutorLevel,
-          visualizationNotes: dto.visualizationNotes,
-          editorial: dto.editorial,
-        })
-        .returning();
+    const [createdProblem] = await this.db
+      .insert(problems)
+      .values({
+        title: dto.title,
+        slug: dto.slug,
+        difficulty: dto.difficulty,
+        description: dto.description,
+        constraints: dto.constraints,
+        isPublished: dto.isPublished ?? false,
+        patternSlug: dto.patternSlug,
+        loopStructure: dto.loopStructure,
+        skillFocus: dto.skillFocus,
+        tutorLevel: dto.tutorLevel,
+        visualizationNotes: dto.visualizationNotes,
+        editorial: dto.editorial,
+      })
+      .returning();
 
-      const problemId = row.id;
+    const problemId = createdProblem.id;
 
-      if (normalizedTags.length > 0) {
-        await tx.insert(tags).values(normalizedTags).onConflictDoNothing();
+    if (normalizedTags.length > 0) {
+      await this.db.insert(tags).values(normalizedTags).onConflictDoNothing();
 
-        const tagRows = await tx
-          .select({ id: tags.id, slug: tags.slug })
-          .from(tags)
-          .where(inArray(tags.slug, normalizedTags.map((tag) => tag.slug)));
+      const tagRows = await this.db
+        .select({ id: tags.id, slug: tags.slug })
+        .from(tags)
+        .where(inArray(tags.slug, normalizedTags.map((tag) => tag.slug)));
 
-        if (tagRows.length > 0) {
-          await tx
-            .insert(problemTags)
-            .values(tagRows.map((tag) => ({ problemId, tagId: tag.id })))
-            .onConflictDoNothing();
-        }
+      if (tagRows.length > 0) {
+        await this.db
+          .insert(problemTags)
+          .values(tagRows.map((tag) => ({ problemId, tagId: tag.id })))
+          .onConflictDoNothing();
       }
+    }
 
-      await tx.insert(starterCode).values(
-        normalizedStarterCode.map((row) => ({
+    await this.db.insert(starterCode).values(
+      normalizedStarterCode.map((row) => ({
+        problemId,
+        language: row.language,
+        code: row.code,
+        functionName: row.functionName,
+      }))
+    );
+
+    if (dto.examples && dto.examples.length > 0) {
+      await this.db.insert(problemExamples).values(
+        dto.examples.map((example, index) => ({
           problemId,
-          language: row.language,
-          code: row.code,
-          functionName: row.functionName,
+          input: example.input,
+          output: example.output,
+          explanation: trimToUndefined(example.explanation),
+          sortOrder: example.sortOrder ?? index,
         }))
       );
+    }
 
-      if (dto.examples && dto.examples.length > 0) {
-        await tx.insert(problemExamples).values(
-          dto.examples.map((example, index) => ({
-            problemId,
-            input: example.input,
-            output: example.output,
-            explanation: trimToUndefined(example.explanation),
-            sortOrder: example.sortOrder ?? index,
-          }))
-        );
-      }
+    if (dto.hints && dto.hints.length > 0) {
+      await this.db.insert(problemHints).values(
+        dto.hints.map((hint, index) => ({
+          problemId,
+          title: trimToUndefined(hint.title),
+          body: hint.body,
+          sortOrder: hint.sortOrder ?? index,
+        }))
+      );
+    }
 
-      if (dto.hints && dto.hints.length > 0) {
-        await tx.insert(problemHints).values(
-          dto.hints.map((hint, index) => ({
-            problemId,
-            title: trimToUndefined(hint.title),
-            body: hint.body,
-            sortOrder: hint.sortOrder ?? index,
-          }))
-        );
-      }
+    if (normalizedSolutions.length > 0) {
+      await this.db.insert(problemSolutions).values(
+        normalizedSolutions.map((solution) => ({
+          problemId,
+          language: solution.language,
+          code: solution.code,
+          explanation: solution.explanation,
+          timeComplexity: solution.timeComplexity,
+          spaceComplexity: solution.spaceComplexity,
+        }))
+      );
+    }
 
-      if (normalizedSolutions.length > 0) {
-        await tx.insert(problemSolutions).values(
-          normalizedSolutions.map((solution) => ({
-            problemId,
-            language: solution.language,
-            code: solution.code,
-            explanation: solution.explanation,
-            timeComplexity: solution.timeComplexity,
-            spaceComplexity: solution.spaceComplexity,
-          }))
-        );
-      }
-
-      if (dto.testCases && dto.testCases.length > 0) {
-        await tx.insert(testCases).values(
-          dto.testCases.map((testCase, index) => ({
-            problemId,
-            input: testCase.input,
-            expectedOutput: testCase.expectedOutput,
-            isSample: testCase.isSample ?? false,
-            sortOrder: testCase.sortOrder ?? index,
-          }))
-        );
-      }
-
-      return row;
-    });
+    if (dto.testCases && dto.testCases.length > 0) {
+      await this.db.insert(testCases).values(
+        dto.testCases.map((testCase, index) => ({
+          problemId,
+          input: testCase.input,
+          expectedOutput: testCase.expectedOutput,
+          isSample: testCase.isSample ?? false,
+          sortOrder: testCase.sortOrder ?? index,
+        }))
+      );
+    }
 
     return createdProblem;
   }

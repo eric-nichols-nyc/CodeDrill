@@ -26,9 +26,11 @@ type TestCaseRow = NonNullable<CreateProblemBody["testCases"]>[number];
 const SELECT_TRIGGER =
   "h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30";
 
-function createStarterCodeRow(): StarterCodeRow {
+const STARTER_LANGUAGES = ["javascript", "typescript", "python"] as const;
+
+function createStarterCodeRow(language = "javascript"): StarterCodeRow {
   return {
-    language: "javascript",
+    language,
     code: "",
     functionName: "",
   };
@@ -96,6 +98,30 @@ function replaceAt<T>(items: T[], index: number, nextItem: T): T[] {
 
 function removeAt<T>(items: T[], index: number): T[] {
   return items.filter((_, itemIndex) => itemIndex !== index);
+}
+
+function nextStarterLanguage(rows: StarterCodeRow[]): string {
+  const used = new Set(rows.map((row) => row.language.trim().toLowerCase()));
+  return (
+    STARTER_LANGUAGES.find((language) => !used.has(language)) ?? "javascript"
+  );
+}
+
+function hasDuplicateStarterLanguages(rows: StarterCodeRow[]): boolean {
+  const seen = new Set<string>();
+
+  for (const row of rows) {
+    const language = row.language.trim().toLowerCase();
+    if (!language) {
+      continue;
+    }
+    if (seen.has(language)) {
+      return true;
+    }
+    seen.add(language);
+  }
+
+  return false;
 }
 
 function SectionHeader({
@@ -221,7 +247,10 @@ export function NewProblemForm() {
   const addStarterCodeRow = () => {
     setValues((prev) => ({
       ...prev,
-      starterCode: [...prev.starterCode, createStarterCodeRow()],
+      starterCode: [
+        ...prev.starterCode,
+        createStarterCodeRow(nextStarterLanguage(prev.starterCode)),
+      ],
     }));
   };
 
@@ -377,6 +406,12 @@ export function NewProblemForm() {
     e.preventDefault();
     setStatus("submitting");
     setMessage(null);
+
+    if (hasDuplicateStarterLanguages(values.starterCode)) {
+      setStatus("error");
+      setMessage("Each starter code entry must use a unique language.");
+      return;
+    }
 
     const res = await fetch("/api/admin/problems", {
       method: "POST",
