@@ -118,11 +118,11 @@ export const CodeBlock = ({
             // biome-ignore lint/security/noDangerouslySetInnerHtml: "this is needed."
             dangerouslySetInnerHTML={{ __html: darkHtml }}
           />
-          {children && (
+          {children ? (
             <div className="absolute top-2 right-2 flex items-center gap-2">
               {children}
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </CodeBlockContext.Provider>
@@ -133,6 +133,8 @@ export type CodeBlockCopyButtonProps = ComponentProps<typeof Button> & {
   onCopy?: () => void;
   onError?: (error: Error) => void;
   timeout?: number;
+  /** Lucide icon size when `children` is not provided. */
+  iconSize?: number;
 };
 
 export const CodeBlockCopyButton = ({
@@ -141,6 +143,7 @@ export const CodeBlockCopyButton = ({
   timeout = 2000,
   children,
   className,
+  iconSize = 14,
   ...props
 }: CodeBlockCopyButtonProps) => {
   const [isCopied, setIsCopied] = useState(false);
@@ -172,7 +175,7 @@ export const CodeBlockCopyButton = ({
       variant="ghost"
       {...props}
     >
-      {children ?? <Icon size={14} />}
+      {children ?? <Icon size={iconSize} />}
     </Button>
   );
 };
