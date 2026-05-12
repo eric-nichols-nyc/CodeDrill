@@ -18,9 +18,43 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+  "http://localhost:3010";
+
 export const metadata: Metadata = {
-  title: "My Neon App",
-  description: "A Next.js application with Neon Auth",
+  metadataBase: new URL(siteUrl),
+  applicationName: "Codedrill",
+  title: {
+    default: "Codedrill",
+    template: "%s · Codedrill",
+  },
+  description:
+    "Codedrill — practice coding problems with instant feedback and durable progress.",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: "Codedrill",
+    title: "Codedrill",
+    description:
+      "Practice coding problems with instant feedback and durable progress.",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Codedrill",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Codedrill",
+    description:
+      "Practice coding problems with instant feedback and durable progress.",
+    images: ["/og.png"],
+  },
 };
 
 export default function RootLayout({
