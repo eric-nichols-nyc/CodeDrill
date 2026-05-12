@@ -38,14 +38,12 @@ export function ProblemDetail({
   examples,
   hints,
   starterCode,
-  learningNotes,
   solutions,
 }: {
   problem: unknown;
   examples: unknown;
   hints: unknown;
   starterCode: unknown;
-  learningNotes: unknown;
   solutions: unknown;
 }) {
   const p = problemRow(problem);
@@ -71,7 +69,6 @@ export function ProblemDetail({
       examples={examples}
       hintList={hintList}
       hints={hints}
-      learningNotes={learningNotes}
       p={p}
       problem={problem}
       showConstraints={showConstraints}
@@ -81,20 +78,31 @@ export function ProblemDetail({
     />
   );
 
-  const starterBody =
-    codeRows.length === 0 ? (
-      <JsonFallback data={starterCode} />
-    ) : (
-      <div className="space-y-4">
-        {codeRows.map((row, i) => (
-          <Sandbox key={rowKey(asRecord(row), `sc-${i}`)} row={row} />
-        ))}
+  const starterBody = (() => {
+    if (codeRows.length === 0) {
+      return (
+        <div className="min-h-0 flex-1 overflow-auto">
+          <JsonFallback data={starterCode} />
+        </div>
+      );
+    }
+    if (codeRows.length === 1) {
+      return <Sandbox fillHeight row={codeRows[0]} />;
+    }
+    return (
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="space-y-4">
+          {codeRows.map((row, i) => (
+            <Sandbox key={rowKey(asRecord(row), `sc-${i}`)} row={row} />
+          ))}
+        </div>
       </div>
     );
+  })();
 
   const starterPanel = (
-    <div className="flex h-full min-h-0 flex-col gap-3 p-4 pl-3">
-      <div className="min-h-0 flex-1 overflow-auto">{starterBody}</div>
+    <div className="flex h-full min-h-0 flex-col p-4 pl-3">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{starterBody}</div>
     </div>
   );
 

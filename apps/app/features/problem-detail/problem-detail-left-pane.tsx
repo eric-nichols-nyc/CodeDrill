@@ -8,7 +8,6 @@ export function ProblemDetailLeftPane({
   problem,
   examples,
   hints,
-  learningNotes,
   solutions,
   exampleList,
   hintList,
@@ -21,7 +20,6 @@ export function ProblemDetailLeftPane({
   problem: unknown;
   examples: unknown;
   hints: unknown;
-  learningNotes: unknown;
   solutions: unknown;
   exampleList: unknown[];
   hintList: unknown[];
@@ -57,7 +55,6 @@ export function ProblemDetailLeftPane({
             examples={examples}
             hintList={hintList}
             hints={hints}
-            learningNotes={learningNotes}
             p={p}
             problem={problem}
             showConstraints={showConstraints}

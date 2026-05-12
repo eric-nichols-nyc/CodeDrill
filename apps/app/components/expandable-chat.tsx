@@ -6,8 +6,25 @@ import { useState } from "react";
 const COLLAPSED_PX = 36;
 const EXPANDED_MIN_PX = 310;
 
-export function ExpandableChat() {
+type ExpandableChatProps = {
+  /** When true, renders only the chat body so it can live inside a parent (e.g. tab panel). */
+  embedded?: boolean;
+};
+
+export function ExpandableChat({ embedded = false }: ExpandableChatProps) {
   const [open, setOpen] = useState(false);
+
+  if (embedded) {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="min-h-0 flex-1 overflow-auto p-3">
+          <p className="text-muted-foreground text-sm">
+            Chat messages will appear here.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <aside

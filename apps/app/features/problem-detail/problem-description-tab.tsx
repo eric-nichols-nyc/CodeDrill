@@ -12,7 +12,6 @@ export function ProblemDescriptionTab({
   p,
   examples,
   hints,
-  learningNotes,
   exampleList,
   hintList,
   showDescription,
@@ -23,7 +22,6 @@ export function ProblemDescriptionTab({
   p: ProblemRow;
   examples: unknown;
   hints: unknown;
-  learningNotes: unknown;
   exampleList: unknown[];
   hintList: unknown[];
   showDescription: boolean;
@@ -91,13 +89,6 @@ export function ProblemDescriptionTab({
             ))}
           </ol>
         )}
-      </section>
-
-      <section className="space-y-2 border-border border-t pt-2">
-        <h2 className="font-medium text-muted-foreground text-sm">
-          Learning notes
-        </h2>
-        <JsonFallback data={learningNotes} />
       </section>
     </div>
   );

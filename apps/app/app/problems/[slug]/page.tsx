@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExpandableChat } from "@/components/expandable-chat";
+import { ProblemSideTabs } from "@/features/problem-detail/problem-side-tabs";
 import { fetchProblemBySlug } from "@/lib/problems/fetch-problem-by-slug";
 import { ProblemDetail } from "../../../features/problem-detail/problem-detail";
 
@@ -94,7 +94,6 @@ export default async function ProblemBySlugPage({
             <ProblemDetail
               examples={bundle.examples}
               hints={bundle.hints}
-              learningNotes={bundle.learningNotes}
               problem={bundle.problem}
               solutions={bundle.solutions}
               starterCode={bundle.starterCode}
@@ -109,7 +108,7 @@ export default async function ProblemBySlugPage({
             </div>
           )}
         </div>
-        <ExpandableChat />
+        <ProblemSideTabs learningNotes={bundle?.learningNotes} />
       </main>
     </div>
   );
