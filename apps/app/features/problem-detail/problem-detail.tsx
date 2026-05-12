@@ -1,4 +1,5 @@
 import { SplitLayout } from "@/components/split-layout";
+import { ProblemTabs } from "@/features/problem-detail/problem-tabs";
 
 type ProblemRow = {
   title?: string;
@@ -144,54 +145,30 @@ function StarterCodeCard({ row }: { row: unknown }) {
   );
 }
 
-export function ProblemDetail({
+function ProblemDescriptionTab({
   problem,
+  p,
   examples,
   hints,
-  starterCode,
   learningNotes,
-  solutions,
+  exampleList,
+  hintList,
+  showDescription,
+  showConstraints,
 }: {
   problem: unknown;
+  p: ProblemRow;
   examples: unknown;
   hints: unknown;
-  starterCode: unknown;
   learningNotes: unknown;
-  solutions: unknown;
+  exampleList: unknown[];
+  hintList: unknown[];
+  showDescription: boolean;
+  showConstraints: boolean;
 }) {
-  const p = problemRow(problem);
-  const exampleList = Array.isArray(examples) ? examples : [];
-  const hintList = Array.isArray(hints) ? hints : [];
-  const codeRows = Array.isArray(starterCode) ? starterCode : [];
-  const showDifficulty = p.difficulty !== undefined && p.difficulty.length > 0;
-  const showDescription =
-    p.description !== undefined && p.description.length > 0;
-  const showConstraints =
-    p.constraints !== undefined &&
-    p.constraints !== null &&
-    p.constraints.length > 0;
-  const editorial =
-    typeof p.editorial === "string" && p.editorial.length > 0
-      ? p.editorial
-      : null;
-
-  const left = (
-    <div className="h-full min-h-0 space-y-6 overflow-y-auto p-4 pr-3">
-      <header className="space-y-1">
-        <h1 className="font-semibold text-xl tracking-tight">
-          {p.title ?? "Problem"}
-        </h1>
-        {showDifficulty ? (
-          <p className="text-muted-foreground text-xs capitalize">
-            {p.difficulty}
-          </p>
-        ) : null}
-      </header>
-
+  return (
+    <div className="space-y-6">
       <section className="space-y-2">
-        <h2 className="font-medium text-muted-foreground text-sm">
-          Description
-        </h2>
         {showDescription ? (
           <div className="max-w-none whitespace-pre-wrap text-foreground text-sm leading-relaxed">
             {p.description}
@@ -207,21 +184,6 @@ export function ProblemDetail({
             <p className="whitespace-pre-wrap text-muted-foreground text-sm">
               {p.constraints}
             </p>
-          </div>
-        ) : null}
-        {editorial ? (
-          <div className="space-y-1 border-border border-t pt-4">
-            <h3 className="font-medium text-muted-foreground text-xs">
-              Editorial
-            </h3>
-            <a
-              className="text-primary text-sm underline-offset-4 hover:underline"
-              href={editorial}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Watch on YouTube
-            </a>
           </div>
         ) : null}
       </section>
@@ -256,17 +218,141 @@ export function ProblemDetail({
         )}
       </section>
 
-      <section className="space-y-2 border-border border-t pt-6">
+      <section className="space-y-2 border-border border-t pt-2">
         <h2 className="font-medium text-muted-foreground text-sm">
           Learning notes
         </h2>
         <JsonFallback data={learningNotes} />
       </section>
-      <section className="space-y-2">
-        <h2 className="font-medium text-muted-foreground text-sm">Solutions</h2>
-        <JsonFallback data={solutions} />
-      </section>
     </div>
+  );
+}
+
+function ProblemDetailLeftPane({
+  p,
+  problem,
+  examples,
+  hints,
+  learningNotes,
+  solutions,
+  exampleList,
+  hintList,
+  showDescription,
+  showConstraints,
+  showDifficulty,
+  editorial,
+}: {
+  p: ProblemRow;
+  problem: unknown;
+  examples: unknown;
+  hints: unknown;
+  learningNotes: unknown;
+  solutions: unknown;
+  exampleList: unknown[];
+  hintList: unknown[];
+  showDescription: boolean;
+  showConstraints: boolean;
+  showDifficulty: boolean;
+  editorial: string | null;
+}) {
+  const editorialTab = editorial ? (
+    <div className="space-y-2">
+      <a
+        className="text-primary text-sm underline-offset-4 hover:underline"
+        href={editorial}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        Watch on YouTube
+      </a>
+    </div>
+  ) : (
+    <p className="text-muted-foreground text-sm">
+      No editorial is linked for this problem yet.
+    </p>
+  );
+
+  return (
+    <div className="flex h-full min-h-0 flex-col overflow-hidden p-4 pr-3">
+      <header className="mb-4 shrink-0 space-y-1">
+        <h1 className="font-semibold text-xl tracking-tight">
+          {p.title ?? "Problem"}
+        </h1>
+        {showDifficulty ? (
+          <p className="text-muted-foreground text-xs capitalize">
+            {p.difficulty}
+          </p>
+        ) : null}
+      </header>
+
+      <ProblemTabs
+        className="min-h-0 flex-1"
+        description={
+          <ProblemDescriptionTab
+            exampleList={exampleList}
+            examples={examples}
+            hintList={hintList}
+            hints={hints}
+            learningNotes={learningNotes}
+            p={p}
+            problem={problem}
+            showConstraints={showConstraints}
+            showDescription={showDescription}
+          />
+        }
+        editorial={editorialTab}
+        solutions={<JsonFallback data={solutions} />}
+      />
+    </div>
+  );
+}
+
+export function ProblemDetail({
+  problem,
+  examples,
+  hints,
+  starterCode,
+  learningNotes,
+  solutions,
+}: {
+  problem: unknown;
+  examples: unknown;
+  hints: unknown;
+  starterCode: unknown;
+  learningNotes: unknown;
+  solutions: unknown;
+}) {
+  const p = problemRow(problem);
+  const exampleList = Array.isArray(examples) ? examples : [];
+  const hintList = Array.isArray(hints) ? hints : [];
+  const codeRows = Array.isArray(starterCode) ? starterCode : [];
+  const showDifficulty = p.difficulty !== undefined && p.difficulty.length > 0;
+  const showDescription =
+    p.description !== undefined && p.description.length > 0;
+  const showConstraints =
+    p.constraints !== undefined &&
+    p.constraints !== null &&
+    p.constraints.length > 0;
+  const editorial =
+    typeof p.editorial === "string" && p.editorial.length > 0
+      ? p.editorial
+      : null;
+
+  const left = (
+    <ProblemDetailLeftPane
+      editorial={editorial}
+      exampleList={exampleList}
+      examples={examples}
+      hintList={hintList}
+      hints={hints}
+      learningNotes={learningNotes}
+      p={p}
+      problem={problem}
+      showConstraints={showConstraints}
+      showDescription={showDescription}
+      showDifficulty={showDifficulty}
+      solutions={solutions}
+    />
   );
 
   const starterBody =

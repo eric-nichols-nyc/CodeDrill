@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExpandableChat } from "@/components/expandable-chat";
 import { fetchProblemBySlug } from "@/lib/problems/fetch-problem-by-slug";
-import { ProblemDetail } from "./problem-detail";
+import { ProblemDetail } from "../../../features/problem-detail/problem-detail";
 
 type ProblemDetailBundle = {
   problem: unknown;
