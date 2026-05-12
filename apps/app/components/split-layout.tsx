@@ -1,5 +1,6 @@
 "use client";
 
+import { GripHorizontal, GripVertical } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export type SplitOrientation = "vertical" | "horizontal";
@@ -112,8 +113,8 @@ export function SplitLayout({
         aria-label={resizeLabel}
         className={
           isVertical
-            ? "group relative z-10 w-2 shrink-0 cursor-col-resize touch-none select-none border-0 bg-transparent p-0"
-            : "group relative z-10 h-2 w-full shrink-0 cursor-row-resize touch-none select-none border-0 bg-transparent p-0"
+            ? "group relative z-10 flex w-5 shrink-0 cursor-col-resize touch-none select-none items-center justify-center border-0 bg-transparent p-0"
+            : "group relative z-10 flex h-5 w-full shrink-0 cursor-row-resize touch-none select-none items-center justify-center border-0 bg-transparent p-0"
         }
         onPointerDown={(e) => {
           e.preventDefault();
@@ -124,10 +125,15 @@ export function SplitLayout({
         <span
           className={
             isVertical
-              ? "-translate-x-1/2 absolute inset-y-0 left-1/2 w-px bg-border transition-colors group-hover:bg-primary/40 group-active:bg-primary"
-              : "-translate-y-1/2 absolute inset-x-0 top-1/2 h-px bg-border transition-colors group-hover:bg-primary/40 group-active:bg-primary"
+              ? "-translate-x-1/2 pointer-events-none absolute inset-y-1 left-1/2 w-px bg-border/80 transition-colors group-hover:bg-primary/50 group-active:bg-primary"
+              : "-translate-y-1/2 pointer-events-none absolute inset-x-1 top-1/2 h-px bg-border/80 transition-colors group-hover:bg-primary/50 group-active:bg-primary"
           }
         />
+        {isVertical ? (
+          <GripVertical className="pointer-events-none relative z-10 h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary group-active:text-primary" />
+        ) : (
+          <GripHorizontal className="pointer-events-none relative z-10 h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary group-active:text-primary" />
+        )}
       </button>
       <section
         className={

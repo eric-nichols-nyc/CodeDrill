@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ExpandableChat } from "@/components/expandable-chat";
 import { fetchProblemBySlug } from "@/lib/problems/fetch-problem-by-slug";
 import { ProblemDetail } from "./problem-detail";
 
@@ -57,7 +58,7 @@ export default async function ProblemBySlugPage({
 
   return (
     <div className="flex h-dvh min-h-0 flex-col bg-background">
-      <header className="flex h-12 shrink-0 items-center gap-6 border-border border-b px-4">
+      <header className="flex h-12 shrink-0 items-center gap-6 border-border/35 border-b px-4">
         <Link
           className="text-muted-foreground text-sm transition-colors hover:text-foreground"
           href="/"
@@ -75,37 +76,40 @@ export default async function ProblemBySlugPage({
         </span>
       </header>
 
-      <main className="min-h-0 flex-1">
-        {result.ok ? null : (
-          <div className="p-6">
-            <p className="text-destructive text-sm">
-              Could not load problem (HTTP {result.status}). Set matching{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                INTERNAL_PROBLEMS_SECRET
-              </code>{" "}
-              or use a Better Auth session cookie when calling the API.
-            </p>
-          </div>
-        )}
+      <main className="flex min-h-0 flex-1 flex-row">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          {result.ok ? null : (
+            <div className="p-6">
+              <p className="text-destructive text-sm">
+                Could not load problem (HTTP {result.status}). Set matching{" "}
+                <code className="rounded bg-muted px-1 py-0.5 text-xs">
+                  INTERNAL_PROBLEMS_SECRET
+                </code>{" "}
+                or use a Better Auth session cookie when calling the API.
+              </p>
+            </div>
+          )}
 
-        {bundle ? (
-          <ProblemDetail
-            examples={bundle.examples}
-            hints={bundle.hints}
-            learningNotes={bundle.learningNotes}
-            problem={bundle.problem}
-            solutions={bundle.solutions}
-            starterCode={bundle.starterCode}
-          />
-        ) : (
-          <div className="p-6">
-            <pre className="overflow-x-auto rounded-md border border-border bg-muted p-4 text-xs">
-              {typeof result.body === "string"
-                ? result.body
-                : JSON.stringify(result.body, null, 2)}
-            </pre>
-          </div>
-        )}
+          {bundle ? (
+            <ProblemDetail
+              examples={bundle.examples}
+              hints={bundle.hints}
+              learningNotes={bundle.learningNotes}
+              problem={bundle.problem}
+              solutions={bundle.solutions}
+              starterCode={bundle.starterCode}
+            />
+          ) : (
+            <div className="p-6">
+              <pre className="overflow-x-auto rounded-md border border-border bg-muted p-4 text-xs">
+                {typeof result.body === "string"
+                  ? result.body
+                  : JSON.stringify(result.body, null, 2)}
+              </pre>
+            </div>
+          )}
+        </div>
+        <ExpandableChat />
       </main>
     </div>
   );

@@ -293,5 +293,12 @@ export function ProblemDetail({
     />
   );
 
-  return <SplitLayout defaultLeftPercent={46} left={left} right={right} />;
+  return (
+    <SplitLayout
+      className="h-full min-h-0"
+      defaultLeftPercent={46}
+      left={left}
+      right={right}
+    />
+  );
 }
