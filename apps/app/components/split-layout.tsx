@@ -98,8 +98,8 @@ export function SplitLayout({
       <section
         className={
           isVertical
-            ? "min-h-0 shrink-0 overflow-auto"
-            : "min-h-0 w-full shrink-0 overflow-auto"
+            ? "h-full min-h-0 shrink-0 overflow-hidden"
+            : "flex min-h-0 w-full shrink-0 flex-col overflow-hidden"
         }
         style={
           isVertical
@@ -139,7 +139,7 @@ export function SplitLayout({
         className={
           isVertical
             ? "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
-            : "min-h-0 w-full min-w-0 flex-1 overflow-auto"
+            : "flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden"
         }
       >
         {right}

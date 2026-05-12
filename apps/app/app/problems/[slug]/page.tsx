@@ -57,7 +57,7 @@ export default async function ProblemBySlugPage({
   }
 
   return (
-    <div className="flex h-dvh min-h-0 flex-col bg-background">
+    <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-background">
       <header className="flex h-12 shrink-0 items-center gap-6 border-border/35 border-b px-4">
         <Link
           className="text-muted-foreground text-sm transition-colors hover:text-foreground"
@@ -76,8 +76,8 @@ export default async function ProblemBySlugPage({
         </span>
       </header>
 
-      <main className="flex min-h-0 flex-1 flex-row">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <main className="flex min-h-0 flex-1 flex-row overflow-hidden">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           {result.ok ? null : (
             <div className="p-6">
               <p className="text-destructive text-sm">

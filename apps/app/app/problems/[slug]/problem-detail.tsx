@@ -176,7 +176,7 @@ export function ProblemDetail({
       : null;
 
   const left = (
-    <div className="space-y-6 p-4 pr-3">
+    <div className="h-full min-h-0 space-y-6 overflow-y-auto p-4 pr-3">
       <header className="space-y-1">
         <h1 className="font-semibold text-xl tracking-tight">
           {p.title ?? "Problem"}
@@ -304,7 +304,7 @@ export function ProblemDetail({
 
   const right = (
     <SplitLayout
-      className="min-h-0 flex-1"
+      className="h-full min-h-0 w-full flex-1"
       defaultLeftPercent={55}
       left={starterPanel}
       minLeftPx={100}
@@ -316,7 +316,7 @@ export function ProblemDetail({
 
   return (
     <SplitLayout
-      className="h-full min-h-0"
+      className="h-full min-h-0 flex-1"
       defaultLeftPercent={46}
       left={left}
       right={right}
