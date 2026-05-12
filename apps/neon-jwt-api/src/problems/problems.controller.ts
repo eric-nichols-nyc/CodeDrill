@@ -32,6 +32,12 @@ export class ProblemsController {
     return this.problemsService.findAll(query);
   }
 
+  /** Must stay above `:id` so `by-slug/...` is not parsed as a UUID. */
+  @Get("by-slug/:slug")
+  findBySlug(@Param("slug") slug: string) {
+    return this.problemsService.findBySlugWithDetails(slug);
+  }
+
   @Get(":id")
   findOne(@Param("id", ParseUUIDPipe) id: string) {
     return this.problemsService.findOne(id);
