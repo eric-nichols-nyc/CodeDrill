@@ -1,20 +1,13 @@
 import { SplitLayout } from "@/components/split-layout";
-import { ProblemTabs } from "@/features/problem-detail/problem-tabs";
-
-type ProblemRow = {
-  title?: string;
-  description?: string;
-  constraints?: string | null;
-  difficulty?: string;
-  editorial?: string | null;
-};
-
-function asRecord(v: unknown): Record<string, unknown> | null {
-  if (typeof v !== "object" || v === null) {
-    return null;
-  }
-  return v as Record<string, unknown>;
-}
+import { JsonFallback } from "@/features/problem-detail/json-fallback";
+import {
+  asRecord,
+  rowKey,
+} from "@/features/problem-detail/problem-detail-helpers";
+import { ProblemDetailLeftPane } from "@/features/problem-detail/problem-detail-left-pane";
+import type { ProblemRow } from "@/features/problem-detail/problem-detail-types";
+import { ProblemOutputPanel } from "@/features/problem-detail/problem-output-panel";
+import { Sandbox } from "@/features/problem-detail/sandbox";
 
 function pickConstraints(raw: unknown): string | null | undefined {
   if (typeof raw === "string") {
@@ -38,273 +31,6 @@ function problemRow(problem: unknown): ProblemRow {
     difficulty: typeof o.difficulty === "string" ? o.difficulty : undefined,
     editorial: pickConstraints(o.editorial),
   };
-}
-
-function strField(
-  o: Record<string, unknown> | null,
-  key: string
-): string | null {
-  if (!o) {
-    return null;
-  }
-  const v = o[key];
-  return typeof v === "string" ? v : null;
-}
-
-function rowKey(o: Record<string, unknown> | null, fallback: string): string {
-  const id = strField(o, "id");
-  return id ?? fallback;
-}
-
-function JsonFallback({ data }: { data: unknown }) {
-  return (
-    <pre className="overflow-x-auto rounded-md border border-border bg-muted p-3 text-xs">
-      {JSON.stringify(data, null, 2)}
-    </pre>
-  );
-}
-
-function ExampleItem({ ex, index }: { ex: unknown; index: number }) {
-  const o = asRecord(ex);
-  const input = strField(o, "input");
-  const output = strField(o, "output");
-  const explanation = strField(o, "explanation");
-  const showExplanation = explanation !== null && explanation.length > 0;
-
-  return (
-    <li className="rounded-md border border-border bg-muted/40 p-3 text-sm">
-      <p className="mb-2 font-medium text-muted-foreground text-xs">
-        Example {index + 1}
-      </p>
-      {input !== null ? (
-        <div className="space-y-1">
-          <span className="text-muted-foreground text-xs">Input</span>
-          <pre className="overflow-x-auto rounded bg-background/80 p-2 font-mono text-xs">
-            {input}
-          </pre>
-        </div>
-      ) : null}
-      {output !== null ? (
-        <div className="mt-2 space-y-1">
-          <span className="text-muted-foreground text-xs">Output</span>
-          <pre className="overflow-x-auto rounded bg-background/80 p-2 font-mono text-xs">
-            {output}
-          </pre>
-        </div>
-      ) : null}
-      {showExplanation ? (
-        <p className="mt-2 text-muted-foreground text-xs">{explanation}</p>
-      ) : null}
-    </li>
-  );
-}
-
-function HintItem({ hint }: { hint: unknown }) {
-  const o = asRecord(hint);
-  const title = strField(o, "title");
-  const body = strField(o, "body");
-  const showTitle = title !== null && title.length > 0;
-  const showBody = body !== null && body.length > 0;
-
-  return (
-    <li>
-      {showTitle ? <p className="font-medium">{title}</p> : null}
-      {showBody ? (
-        <p className="whitespace-pre-wrap text-muted-foreground">{body}</p>
-      ) : null}
-      {showBody ? null : <JsonFallback data={hint} />}
-    </li>
-  );
-}
-
-function StarterCodeCard({ row }: { row: unknown }) {
-  const o = asRecord(row);
-  const lang = strField(o, "language") ?? "code";
-  const code = strField(o, "code");
-  const fn = strField(o, "functionName");
-  const showFn = fn !== null && fn.length > 0;
-
-  return (
-    <div className="overflow-hidden rounded-md border border-border bg-muted/30">
-      <div className="flex items-center justify-between border-border border-b bg-muted/60 px-3 py-2">
-        <span className="font-mono text-muted-foreground text-xs">{lang}</span>
-        {showFn ? (
-          <span className="text-muted-foreground text-xs">{fn}</span>
-        ) : null}
-      </div>
-      {code !== null ? (
-        <pre className="overflow-x-auto p-3 font-mono text-xs leading-relaxed">
-          {code}
-        </pre>
-      ) : (
-        <div className="p-3">
-          <JsonFallback data={row} />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ProblemDescriptionTab({
-  problem,
-  p,
-  examples,
-  hints,
-  learningNotes,
-  exampleList,
-  hintList,
-  showDescription,
-  showConstraints,
-}: {
-  problem: unknown;
-  p: ProblemRow;
-  examples: unknown;
-  hints: unknown;
-  learningNotes: unknown;
-  exampleList: unknown[];
-  hintList: unknown[];
-  showDescription: boolean;
-  showConstraints: boolean;
-}) {
-  return (
-    <div className="space-y-6">
-      <section className="space-y-2">
-        {showDescription ? (
-          <div className="max-w-none whitespace-pre-wrap text-foreground text-sm leading-relaxed">
-            {p.description}
-          </div>
-        ) : (
-          <JsonFallback data={problem} />
-        )}
-        {showConstraints ? (
-          <div className="space-y-1">
-            <h3 className="font-medium text-muted-foreground text-xs">
-              Constraints
-            </h3>
-            <p className="whitespace-pre-wrap text-muted-foreground text-sm">
-              {p.constraints}
-            </p>
-          </div>
-        ) : null}
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="font-medium text-muted-foreground text-sm">Examples</h2>
-        {exampleList.length === 0 ? (
-          <JsonFallback data={examples} />
-        ) : (
-          <ul className="space-y-4">
-            {exampleList.map((ex, i) => (
-              <ExampleItem
-                ex={ex}
-                index={i}
-                key={rowKey(asRecord(ex), `ex-${i}`)}
-              />
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="font-medium text-muted-foreground text-sm">Hints</h2>
-        {hintList.length === 0 ? (
-          <JsonFallback data={hints} />
-        ) : (
-          <ol className="list-decimal space-y-3 pl-4 text-sm">
-            {hintList.map((h, i) => (
-              <HintItem hint={h} key={rowKey(asRecord(h), `hint-${i}`)} />
-            ))}
-          </ol>
-        )}
-      </section>
-
-      <section className="space-y-2 border-border border-t pt-2">
-        <h2 className="font-medium text-muted-foreground text-sm">
-          Learning notes
-        </h2>
-        <JsonFallback data={learningNotes} />
-      </section>
-    </div>
-  );
-}
-
-function ProblemDetailLeftPane({
-  p,
-  problem,
-  examples,
-  hints,
-  learningNotes,
-  solutions,
-  exampleList,
-  hintList,
-  showDescription,
-  showConstraints,
-  showDifficulty,
-  editorial,
-}: {
-  p: ProblemRow;
-  problem: unknown;
-  examples: unknown;
-  hints: unknown;
-  learningNotes: unknown;
-  solutions: unknown;
-  exampleList: unknown[];
-  hintList: unknown[];
-  showDescription: boolean;
-  showConstraints: boolean;
-  showDifficulty: boolean;
-  editorial: string | null;
-}) {
-  const editorialTab = editorial ? (
-    <div className="space-y-2">
-      <a
-        className="text-primary text-sm underline-offset-4 hover:underline"
-        href={editorial}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        Watch on YouTube
-      </a>
-    </div>
-  ) : (
-    <p className="text-muted-foreground text-sm">
-      No editorial is linked for this problem yet.
-    </p>
-  );
-
-  return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden p-4 pr-3">
-      <header className="mb-4 shrink-0 space-y-1">
-        <h1 className="font-semibold text-xl tracking-tight">
-          {p.title ?? "Problem"}
-        </h1>
-        {showDifficulty ? (
-          <p className="text-muted-foreground text-xs capitalize">
-            {p.difficulty}
-          </p>
-        ) : null}
-      </header>
-
-      <ProblemTabs
-        className="min-h-0 flex-1"
-        description={
-          <ProblemDescriptionTab
-            exampleList={exampleList}
-            examples={examples}
-            hintList={hintList}
-            hints={hints}
-            learningNotes={learningNotes}
-            p={p}
-            problem={problem}
-            showConstraints={showConstraints}
-            showDescription={showDescription}
-          />
-        }
-        editorial={editorialTab}
-        solutions={<JsonFallback data={solutions} />}
-      />
-    </div>
-  );
 }
 
 export function ProblemDetail({
@@ -361,30 +87,14 @@ export function ProblemDetail({
     ) : (
       <div className="space-y-4">
         {codeRows.map((row, i) => (
-          <StarterCodeCard key={rowKey(asRecord(row), `sc-${i}`)} row={row} />
+          <Sandbox key={rowKey(asRecord(row), `sc-${i}`)} row={row} />
         ))}
       </div>
     );
 
   const starterPanel = (
     <div className="flex h-full min-h-0 flex-col gap-3 p-4 pl-3">
-      <h2 className="shrink-0 font-medium text-muted-foreground text-sm">
-        Starter code
-      </h2>
       <div className="min-h-0 flex-1 overflow-auto">{starterBody}</div>
-    </div>
-  );
-
-  const outputPanel = (
-    <div className="flex h-full min-h-0 flex-col gap-3 p-4 pl-3">
-      <h2 className="shrink-0 font-medium text-muted-foreground text-sm">
-        Output
-      </h2>
-      <div className="min-h-0 flex-1 overflow-auto rounded-md border border-border border-dashed bg-muted/20 p-3">
-        <p className="text-muted-foreground text-sm">
-          Run results and logs will show here.
-        </p>
-      </div>
     </div>
   );
 
@@ -396,7 +106,7 @@ export function ProblemDetail({
       minLeftPx={100}
       minRightPx={96}
       orientation="horizontal"
-      right={outputPanel}
+      right={<ProblemOutputPanel />}
     />
   );
 
