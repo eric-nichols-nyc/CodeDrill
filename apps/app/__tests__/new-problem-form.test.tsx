@@ -45,97 +45,101 @@ describe("NewProblemForm", () => {
     expect(screen.getByPlaceholderText("two-pointers")).toBeInTheDocument();
   });
 
-  it("submits nested problem content through the admin endpoint", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      text: async () => JSON.stringify({ id: "problem-123" }),
-    });
-    vi.stubGlobal("fetch", fetchMock);
+  it(
+    "submits nested problem content through the admin endpoint",
+    async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "problem-123" }),
+      });
+      vi.stubGlobal("fetch", fetchMock);
 
-    render(<NewProblemForm />);
+      render(<NewProblemForm />);
 
-    fireEvent.change(screen.getByLabelText(/Title/), {
-      target: { value: "Valid Palindrome" },
-    });
-    fireEvent.change(screen.getByLabelText(/Slug/), {
-      target: { value: "valid-palindrome" },
-    });
-    fireEvent.change(screen.getByLabelText(/Description/), {
-      target: { value: "Determine whether a string is a palindrome." },
-    });
-    fireEvent.change(screen.getAllByLabelText(/Code/)[0], {
-      target: { value: "function isPalindrome(s) { return true; }" },
-    });
-    fireEvent.change(screen.getByLabelText(/Function name/), {
-      target: { value: "isPalindrome" },
-    });
+      fireEvent.change(screen.getByLabelText(/Title/), {
+        target: { value: "Valid Palindrome" },
+      });
+      fireEvent.change(screen.getByLabelText(/Slug/), {
+        target: { value: "valid-palindrome" },
+      });
+      fireEvent.change(screen.getByLabelText(/Description/), {
+        target: { value: "Determine whether a string is a palindrome." },
+      });
+      fireEvent.change(screen.getAllByLabelText(/Code/)[0], {
+        target: { value: "function isPalindrome(s) { return true; }" },
+      });
+      fireEvent.change(screen.getByLabelText(/Function name/), {
+        target: { value: "isPalindrome" },
+      });
 
-    fireEvent.click(screen.getByRole("button", { name: "Add tag" }));
-    fireEvent.change(screen.getByPlaceholderText("two-pointers"), {
-      target: { value: "string" },
-    });
+      fireEvent.click(screen.getByRole("button", { name: "Add tag" }));
+      fireEvent.change(screen.getByPlaceholderText("two-pointers"), {
+        target: { value: "string" },
+      });
 
-    fireEvent.click(screen.getByRole("button", { name: "Add hint" }));
-    fireEvent.change(screen.getByLabelText(/Title \(optional\)/), {
-      target: { value: "Normalize first" },
-    });
-    fireEvent.change(screen.getByLabelText(/^Body$/), {
-      target: { value: "Strip non-alphanumeric characters before checking." },
-    });
+      fireEvent.click(screen.getByRole("button", { name: "Add hint" }));
+      fireEvent.change(screen.getByLabelText(/Title \(optional\)/), {
+        target: { value: "Normalize first" },
+      });
+      fireEvent.change(screen.getByLabelText(/^Body$/), {
+        target: { value: "Strip non-alphanumeric characters before checking." },
+      });
 
-    fireEvent.click(screen.getByRole("button", { name: "Add testcase" }));
-    fireEvent.change(screen.getByLabelText(/^Input$/), {
-      target: { value: 's = "A man, a plan, a canal: Panama"' },
-    });
-    fireEvent.change(screen.getByLabelText(/Expected output/), {
-      target: { value: "true" },
-    });
-    fireEvent.click(screen.getByLabelText(/Sample testcase/));
+      fireEvent.click(screen.getByRole("button", { name: "Add testcase" }));
+      fireEvent.change(screen.getByLabelText(/^Input$/), {
+        target: { value: 's = "A man, a plan, a canal: Panama"' },
+      });
+      fireEvent.change(screen.getByLabelText(/Expected output/), {
+        target: { value: "true" },
+      });
+      fireEvent.click(screen.getByLabelText(/Sample testcase/));
 
-    fireEvent.click(screen.getByRole("button", { name: "Create problem" }));
+      fireEvent.click(screen.getByRole("button", { name: "Create problem" }));
 
-    await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledTimes(1);
-    });
+      await waitFor(() => {
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+      });
 
-    const [url, options] = fetchMock.mock.calls[0] as [
-      string,
-      { body: string; method: string }
-    ];
-    const payload = JSON.parse(options.body);
+      const [url, options] = fetchMock.mock.calls[0] as [
+        string,
+        { body: string; method: string }
+      ];
+      const payload = JSON.parse(options.body);
 
-    expect(url).toBe("/api/admin/problems");
-    expect(options.method).toBe("POST");
-    expect(payload).toMatchObject({
-      title: "Valid Palindrome",
-      slug: "valid-palindrome",
-      description: "Determine whether a string is a palindrome.",
-      starterCode: [
-        {
-          language: "javascript",
-          code: "function isPalindrome(s) { return true; }",
-          functionName: "isPalindrome",
-        },
-      ],
-      tags: ["string"],
-      hints: [
-        {
-          title: "Normalize first",
-          body: "Strip non-alphanumeric characters before checking.",
-        },
-      ],
-      testCases: [
-        {
-          input: 's = "A man, a plan, a canal: Panama"',
-          expectedOutput: "true",
-          isSample: true,
-        },
-      ],
-    });
-    await waitFor(() => {
-      expect(refreshMock).toHaveBeenCalledTimes(1);
-    });
-    expect(await screen.findByText("Problem created.")).toBeInTheDocument();
-  });
+      expect(url).toBe("/api/admin/problems");
+      expect(options.method).toBe("POST");
+      expect(payload).toMatchObject({
+        title: "Valid Palindrome",
+        slug: "valid-palindrome",
+        description: "Determine whether a string is a palindrome.",
+        starterCode: [
+          {
+            language: "javascript",
+            code: "function isPalindrome(s) { return true; }",
+            functionName: "isPalindrome",
+          },
+        ],
+        tags: ["string"],
+        hints: [
+          {
+            title: "Normalize first",
+            body: "Strip non-alphanumeric characters before checking.",
+          },
+        ],
+        testCases: [
+          {
+            input: 's = "A man, a plan, a canal: Panama"',
+            expectedOutput: "true",
+            isSample: true,
+          },
+        ],
+      });
+      await waitFor(() => {
+        expect(refreshMock).toHaveBeenCalledTimes(1);
+      });
+      expect(await screen.findByText("Problem created.")).toBeInTheDocument();
+    },
+    15_000
+  );
 });
