@@ -1,13 +1,8 @@
 import { SplitLayout } from "@/components/split-layout";
-import { JsonFallback } from "@/features/problem-detail/json-fallback";
-import {
-  asRecord,
-  rowKey,
-} from "@/features/problem-detail/problem-detail-helpers";
+import { asRecord } from "@/features/problem-detail/problem-detail-helpers";
 import { ProblemDetailLeftPane } from "@/features/problem-detail/problem-detail-left-pane";
 import type { ProblemRow } from "@/features/problem-detail/problem-detail-types";
-import { ProblemOutputPanel } from "@/features/problem-detail/problem-output-panel";
-import { SolutionEditor } from "@/features/problem-detail/solution-editor";
+import { ProblemWorkspace } from "@/features/problem-detail/problem-workspace";
 
 function pickConstraints(raw: unknown): string | null | undefined {
   if (typeof raw === "string") {
@@ -49,7 +44,6 @@ export function ProblemDetail({
   const p = problemRow(problem);
   const exampleList = Array.isArray(examples) ? examples : [];
   const hintList = Array.isArray(hints) ? hints : [];
-  const codeRows = Array.isArray(starterCode) ? starterCode : [];
   const showDifficulty = p.difficulty !== undefined && p.difficulty.length > 0;
   const showDescription =
     p.description !== undefined && p.description.length > 0;
@@ -78,52 +72,12 @@ export function ProblemDetail({
     />
   );
 
-  const starterBody = (() => {
-    if (codeRows.length === 0) {
-      return (
-        <div className="min-h-0 flex-1 overflow-auto">
-          <JsonFallback data={starterCode} />
-        </div>
-      );
-    }
-    if (codeRows.length === 1) {
-      return <SolutionEditor fillHeight row={codeRows[0]} />;
-    }
-    return (
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="space-y-4">
-          {codeRows.map((row, i) => (
-            <SolutionEditor key={rowKey(asRecord(row), `sc-${i}`)} row={row} />
-          ))}
-        </div>
-      </div>
-    );
-  })();
-
-  const starterPanel = (
-    <div className="flex h-full min-h-0 flex-col p-4 pl-3">
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{starterBody}</div>
-    </div>
-  );
-
-  const right = (
-    <SplitLayout
-      className="h-full min-h-0 w-full flex-1"
-      defaultLeftPercent={55}
-      left={starterPanel}
-      minLeftPx={100}
-      minRightPx={96}
-      orientation="horizontal"
-      right={<ProblemOutputPanel />}
-    />
-  );
-
   return (
     <SplitLayout
       className="h-full min-h-0 flex-1"
       defaultLeftPercent={46}
       left={left}
-      right={right}
+      right={<ProblemWorkspace starterCode={starterCode} />}
     />
   );
 }
