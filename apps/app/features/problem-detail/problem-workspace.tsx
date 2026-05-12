@@ -24,7 +24,7 @@ type StarterCodeRow = {
 
 type ConsoleEntry = {
   id: string;
-  level: "info" | "success";
+  level: "info" | "success" | "error";
   message: string;
   createdAt: string;
 };
@@ -56,6 +56,61 @@ function nowLabel() {
     minute: "2-digit",
     second: "2-digit",
   }).format(new Date());
+}
+
+function formatConsoleValue(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (value instanceof Error) {
+    return value.stack ?? value.message;
+  }
+
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function runJavaScript(code: string) {
+  const logs: string[] = [];
+  const originalConsole = {
+    log: console.log,
+    info: console.info,
+    warn: console.warn,
+    error: console.error,
+  };
+
+  const capture = (...args: unknown[]) => {
+    logs.push(args.map((arg) => formatConsoleValue(arg)).join(" "));
+  };
+
+  console.log = capture;
+  console.info = capture;
+  console.warn = capture;
+  console.error = capture;
+
+  try {
+    const runner = new Function(code);
+    runner();
+    return {
+      ok: true as const,
+      logs,
+    };
+  } catch (error) {
+    return {
+      ok: false as const,
+      logs,
+      error: formatConsoleValue(error),
+    };
+  } finally {
+    console.log = originalConsole.log;
+    console.info = originalConsole.info;
+    console.warn = originalConsole.warn;
+    console.error = originalConsole.error;
+  }
 }
 
 export function ProblemWorkspace({ starterCode }: { starterCode: unknown }) {
@@ -104,10 +159,51 @@ export function ProblemWorkspace({ starterCode }: { starterCode: unknown }) {
         "info",
         `Run requested for ${rows.length} file${rows.length === 1 ? "" : "s"} (${totalChars} chars).`
       );
-      appendConsole(
-        "success",
-        "Console wiring is live. Execution backend is the next step."
-      );
+
+      if (rows.length === 0) {
+        appendConsole("error", "Nothing to run because no starter files were loaded.");
+        return;
+      }
+
+      const unsupported = rows.filter((row) => {
+        const language = row.language.toLowerCase();
+        return language !== "javascript" && language !== "js";
+      });
+
+      if (unsupported.length > 0) {
+        appendConsole(
+          "error",
+          `Local Run currently supports JavaScript only. Unsupported languages: ${unsupported
+            .map((row) => row.language)
+            .join(", ")}.`
+        );
+        return;
+      }
+
+      const combinedCode = rows.map((row) => drafts[row.key] ?? "").join("\n\n");
+      const result = runJavaScript(combinedCode);
+
+      for (const log of result.logs) {
+        appendConsole("success", log);
+      }
+
+      if (!result.ok) {
+        appendConsole("error", result.error);
+        return;
+      }
+
+      if (result.logs.length === 0) {
+        const namedFunction = rows.find((row) => row.functionName);
+        if (namedFunction?.functionName) {
+          appendConsole(
+            "info",
+            `Program ran with no console output. ${namedFunction.functionName}(...) is defined, but it was not called.`
+          );
+          return;
+        }
+
+        appendConsole("info", "Program ran successfully with no console output.");
+      }
     });
   }
 

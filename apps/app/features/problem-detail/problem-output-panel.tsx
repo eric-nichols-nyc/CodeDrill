@@ -11,7 +11,7 @@ import {
 
 type ConsoleEntry = {
   id: string;
-  level: "info" | "success";
+  level: "info" | "success" | "error";
   message: string;
   createdAt: string;
 };
@@ -80,7 +80,15 @@ export function ProblemOutputPanel({
                       <span>{entry.level}</span>
                       <span>{entry.createdAt}</span>
                     </div>
-                    <p>{entry.message}</p>
+                    <p
+                      className={
+                        entry.level === "error"
+                          ? "text-destructive"
+                          : undefined
+                      }
+                    >
+                      {entry.message}
+                    </p>
                   </div>
                 ))
               ) : (
