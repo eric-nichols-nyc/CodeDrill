@@ -12,10 +12,11 @@ import { Input } from "@repo/design-system/components/ui/input";
 import { Label } from "@repo/design-system/components/ui/label";
 import { Textarea } from "@repo/design-system/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { type ReactNode, useCallback, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { DevAdminProblemFill } from "@/components/dev-admin-problem-fill";
 import type { CreateProblemBody } from "@/lib/admin/create-problem-schema";
 import { buildProblemPayload, formatSubmitError } from "@/lib/admin/build-problem-payload";
+import { normalizeCreateProblemBody } from "@/lib/admin/problem-form-values";
 
 type StarterCodeRow = CreateProblemBody["starterCode"][number];
 type ExampleRow = NonNullable<CreateProblemBody["examples"]>[number];
@@ -70,26 +71,9 @@ function createTestCaseRow(): TestCaseRow {
 }
 
 function createEmptyForm(): CreateProblemBody {
-  return {
-    title: "",
-    slug: "",
-    difficulty: "easy",
-    description: "",
-    constraints: "",
-    isPublished: false,
-    patternSlug: "",
-    loopStructure: "",
-    skillFocus: "",
-    tutorLevel: "",
-    visualizationNotes: "",
-    editorial: "",
-    tags: [],
-    examples: [],
+  return normalizeCreateProblemBody({
     starterCode: [createStarterCodeRow()],
-    hints: [],
-    solutions: [],
-    testCases: [],
-  };
+  });
 }
 
 function replaceAt<T>(items: T[], index: number, nextItem: T): T[] {
@@ -190,13 +174,41 @@ function AccordionSection({
   );
 }
 
-export function NewProblemForm() {
+export function NewProblemForm({
+  initialValues,
+  method = "POST",
+  endpoint = "/api/admin/problems",
+  submitLabel,
+  successMessage,
+  onSubmitted,
+  showDevFill = method === "POST",
+}: {
+  initialValues?: CreateProblemBody;
+  method?: "POST" | "PUT";
+  endpoint?: string;
+  submitLabel?: string;
+  successMessage?: string;
+  onSubmitted?: (body: unknown, values: CreateProblemBody) => void | Promise<void>;
+  showDevFill?: boolean;
+}) {
   const router = useRouter();
-  const [values, setValues] = useState<CreateProblemBody>(() => createEmptyForm());
+  const [values, setValues] = useState<CreateProblemBody>(() =>
+    normalizeCreateProblemBody(initialValues ?? createEmptyForm())
+  );
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">(
     "idle"
   );
   const [message, setMessage] = useState<string | null>(null);
+  const resolvedSubmitLabel =
+    submitLabel ?? (method === "PUT" ? "Update problem" : "Create problem");
+  const resolvedSuccessMessage =
+    successMessage ?? (method === "PUT" ? "Problem updated." : "Problem created.");
+
+  useEffect(() => {
+    setValues(normalizeCreateProblemBody(initialValues ?? createEmptyForm()));
+    setMessage(null);
+    setStatus("idle");
+  }, [initialValues]);
 
   const set =
     (key: keyof CreateProblemBody) =>
@@ -413,8 +425,8 @@ export function NewProblemForm() {
       return;
     }
 
-    const res = await fetch("/api/admin/problems", {
-      method: "POST",
+    const res = await fetch(endpoint, {
+      method,
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify(buildProblemPayload(values)),
@@ -435,14 +447,17 @@ export function NewProblemForm() {
     }
 
     setStatus("success");
-    setMessage("Problem created.");
-    setValues(createEmptyForm());
+    setMessage(resolvedSuccessMessage);
+    if (method === "POST") {
+      setValues(createEmptyForm());
+    }
+    await onSubmitted?.(body, values);
     router.refresh();
   }
 
   return (
     <form className="space-y-6" id="admin-new-problem" onSubmit={onSubmit}>
-      <DevAdminProblemFill onFill={handleDevFill} />
+      {showDevFill ? <DevAdminProblemFill onFill={handleDevFill} /> : null}
 
       <Accordion
         className="space-y-4"
@@ -967,7 +982,7 @@ export function NewProblemForm() {
       </p>
 
       <Button disabled={status === "submitting"} type="submit">
-        {status === "submitting" ? "Submitting..." : "Create problem"}
+        {status === "submitting" ? "Submitting..." : resolvedSubmitLabel}
       </Button>
     </form>
   );
