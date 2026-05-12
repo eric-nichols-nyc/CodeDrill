@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { isProblemSolutionRowArray } from "@/features/problem-detail/problem-detail-helpers";
 import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
-import { ProblemSideTabs } from "@/features/problem-detail/problem-side-tabs";
+import { ProblemExpandableSidebar } from "@/features/problem-detail/problem-expandable-sidebar";
 import { fetchProblemBySlug } from "@/lib/problems/fetch-problem-by-slug";
 import { ProblemDetail } from "../../../features/problem-detail/problem-detail";
 
@@ -111,7 +111,7 @@ export default async function ProblemBySlugPage({
             </div>
           )}
         </div>
-        <ProblemSideTabs learningNotes={bundle?.learningNotes} />
+        <ProblemExpandableSidebar learningNotes={bundle?.learningNotes} />
       </main>
     </div>
   );

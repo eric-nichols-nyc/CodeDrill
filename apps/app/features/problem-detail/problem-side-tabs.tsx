@@ -19,14 +19,9 @@ export function ProblemSideTabs({
   learningNotes?: unknown;
 }) {
   return (
-    <aside
-      className="flex h-full min-h-0 shrink-0 flex-col border-border border-l bg-muted/20"
-      style={{
-        width: "max(280px, min(100vw - 2rem, 400px))",
-      }}
-    >
+    <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <Tabs
-        className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden p-2 pt-3"
+        className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden p-2 pt-2"
         defaultValue="chat"
       >
         <TabsList className="h-auto w-full min-w-0 shrink-0 flex-wrap justify-start gap-1 sm:flex-nowrap">
@@ -47,6 +42,6 @@ export function ProblemSideTabs({
           <ProblemNotes learningNotes={learningNotes} />
         </TabsContent>
       </Tabs>
-    </aside>
+    </div>
   );
 }
