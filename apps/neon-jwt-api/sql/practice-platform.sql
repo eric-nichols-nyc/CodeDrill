@@ -30,6 +30,7 @@ create table problems (
   skill_focus text,
   tutor_level text,
   visualization_notes text,
+  editorial text,
 
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

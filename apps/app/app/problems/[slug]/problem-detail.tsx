@@ -5,6 +5,7 @@ type ProblemRow = {
   description?: string;
   constraints?: string | null;
   difficulty?: string;
+  editorial?: string | null;
 };
 
 function asRecord(v: unknown): Record<string, unknown> | null {
@@ -34,6 +35,7 @@ function problemRow(problem: unknown): ProblemRow {
     description: typeof o.description === "string" ? o.description : undefined,
     constraints: pickConstraints(o.constraints),
     difficulty: typeof o.difficulty === "string" ? o.difficulty : undefined,
+    editorial: pickConstraints(o.editorial),
   };
 }
 
@@ -168,6 +170,10 @@ export function ProblemDetail({
     p.constraints !== undefined &&
     p.constraints !== null &&
     p.constraints.length > 0;
+  const editorial =
+    typeof p.editorial === "string" && p.editorial.length > 0
+      ? p.editorial
+      : null;
 
   const left = (
     <div className="space-y-6 p-4 pr-3">
@@ -201,6 +207,21 @@ export function ProblemDetail({
             <p className="whitespace-pre-wrap text-muted-foreground text-sm">
               {p.constraints}
             </p>
+          </div>
+        ) : null}
+        {editorial ? (
+          <div className="space-y-1 border-border border-t pt-4">
+            <h3 className="font-medium text-muted-foreground text-xs">
+              Editorial
+            </h3>
+            <a
+              className="text-primary text-sm underline-offset-4 hover:underline"
+              href={editorial}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Watch on YouTube
+            </a>
           </div>
         ) : null}
       </section>

@@ -14,6 +14,7 @@ export const createProblemBodySchema = z.object({
   skillFocus: z.string().max(200).optional(),
   tutorLevel: z.string().max(200).optional(),
   visualizationNotes: z.string().max(50_000).optional(),
+  editorial: z.string().url().max(2048).optional(),
 });
 
 export type CreateProblemBody = z.infer<typeof createProblemBodySchema>;

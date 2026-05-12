@@ -39,6 +39,7 @@ export class ProblemsService {
         skillFocus: dto.skillFocus,
         tutorLevel: dto.tutorLevel,
         visualizationNotes: dto.visualizationNotes,
+        editorial: dto.editorial,
       })
       .returning();
 

@@ -22,6 +22,7 @@ const emptyForm: CreateProblemBody = {
   skillFocus: "",
   tutorLevel: "",
   visualizationNotes: "",
+  editorial: "",
 };
 
 const SELECT_TRIGGER =
@@ -188,6 +189,17 @@ export function NewProblemForm() {
             id="visualizationNotes"
             onChange={(e) => set("visualizationNotes")(e.target.value)}
             value={values.visualizationNotes ?? ""}
+          />
+        </div>
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="editorial">Editorial — YouTube URL (optional)</Label>
+          <Input
+            autoComplete="off"
+            id="editorial"
+            onChange={(e) => set("editorial")(e.target.value)}
+            placeholder="https://www.youtube.com/watch?v=…"
+            type="url"
+            value={values.editorial ?? ""}
           />
         </div>
       </div>

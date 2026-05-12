@@ -4,6 +4,7 @@ import {
   IsIn,
   IsOptional,
   IsString,
+  IsUrl,
   MaxLength,
   MinLength,
 } from "class-validator";
@@ -63,4 +64,10 @@ export class CreateProblemDto {
   @IsString()
   @MaxLength(50_000)
   visualizationNotes?: string;
+
+  /** Optional YouTube walkthrough / editorial link */
+  @IsOptional()
+  @IsUrl({ require_protocol: true })
+  @MaxLength(2048)
+  editorial?: string;
 }

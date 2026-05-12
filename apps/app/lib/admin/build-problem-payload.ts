@@ -27,6 +27,7 @@ export function buildProblemPayload(values: CreateProblemBody): Record<string, u
   addIfNonEmpty("skillFocus", values.skillFocus);
   addIfNonEmpty("tutorLevel", values.tutorLevel);
   addIfNonEmpty("visualizationNotes", values.visualizationNotes);
+  addIfNonEmpty("editorial", values.editorial);
 
   return payload;
 }
