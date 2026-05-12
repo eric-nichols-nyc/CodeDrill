@@ -7,7 +7,7 @@ import {
 import { ProblemDetailLeftPane } from "@/features/problem-detail/problem-detail-left-pane";
 import type { ProblemRow } from "@/features/problem-detail/problem-detail-types";
 import { ProblemOutputPanel } from "@/features/problem-detail/problem-output-panel";
-import { Sandbox } from "@/features/problem-detail/sandbox";
+import { SolutionEditor } from "@/features/problem-detail/solution-editor";
 
 function pickConstraints(raw: unknown): string | null | undefined {
   if (typeof raw === "string") {
@@ -87,13 +87,13 @@ export function ProblemDetail({
       );
     }
     if (codeRows.length === 1) {
-      return <Sandbox fillHeight row={codeRows[0]} />;
+      return <SolutionEditor fillHeight row={codeRows[0]} />;
     }
     return (
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="space-y-4">
           {codeRows.map((row, i) => (
-            <Sandbox key={rowKey(asRecord(row), `sc-${i}`)} row={row} />
+            <SolutionEditor key={rowKey(asRecord(row), `sc-${i}`)} row={row} />
           ))}
         </div>
       </div>

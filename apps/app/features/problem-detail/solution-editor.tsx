@@ -5,7 +5,7 @@ import {
   strField,
 } from "@/features/problem-detail/problem-detail-helpers";
 
-export function Sandbox({
+export function SolutionEditor({
   row,
   fillHeight = false,
 }: {
