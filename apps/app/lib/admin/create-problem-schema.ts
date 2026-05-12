@@ -2,6 +2,40 @@ import { z } from "zod";
 
 export const difficultySchema = z.enum(["easy", "medium", "hard"]);
 
+export const problemExampleSchema = z.object({
+  input: z.string().min(1).max(50_000),
+  output: z.string().min(1).max(50_000),
+  explanation: z.string().max(50_000).optional(),
+  sortOrder: z.number().int().optional(),
+});
+
+export const problemStarterCodeSchema = z.object({
+  language: z.string().min(1).max(50),
+  code: z.string().min(1).max(100_000),
+  functionName: z.string().max(200).optional(),
+});
+
+export const problemHintSchema = z.object({
+  title: z.string().max(200).optional(),
+  body: z.string().min(1).max(50_000),
+  sortOrder: z.number().int().optional(),
+});
+
+export const problemSolutionSchema = z.object({
+  language: z.string().min(1).max(50),
+  code: z.string().min(1).max(100_000),
+  explanation: z.string().max(50_000).optional(),
+  timeComplexity: z.string().max(200).optional(),
+  spaceComplexity: z.string().max(200).optional(),
+});
+
+export const problemTestCaseSchema = z.object({
+  input: z.string().min(1).max(50_000),
+  expectedOutput: z.string().min(1).max(50_000),
+  isSample: z.boolean().optional(),
+  sortOrder: z.number().int().optional(),
+});
+
 export const createProblemBodySchema = z.object({
   title: z.string().min(1).max(500),
   slug: z.string().min(1).max(200),
@@ -15,6 +49,12 @@ export const createProblemBodySchema = z.object({
   tutorLevel: z.string().max(200).optional(),
   visualizationNotes: z.string().max(50_000).optional(),
   editorial: z.string().url().max(2048).optional(),
+  tags: z.array(z.string().min(1).max(100)).optional(),
+  examples: z.array(problemExampleSchema).optional(),
+  starterCode: z.array(problemStarterCodeSchema).min(1),
+  hints: z.array(problemHintSchema).optional(),
+  solutions: z.array(problemSolutionSchema).optional(),
+  testCases: z.array(problemTestCaseSchema).optional(),
 });
 
 export type CreateProblemBody = z.infer<typeof createProblemBodySchema>;
