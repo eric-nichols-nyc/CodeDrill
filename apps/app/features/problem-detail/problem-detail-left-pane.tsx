@@ -1,6 +1,8 @@
-import { JsonFallback } from "@/features/problem-detail/json-fallback";
 import { ProblemDescriptionTab } from "@/features/problem-detail/problem-description-tab";
-import type { ProblemRow } from "@/features/problem-detail/problem-detail-types";
+import type {
+  ProblemRow,
+  ProblemSolutionRow,
+} from "@/features/problem-detail/problem-detail-types";
 import { ProblemTabs } from "@/features/problem-detail/problem-tabs";
 
 export function ProblemDetailLeftPane({
@@ -20,7 +22,7 @@ export function ProblemDetailLeftPane({
   problem: unknown;
   examples: unknown;
   hints: unknown;
-  solutions: unknown;
+  solutions: ProblemSolutionRow[];
   exampleList: unknown[];
   hintList: unknown[];
   showDescription: boolean;
@@ -63,7 +65,7 @@ export function ProblemDetailLeftPane({
           />
         }
         editorial={editorialTab}
-        solutions={<JsonFallback data={solutions} />}
+        solutions={solutions}
       />
     </div>
   );

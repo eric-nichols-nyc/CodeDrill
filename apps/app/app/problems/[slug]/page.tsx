@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { isProblemSolutionRowArray } from "@/features/problem-detail/problem-detail-helpers";
+import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
 import { ProblemSideTabs } from "@/features/problem-detail/problem-side-tabs";
 import { fetchProblemBySlug } from "@/lib/problems/fetch-problem-by-slug";
 import { ProblemDetail } from "../../../features/problem-detail/problem-detail";
@@ -10,7 +12,7 @@ type ProblemDetailBundle = {
   hints: unknown;
   starterCode: unknown;
   learningNotes: unknown;
-  solutions: unknown;
+  solutions: ProblemSolutionRow[];
 };
 
 function isProblemDetailBundle(value: unknown): value is ProblemDetailBundle {
@@ -24,7 +26,8 @@ function isProblemDetailBundle(value: unknown): value is ProblemDetailBundle {
     "hints" in o &&
     "starterCode" in o &&
     "learningNotes" in o &&
-    "solutions" in o
+    "solutions" in o &&
+    isProblemSolutionRowArray(o.solutions)
   );
 }
 

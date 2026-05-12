@@ -8,10 +8,12 @@ import {
   TabsTrigger,
 } from "@repo/design-system/components/ui/tabs";
 import { cn } from "@repo/design-system/lib/utils";
+import { ProblemSolution } from "@/features/problem-detail/problem-solution";
+import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
 
 export type ProblemTabsProps = {
   description: ReactNode;
-  solutions: ReactNode;
+  solutions: ProblemSolutionRow[];
   editorial: ReactNode;
   className?: string;
 };
@@ -48,7 +50,7 @@ export function ProblemTabs({
         {description}
       </TabsContent>
       <TabsContent className={panelClass} value="solutions">
-        {solutions}
+        <ProblemSolution data={solutions} />
       </TabsContent>
       <TabsContent className={panelClass} value="editorial">
         {editorial}

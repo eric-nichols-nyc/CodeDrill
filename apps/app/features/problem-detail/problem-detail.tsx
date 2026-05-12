@@ -1,7 +1,10 @@
 import { SplitLayout } from "@/components/split-layout";
 import { asRecord } from "@/features/problem-detail/problem-detail-helpers";
 import { ProblemDetailLeftPane } from "@/features/problem-detail/problem-detail-left-pane";
-import type { ProblemRow } from "@/features/problem-detail/problem-detail-types";
+import type {
+  ProblemRow,
+  ProblemSolutionRow,
+} from "@/features/problem-detail/problem-detail-types";
 import { ProblemWorkspace } from "@/features/problem-detail/problem-workspace";
 
 function pickConstraints(raw: unknown): string | null | undefined {
@@ -39,7 +42,7 @@ export function ProblemDetail({
   examples: unknown;
   hints: unknown;
   starterCode: unknown;
-  solutions: unknown;
+  solutions: ProblemSolutionRow[];
 }) {
   const p = problemRow(problem);
   const exampleList = Array.isArray(examples) ? examples : [];
