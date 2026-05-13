@@ -9,6 +9,10 @@ import { JsonFallback } from "@/features/problem-detail/components/json-fallback
 import { MonacoSolutionEdtor } from "@/features/problem-detail/components/monaco-solution-edtor";
 import { ProblemOutputPanel } from "@/features/problem-detail/components/problem-output-panel";
 import {
+  runClientTests,
+  type RunClientTestsOutcome,
+} from "@/features/problem-detail/client-test-run";
+import {
   asRecord,
   rowKey,
   strField,
@@ -58,18 +62,6 @@ function nowLabel() {
   }).format(new Date());
 }
 
-function runClientTests(
-  code: string,
-  functionName: string,
-  tests: unknown
-): void {
-  console.log("[problem-workspace] runClientTests", {
-    code,
-    functionName,
-    tests,
-  });
-}
-
 export function ProblemWorkspace({
   starterCode,
   testCases,
@@ -84,6 +76,8 @@ export function ProblemWorkspace({
   const [consoleEntries, setConsoleEntries] = useState<ConsoleEntry[]>([]);
   const [activeTab, setActiveTab] = useState("console");
   const [lastAction, setLastAction] = useState<"run" | "submit" | null>(null);
+  const [lastRunOutcome, setLastRunOutcome] =
+    useState<RunClientTestsOutcome | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const workspaceSignature = useMemo(
@@ -95,6 +89,7 @@ export function ProblemWorkspace({
     setDrafts(buildInitialDrafts(rows));
     setConsoleEntries([]);
     setLastAction(null);
+    setLastRunOutcome(null);
   }, [workspaceSignature, rows]);
 
   const totalChars = rows.reduce(
@@ -112,6 +107,25 @@ export function ProblemWorkspace({
         message,
       },
     ]);
+  }
+
+  function handleRun() {
+    setLastAction("run");
+    const combinedCode = rows
+      .map((row) => drafts[row.key] ?? "")
+      .join("\n\n");
+    const functionName =
+      rows.find((row) => row.functionName)?.functionName ?? "";
+    console.log("[problem-workspace] Run clicked", {
+      starterFileCount: rows.length,
+      functionName: functionName || "(none)",
+      combinedCodeLength: combinedCode.length,
+      hasTestCases: testCases !== undefined && testCases !== null,
+    });
+    const outcome = runClientTests(combinedCode, functionName, testCases);
+    console.log("[problem-workspace] runClientTests outcome", outcome);
+    setLastRunOutcome(outcome);
+    setActiveTab("results");
   }
 
   function handleSubmit() {
@@ -180,21 +194,7 @@ export function ProblemWorkspace({
           {rows[0] ? <Badge variant="outline">{rows[0].language}</Badge> : null}
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            disabled={isPending}
-            onClick={() => {
-              setActiveTab("console");
-              setLastAction("run");
-              const combinedCode = rows
-                .map((row) => drafts[row.key] ?? "")
-                .join("\n\n");
-              const functionName =
-                rows.find((row) => row.functionName)?.functionName ?? "";
-              runClientTests(combinedCode, functionName, testCases);
-            }}
-            size="sm"
-            variant="outline"
-          >
+          <Button disabled={isPending} onClick={handleRun} size="sm" variant="outline">
             <Play />
             Run
           </Button>
@@ -224,6 +224,7 @@ export function ProblemWorkspace({
           consoleEntries={consoleEntries}
           isBusy={isPending}
           lastAction={lastAction}
+          lastRunOutcome={lastRunOutcome}
           onTabChange={setActiveTab}
           rows={rows}
         />

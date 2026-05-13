@@ -9,6 +9,8 @@ import {
   TabsTrigger,
 } from "@repo/design-system/components/ui/tabs";
 
+import type { RunClientTestsOutcome } from "@/features/problem-detail/client-test-run";
+
 type ConsoleEntry = {
   id: string;
   level: "info" | "success" | "error";
@@ -22,11 +24,96 @@ type StarterCodeRow = {
   functionName: string | null;
 };
 
+function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
+  if (outcome.compileError) {
+    return (
+      <div className="rounded-md border border-border/70 bg-background/70 px-3 py-3">
+        <p className="font-medium text-destructive">Compile error</p>
+        <p className="mt-2 font-mono text-muted-foreground text-xs">
+          {outcome.compileError}
+        </p>
+      </div>
+    );
+  }
+
+  if (outcome.caseResults.length === 0) {
+    return (
+      <div className="rounded-md border border-border/70 bg-background/70 px-3 py-3">
+        <p className="text-muted-foreground">
+          No test cases were returned for this problem, or none could be
+          normalized.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-md border border-border/70 bg-background/70 px-3 py-3">
+      <p className="font-medium">
+        {outcome.allPassed ? "All tests passed" : "Some tests failed"}
+      </p>
+      <ul className="mt-3 space-y-3">
+        {outcome.caseResults.map((c) => (
+          <li
+            className="rounded border border-border/50 bg-muted/30 px-2 py-2 font-mono text-xs"
+            key={c.index}
+          >
+            <div className="mb-1 font-medium font-sans text-sm">
+              Case {c.index + 1}:{" "}
+              <span
+                className={
+                  c.passed
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-destructive"
+                }
+              >
+                {c.passed ? "passed" : "failed"}
+              </span>
+            </div>
+            <div className="text-muted-foreground">
+              Expected: {c.expectedDisplay}
+            </div>
+            <div className="text-muted-foreground">
+              Actual: {c.actualDisplay.length > 0 ? c.actualDisplay : "—"}
+            </div>
+            {c.error !== undefined && c.error.length > 0 ? (
+              <div className="mt-1 text-destructive">{c.error}</div>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ResultsPlaceholder({
+  lastAction,
+}: {
+  lastAction: "run" | "submit" | null;
+}) {
+  let message =
+    "Run or submit to populate this panel with real results.";
+  if (lastAction === "submit") {
+    message = "Submission UI is ready to connect to your judge.";
+  } else if (lastAction === "run") {
+    message =
+      "Run completed; open this tab after Run to see testcase results.";
+  }
+
+  return (
+    <div className="rounded-md border border-border/70 bg-background/70 px-3 py-3">
+      <p className="font-medium">Workspace status</p>
+      <p className="mt-2 text-muted-foreground">{message}</p>
+    </div>
+  );
+}
+
 export function ProblemOutputPanel({
   activeTab,
   consoleEntries,
   isBusy,
   lastAction,
+  lastRunOutcome = null,
   onTabChange,
   rows,
 }: {
@@ -34,6 +121,7 @@ export function ProblemOutputPanel({
   consoleEntries: ConsoleEntry[];
   isBusy: boolean;
   lastAction: "run" | "submit" | null;
+  lastRunOutcome?: RunClientTestsOutcome | null;
   onTabChange: (value: string) => void;
   rows: StarterCodeRow[];
 }) {
@@ -82,9 +170,7 @@ export function ProblemOutputPanel({
                     </div>
                     <p
                       className={
-                        entry.level === "error"
-                          ? "text-destructive"
-                          : undefined
+                        entry.level === "error" ? "text-destructive" : ""
                       }
                     >
                       {entry.message}
@@ -138,16 +224,11 @@ export function ProblemOutputPanel({
         >
           <ScrollArea className="h-full">
             <div className="space-y-3 p-3 text-sm">
-              <div className="rounded-md border border-border/70 bg-background/70 px-3 py-3">
-                <p className="font-medium">Workspace status</p>
-                <p className="mt-2 text-muted-foreground">
-                  {lastAction === "submit"
-                    ? "Submission UI is ready to connect to your judge."
-                    : lastAction === "run"
-                      ? "Run UI is ready to connect to your local test execution path."
-                      : "Run or submit to populate this panel with real results."}
-                </p>
-              </div>
+              {lastRunOutcome !== null && lastAction === "run" ? (
+                <RunResultsBody outcome={lastRunOutcome} />
+              ) : (
+                <ResultsPlaceholder lastAction={lastAction} />
+              )}
             </div>
           </ScrollArea>
         </TabsContent>
