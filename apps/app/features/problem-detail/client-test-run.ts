@@ -24,10 +24,14 @@ function deepEqual(a: unknown, b: unknown): boolean {
 
 function stringifyUnknown(value: unknown): string {
   try {
-    return JSON.stringify(value);
+    const json = JSON.stringify(value);
+    if (json !== undefined) {
+      return json;
+    }
   } catch {
-    return String(value);
+    // fall through
   }
+  return String(value);
 }
 
 /**
@@ -43,20 +47,40 @@ function parseCallArgs(input: string): unknown[] {
   return [parsed];
 }
 
-function normalizeTestRows(tests: unknown): { input: string; expectedOutput: string }[] {
+export type ProblemTestCaseView = {
+  input: string;
+  expectedOutput: string;
+  isSample: boolean;
+};
+
+/**
+ * Normalizes API `testCases` for display or for `runClientTests` (subset of fields).
+ */
+export function normalizeProblemTestCases(tests: unknown): ProblemTestCaseView[] {
   if (!Array.isArray(tests)) {
     return [];
   }
-  const out: { input: string; expectedOutput: string }[] = [];
+  const out: ProblemTestCaseView[] = [];
   for (const row of tests) {
     const o = asRecord(row);
     const input = strField(o, "input");
     const expectedOutput = strField(o, "expectedOutput");
     if (input !== null && expectedOutput !== null) {
-      out.push({ input, expectedOutput });
+      out.push({
+        input,
+        expectedOutput,
+        isSample: o.isSample === true,
+      });
     }
   }
   return out;
+}
+
+function normalizeTestRows(tests: unknown): { input: string; expectedOutput: string }[] {
+  return normalizeProblemTestCases(tests).map(({ input, expectedOutput }) => ({
+    input,
+    expectedOutput,
+  }));
 }
 
 /**

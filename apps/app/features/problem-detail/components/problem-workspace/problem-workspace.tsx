@@ -117,7 +117,7 @@ export function ProblemWorkspace({
           lastAction={lastAction}
           lastRunOutcome={lastRunOutcome}
           onTabChange={setActiveTab}
-          rows={rows}
+          testCases={testCases}
         />
       }
     />

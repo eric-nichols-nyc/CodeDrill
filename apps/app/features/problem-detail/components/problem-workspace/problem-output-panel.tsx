@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Output region beside the editor: Console (log lines), Testcases (starter summary),
- * Results (last `runClientTests` outcome from Run).
+ * Output region beside the editor: Console (log lines), Testcases (official
+ * cases from the problem), Results (last `runClientTests` outcome from Run).
  */
 
 import { Badge } from "@repo/design-system/components/ui/badge";
@@ -14,8 +14,12 @@ import {
   TabsTrigger,
 } from "@repo/design-system/components/ui/tabs";
 
+import { useMemo } from "react";
+
 import type { RunClientTestsOutcome } from "@/features/problem-detail/client-test-run";
-import type { ConsoleEntry, StarterCodeRow } from "./types";
+import { normalizeProblemTestCases } from "@/features/problem-detail/client-test-run";
+
+import type { ConsoleEntry } from "./types";
 
 /** Renders compile error, empty state, or per-case expected vs actual. */
 function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
@@ -65,10 +69,11 @@ function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
               </span>
             </div>
             <div className="text-muted-foreground">
-              Expected: {c.expectedDisplay}
+              Expected: {c.expectedDisplay ?? "—"}
             </div>
             <div className="text-muted-foreground">
-              Actual: {c.actualDisplay.length > 0 ? c.actualDisplay : "—"}
+              Actual:{" "}
+              {(c.actualDisplay?.length ?? 0) > 0 ? c.actualDisplay : "—"}
             </div>
             {c.error !== undefined && c.error.length > 0 ? (
               <div className="mt-1 text-destructive">{c.error}</div>
@@ -90,8 +95,7 @@ function ResultsPlaceholder({
   if (lastAction === "submit") {
     message = "Submission UI is ready to connect to your judge.";
   } else if (lastAction === "run") {
-    message =
-      "Run completed; open this tab after Run to see testcase results.";
+    message = "Run completed; open this tab after Run to see testcase results.";
   }
 
   return (
@@ -110,7 +114,7 @@ export function ProblemOutputPanel({
   lastAction,
   lastRunOutcome = null,
   onTabChange,
-  rows,
+  testCases,
 }: {
   activeTab: string;
   consoleEntries: ConsoleEntry[];
@@ -118,8 +122,12 @@ export function ProblemOutputPanel({
   lastAction: "run" | "submit" | null;
   lastRunOutcome?: RunClientTestsOutcome | null;
   onTabChange: (value: string) => void;
-  rows: StarterCodeRow[];
+  testCases?: unknown;
 }) {
+  const testCaseRows = useMemo(
+    () => normalizeProblemTestCases(testCases ?? null),
+    [testCases]
+  );
   return (
     <div className="flex h-full min-h-0 flex-col gap-3 p-4 pl-3">
       <div className="flex shrink-0 items-center justify-between gap-3">
@@ -188,27 +196,46 @@ export function ProblemOutputPanel({
           value="testcases"
         >
           <ScrollArea className="h-full">
-            <div className="space-y-3 p-3 text-sm">
-              {rows.length > 0 ? (
-                rows.map((row, index) => (
-                  <div
-                    className="rounded-md border border-border/70 bg-background/70 px-3 py-3"
-                    key={row.key}
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="outline">Starter {index + 1}</Badge>
-                      <Badge variant="outline">{row.language}</Badge>
-                    </div>
-                    <p className="mt-2 text-muted-foreground text-sm">
-                      {row.functionName
-                        ? `Ready to validate function ${row.functionName}.`
-                        : "Ready to validate this starter file once testcases are wired."}
-                    </p>
-                  </div>
-                ))
+            <div className="p-3 text-sm">
+              {testCaseRows.length > 0 ? (
+                <ul className="space-y-3">
+                  {testCaseRows.map((tc, index) => (
+                    <li
+                      className="rounded-md border border-border/70 bg-background/70 px-3 py-3"
+                      key={`${index}-${tc.input}`}
+                    >
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <Badge variant="outline">Case {index + 1}</Badge>
+                        {tc.isSample ? (
+                          <Badge variant="secondary">Sample</Badge>
+                        ) : (
+                          <Badge variant="outline">Hidden</Badge>
+                        )}
+                      </div>
+                      <div className="space-y-2 font-mono text-muted-foreground text-xs leading-relaxed">
+                        <div>
+                          <span className="font-medium font-sans text-foreground text-xs">
+                            Input
+                          </span>
+                          <pre className="mt-0.5 whitespace-pre-wrap break-all">
+                            {tc.input}
+                          </pre>
+                        </div>
+                        <div>
+                          <span className="font-medium font-sans text-foreground text-xs">
+                            Expected
+                          </span>
+                          <pre className="mt-0.5 whitespace-pre-wrap break-all">
+                            {tc.expectedOutput}
+                          </pre>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <p className="p-3 text-muted-foreground text-sm">
-                  No starter files are available for testcase preview yet.
+                <p className="text-muted-foreground">
+                  No test cases are available for this problem.
                 </p>
               )}
             </div>
