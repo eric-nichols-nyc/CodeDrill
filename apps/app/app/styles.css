@@ -3,6 +3,15 @@
 @import "react-quill-new/dist/quill.snow.css";
 @import "@repo/design-system/styles/globals.css";
 
+/* Problem detail page: dark nav bar tokens used by `ProblemSlugNavHeader`. */
+.problem-by-slug-page {
+  --nav-bg: #282828;
+  --nav-border: #3c3c3c;
+  --nav-icon: #9ca3af;
+  --nav-icon-hover: #f3f4f6;
+  --teal-accent: #14b8a6;
+}
+
 /* The root element rendered by ReactQuill */
 .quill {
   height: 100%;

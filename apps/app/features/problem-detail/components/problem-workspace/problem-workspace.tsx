@@ -1,53 +1,21 @@
 "use client";
 
+/**
+ * Problem workspace shell: starter editors (Monaco), Run/Submit actions, and the
+ * output split (see `ProblemOutputPanel`). State and handlers live in
+ * `useProblemWorkspace`.
+ */
+
 import { Badge } from "@repo/design-system/components/ui/badge";
 import { Button } from "@repo/design-system/components/ui/button";
 import { Play, Send } from "lucide-react";
-import { useEffect, useMemo, useState, useTransition } from "react";
 import { SplitLayout } from "@/components/split-layout";
 import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
+import { useProblemWorkspace } from "./hooks/use-problem-workspace";
 import { MonacoSolutionEdtor } from "./monaco-solution-edtor";
 import { ProblemOutputPanel } from "./problem-output-panel";
-import {
-  runClientTests,
-  type RunClientTestsOutcome,
-} from "@/features/problem-detail/client-test-run";
-import {
-  asRecord,
-  rowKey,
-  strField,
-} from "@/features/problem-detail/problem-detail-helpers";
-import type { ConsoleEntry, StarterCodeRow } from "./types";
 
-function toStarterCodeRows(starterCode: unknown): StarterCodeRow[] {
-  if (!Array.isArray(starterCode)) {
-    return [];
-  }
-
-  return starterCode.map((row, index) => {
-    const record = asRecord(row);
-    return {
-      key: rowKey(record, `sc-${index}`),
-      raw: row,
-      language: strField(record, "language") ?? "code",
-      functionName: strField(record, "functionName"),
-      code: strField(record, "code"),
-    };
-  });
-}
-
-function buildInitialDrafts(rows: StarterCodeRow[]) {
-  return Object.fromEntries(rows.map((row) => [row.key, row.code ?? ""]));
-}
-
-function nowLabel() {
-  return new Intl.DateTimeFormat(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-  }).format(new Date());
-}
-
+/** Right-hand pane of the problem page: code editing + console / testcase / results tabs. */
 export function ProblemWorkspace({
   starterCode,
   testCases,
@@ -55,79 +23,20 @@ export function ProblemWorkspace({
   starterCode: unknown;
   testCases?: unknown;
 }) {
-  const rows = useMemo(() => toStarterCodeRows(starterCode), [starterCode]);
-  const [drafts, setDrafts] = useState<Record<string, string>>(() =>
-    buildInitialDrafts(rows)
-  );
-  const [consoleEntries, setConsoleEntries] = useState<ConsoleEntry[]>([]);
-  const [activeTab, setActiveTab] = useState("console");
-  const [lastAction, setLastAction] = useState<"run" | "submit" | null>(null);
-  const [lastRunOutcome, setLastRunOutcome] =
-    useState<RunClientTestsOutcome | null>(null);
-  const [isPending, startTransition] = useTransition();
-
-  const workspaceSignature = useMemo(
-    () => rows.map((row) => `${row.key}:${row.code ?? ""}`).join("||"),
-    [rows]
-  );
-
-  useEffect(() => {
-    setDrafts(buildInitialDrafts(rows));
-    setConsoleEntries([]);
-    setLastAction(null);
-    setLastRunOutcome(null);
-  }, [workspaceSignature, rows]);
-
-  const totalChars = rows.reduce(
-    (sum, row) => sum + (drafts[row.key] ?? "").length,
-    0
-  );
-
-  function appendConsole(level: ConsoleEntry["level"], message: string) {
-    setConsoleEntries((prev) => [
-      ...prev,
-      {
-        id: `${Date.now()}-${prev.length}`,
-        createdAt: nowLabel(),
-        level,
-        message,
-      },
-    ]);
-  }
-
-  function handleRun() {
-    setLastAction("run");
-    const combinedCode = rows
-      .map((row) => drafts[row.key] ?? "")
-      .join("\n\n");
-    const functionName =
-      rows.find((row) => row.functionName)?.functionName ?? "";
-    console.log("[problem-workspace] Run clicked", {
-      starterFileCount: rows.length,
-      functionName: functionName || "(none)",
-      combinedCodeLength: combinedCode.length,
-      hasTestCases: testCases !== undefined && testCases !== null,
-    });
-    const outcome = runClientTests(combinedCode, functionName, testCases);
-    console.log("[problem-workspace] runClientTests outcome", outcome);
-    setLastRunOutcome(outcome);
-    setActiveTab("results");
-  }
-
-  function handleSubmit() {
-    setActiveTab("results");
-    setLastAction("submit");
-    startTransition(() => {
-      appendConsole(
-        "info",
-        `Submit queued with ${rows.length} file${rows.length === 1 ? "" : "s"} and ${totalChars} chars of code.`
-      );
-      appendConsole(
-        "success",
-        "Submission UI is ready. Hook this button to the judge when your endpoint is in place."
-      );
-    });
-  }
+  const {
+    rows,
+    drafts,
+    setDraftForKey,
+    consoleEntries,
+    activeTab,
+    setActiveTab,
+    lastAction,
+    lastRunOutcome,
+    isPending,
+    totalChars,
+    handleRun,
+    handleSubmit,
+  } = useProblemWorkspace({ starterCode, testCases });
 
   const starterBody = (() => {
     if (rows.length === 0) {
@@ -143,9 +52,7 @@ export function ProblemWorkspace({
       return (
         <MonacoSolutionEdtor
           className="h-full"
-          onChange={(nextValue) =>
-            setDrafts((prev) => ({ ...prev, [row.key]: nextValue }))
-          }
+          onChange={(nextValue) => setDraftForKey(row.key, nextValue)}
           value={drafts[row.key] ?? ""}
         />
       );
@@ -157,9 +64,7 @@ export function ProblemWorkspace({
           {rows.map((row) => (
             <MonacoSolutionEdtor
               key={row.key}
-              onChange={(nextValue) =>
-                setDrafts((prev) => ({ ...prev, [row.key]: nextValue }))
-              }
+              onChange={(nextValue) => setDraftForKey(row.key, nextValue)}
               value={drafts[row.key] ?? ""}
             />
           ))}

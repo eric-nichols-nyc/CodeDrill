@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProblemDetail } from "@/features/problem-detail/components/problem-detail";
 import { ProblemExpandableSidebar } from "@/features/problem-detail/components/problem-expandable-sidebar";
+import { ProblemSlugNavHeader } from "@/features/problem-detail/components/problem-slug-nav-header";
 import { isProblemSolutionRowArray } from "@/features/problem-detail/problem-detail-helpers";
 import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
 import { fetchProblemBySlug } from "@/lib/problems/fetch-problem-by-slug";
@@ -62,24 +62,8 @@ export default async function ProblemBySlugPage({
   }
 
   return (
-    <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-background">
-      <header className="flex h-12 shrink-0 items-center gap-6 border-border/35 border-b px-4">
-        <Link
-          className="text-muted-foreground text-sm transition-colors hover:text-foreground"
-          href="/"
-        >
-          Home
-        </Link>
-        <Link
-          className="text-muted-foreground text-sm transition-colors hover:text-foreground"
-          href="/problems"
-        >
-          All problems
-        </Link>
-        <span className="truncate font-medium text-sm" title={title}>
-          {title}
-        </span>
-      </header>
+    <div className="problem-by-slug-page flex h-dvh min-h-0 flex-col overflow-hidden bg-background">
+      <ProblemSlugNavHeader title={title} />
 
       <main className="flex min-h-0 flex-1 flex-row overflow-hidden">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">

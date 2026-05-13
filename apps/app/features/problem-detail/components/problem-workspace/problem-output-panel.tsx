@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Output region beside the editor: Console (log lines), Testcases (starter summary),
+ * Results (last `runClientTests` outcome from Run).
+ */
+
 import { Badge } from "@repo/design-system/components/ui/badge";
 import { ScrollArea } from "@repo/design-system/components/ui/scroll-area";
 import {
@@ -12,6 +17,7 @@ import {
 import type { RunClientTestsOutcome } from "@/features/problem-detail/client-test-run";
 import type { ConsoleEntry, StarterCodeRow } from "./types";
 
+/** Renders compile error, empty state, or per-case expected vs actual. */
 function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
   if (outcome.compileError) {
     return (
@@ -74,6 +80,7 @@ function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
   );
 }
 
+/** Shown on Results tab before Run, or when Submit was last. */
 function ResultsPlaceholder({
   lastAction,
 }: {
@@ -95,6 +102,7 @@ function ResultsPlaceholder({
   );
 }
 
+/** Tabbed output UI driven by `useProblemWorkspace` state. */
 export function ProblemOutputPanel({
   activeTab,
   consoleEntries,

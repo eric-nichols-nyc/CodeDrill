@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * Thin Monaco wrapper for workspace solutions: client-only load, JS highlighting,
+ * controlled `value` / `onChange`. Export name is `MonacoSolutionEdtor` (existing spelling).
+ */
+
 import { cn } from "@repo/design-system/lib/utils";
 import dynamic from "next/dynamic";
 
@@ -12,6 +17,7 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ),
 });
 
+/** Controlled code editor; fills parent when `className` includes flex-1 / h-full. */
 export function MonacoSolutionEdtor({
   value,
   onChange,
