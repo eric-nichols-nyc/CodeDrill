@@ -10,19 +10,7 @@ import {
 } from "@repo/design-system/components/ui/tabs";
 
 import type { RunClientTestsOutcome } from "@/features/problem-detail/client-test-run";
-
-type ConsoleEntry = {
-  id: string;
-  level: "info" | "success" | "error";
-  message: string;
-  createdAt: string;
-};
-
-type StarterCodeRow = {
-  key: string;
-  language: string;
-  functionName: string | null;
-};
+import type { ConsoleEntry, StarterCodeRow } from "./types";
 
 function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
   if (outcome.compileError) {
@@ -91,8 +79,7 @@ function ResultsPlaceholder({
 }: {
   lastAction: "run" | "submit" | null;
 }) {
-  let message =
-    "Run or submit to populate this panel with real results.";
+  let message = "Run or submit to populate this panel with real results.";
   if (lastAction === "submit") {
     message = "Submission UI is ready to connect to your judge.";
   } else if (lastAction === "run") {
@@ -130,7 +117,9 @@ export function ProblemOutputPanel({
       <div className="flex shrink-0 items-center justify-between gap-3">
         <h2 className="font-medium text-muted-foreground text-sm">Output</h2>
         <div className="flex items-center gap-2">
-          {lastAction ? <Badge variant="outline">Last action: {lastAction}</Badge> : null}
+          {lastAction ? (
+            <Badge variant="outline">Last action: {lastAction}</Badge>
+          ) : null}
           {isBusy ? <Badge>Working</Badge> : null}
         </div>
       </div>

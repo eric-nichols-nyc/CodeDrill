@@ -6,8 +6,8 @@ import { Play, Send } from "lucide-react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { SplitLayout } from "@/components/split-layout";
 import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
-import { MonacoSolutionEdtor } from "@/features/problem-detail/components/monaco-solution-edtor";
-import { ProblemOutputPanel } from "@/features/problem-detail/components/problem-output-panel";
+import { MonacoSolutionEdtor } from "./monaco-solution-edtor";
+import { ProblemOutputPanel } from "./problem-output-panel";
 import {
   runClientTests,
   type RunClientTestsOutcome,
@@ -17,21 +17,7 @@ import {
   rowKey,
   strField,
 } from "@/features/problem-detail/problem-detail-helpers";
-
-type StarterCodeRow = {
-  key: string;
-  raw: unknown;
-  language: string;
-  functionName: string | null;
-  code: string | null;
-};
-
-type ConsoleEntry = {
-  id: string;
-  level: "info" | "success" | "error";
-  message: string;
-  createdAt: string;
-};
+import type { ConsoleEntry, StarterCodeRow } from "./types";
 
 function toStarterCodeRows(starterCode: unknown): StarterCodeRow[] {
   if (!Array.isArray(starterCode)) {

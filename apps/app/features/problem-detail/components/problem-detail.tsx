@@ -5,7 +5,7 @@ import type {
   ProblemRow,
   ProblemSolutionRow,
 } from "@/features/problem-detail/problem-detail-types";
-import { ProblemWorkspace } from "@/features/problem-detail/components/problem-workspace";
+import { ProblemWorkspace } from "@/features/problem-detail/components/problem-workspace/problem-workspace";
 
 function pickConstraints(raw: unknown): string | null | undefined {
   if (typeof raw === "string") {
