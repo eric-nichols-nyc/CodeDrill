@@ -25,6 +25,28 @@ export type AdminProblemListItem = {
   isPublished: boolean;
 };
 
+export function parseAdminProblemListItem(
+  value: unknown
+): AdminProblemListItem | null {
+  const row = asRecord(value);
+  if (
+    !row ||
+    typeof row.id !== "string" ||
+    typeof row.title !== "string" ||
+    typeof row.slug !== "string" ||
+    typeof row.difficulty !== "string"
+  ) {
+    return null;
+  }
+  return {
+    id: row.id,
+    title: row.title,
+    slug: row.slug,
+    difficulty: row.difficulty,
+    isPublished: row.isPublished === true,
+  };
+}
+
 export type AdminProblemDetail = {
   problem: unknown;
   tags?: unknown;

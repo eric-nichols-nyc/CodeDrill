@@ -2,6 +2,10 @@
 
 **Production-grade Turborepo template for Next.js apps.**
 
+## CodeDrill
+
+This monorepo includes **`apps/app`** (Next.js) and **`apps/api`** (NestJS + Better Auth + Drizzle for problems and related data). API setup, Drizzle schema (`src/database/schema.ts`), and **problem chat** HTTP routes are documented in [**`apps/api/README.md`**](apps/api/README.md).
+
 <div>
   <img src="https://img.shields.io/npm/dy/next-forge" alt="" />
   <img src="https://img.shields.io/npm/v/next-forge" alt="" />
