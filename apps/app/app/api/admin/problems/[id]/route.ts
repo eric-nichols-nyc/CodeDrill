@@ -1,8 +1,8 @@
-import { createProblemBodySchema } from "@/lib/admin/create-problem-schema";
-import { getNeonAuth } from "@/lib/auth/server";
-import { keys } from "@/lib/auth/keys";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { createProblemBodySchema } from "@/features/admin/lib/create-problem-schema";
+import { keys } from "@/lib/auth/keys";
+import { getNeonAuth } from "@/lib/auth/server";
 
 const TRAILING_SLASH = /\/$/;
 
@@ -38,13 +38,17 @@ export async function GET(
   }
 
   const { id } = await params;
-  const upstream = await fetch(`${apiBaseUrl()}/problems/${encodeURIComponent(id)}/details`, {
-    headers: auth,
-    cache: "no-store",
-  });
+  const upstream = await fetch(
+    `${apiBaseUrl()}/problems/${encodeURIComponent(id)}/details`,
+    {
+      headers: auth,
+      cache: "no-store",
+    }
+  );
 
   const text = await upstream.text();
-  const contentType = upstream.headers.get("content-type") ?? "application/json";
+  const contentType =
+    upstream.headers.get("content-type") ?? "application/json";
 
   return new NextResponse(text, {
     status: upstream.status,
@@ -77,17 +81,21 @@ export async function PUT(
   }
 
   const { id } = await params;
-  const upstream = await fetch(`${apiBaseUrl()}/problems/${encodeURIComponent(id)}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      ...auth,
-    },
-    body: JSON.stringify(parsed.data),
-  });
+  const upstream = await fetch(
+    `${apiBaseUrl()}/problems/${encodeURIComponent(id)}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...auth,
+      },
+      body: JSON.stringify(parsed.data),
+    }
+  );
 
   const text = await upstream.text();
-  const contentType = upstream.headers.get("content-type") ?? "application/json";
+  const contentType =
+    upstream.headers.get("content-type") ?? "application/json";
 
   return new NextResponse(text, {
     status: upstream.status,

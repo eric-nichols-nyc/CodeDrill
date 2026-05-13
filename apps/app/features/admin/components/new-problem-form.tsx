@@ -1,6 +1,5 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -11,12 +10,16 @@ import { Button } from "@repo/design-system/components/ui/button";
 import { Input } from "@repo/design-system/components/ui/input";
 import { Label } from "@repo/design-system/components/ui/label";
 import { Textarea } from "@repo/design-system/components/ui/textarea";
+import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { DevAdminProblemFill } from "@/components/dev-admin-problem-fill";
-import type { CreateProblemBody } from "@/lib/admin/create-problem-schema";
-import { buildProblemPayload, formatSubmitError } from "@/lib/admin/build-problem-payload";
-import { normalizeCreateProblemBody } from "@/lib/admin/problem-form-values";
+import {
+  buildProblemPayload,
+  formatSubmitError,
+} from "@/features/admin/lib/build-problem-payload";
+import type { CreateProblemBody } from "@/features/admin/lib/create-problem-schema";
+import { normalizeCreateProblemBody } from "@/features/admin/lib/problem-form-values";
 
 type StarterCodeRow = CreateProblemBody["starterCode"][number];
 type ExampleRow = NonNullable<CreateProblemBody["examples"]>[number];
@@ -77,7 +80,9 @@ function createEmptyForm(): CreateProblemBody {
 }
 
 function replaceAt<T>(items: T[], index: number, nextItem: T): T[] {
-  return items.map((item, itemIndex) => (itemIndex === index ? nextItem : item));
+  return items.map((item, itemIndex) =>
+    itemIndex === index ? nextItem : item
+  );
 }
 
 function removeAt<T>(items: T[], index: number): T[] {
@@ -162,7 +167,10 @@ function AccordionSection({
   children: ReactNode;
 }) {
   return (
-    <AccordionItem className="rounded-lg border border-border px-4" value={value}>
+    <AccordionItem
+      className="rounded-lg border border-border px-4"
+      value={value}
+    >
       <AccordionTrigger className="hover:no-underline">
         <div className="space-y-1">
           <h2 className="font-semibold text-base">{title}</h2>
@@ -188,21 +196,25 @@ export function NewProblemForm({
   endpoint?: string;
   submitLabel?: string;
   successMessage?: string;
-  onSubmitted?: (body: unknown, values: CreateProblemBody) => void | Promise<void>;
+  onSubmitted?: (
+    body: unknown,
+    values: CreateProblemBody
+  ) => void | Promise<void>;
   showDevFill?: boolean;
 }) {
   const router = useRouter();
   const [values, setValues] = useState<CreateProblemBody>(() =>
     normalizeCreateProblemBody(initialValues ?? createEmptyForm())
   );
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">(
-    "idle"
-  );
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
   const [message, setMessage] = useState<string | null>(null);
   const resolvedSubmitLabel =
     submitLabel ?? (method === "PUT" ? "Update problem" : "Create problem");
   const resolvedSuccessMessage =
-    successMessage ?? (method === "PUT" ? "Problem updated." : "Problem created.");
+    successMessage ??
+    (method === "PUT" ? "Problem updated." : "Problem created.");
 
   useEffect(() => {
     setValues(normalizeCreateProblemBody(initialValues ?? createEmptyForm()));
@@ -210,11 +222,9 @@ export function NewProblemForm({
     setStatus("idle");
   }, [initialValues]);
 
-  const set =
-    (key: keyof CreateProblemBody) =>
-    (v: string | boolean) => {
-      setValues((prev) => ({ ...prev, [key]: v }));
-    };
+  const set = (key: keyof CreateProblemBody) => (v: string | boolean) => {
+    setValues((prev) => ({ ...prev, [key]: v }));
+  };
 
   const updateTag = (index: number, value: string) => {
     setValues((prev) => ({
@@ -238,8 +248,7 @@ export function NewProblemForm({
   };
 
   const updateStarterCodeField =
-    (index: number, key: keyof StarterCodeRow) =>
-    (value: string) => {
+    (index: number, key: keyof StarterCodeRow) => (value: string) => {
       setValues((prev) => {
         const current = prev.starterCode[index] ?? createStarterCodeRow();
         const nextRow: StarterCodeRow =
@@ -277,8 +286,7 @@ export function NewProblemForm({
   };
 
   const updateExampleField =
-    (index: number, key: keyof ExampleRow) =>
-    (value: string) => {
+    (index: number, key: keyof ExampleRow) => (value: string) => {
       setValues((prev) => {
         const current = prev.examples?.[index] ?? createExampleRow();
         const nextRow: ExampleRow =
@@ -310,12 +318,13 @@ export function NewProblemForm({
   };
 
   const updateHintField =
-    (index: number, key: keyof HintRow) =>
-    (value: string) => {
+    (index: number, key: keyof HintRow) => (value: string) => {
       setValues((prev) => {
         const current = prev.hints?.[index] ?? createHintRow();
         const nextRow: HintRow =
-          key === "title" ? { ...current, title: value } : { ...current, body: value };
+          key === "title"
+            ? { ...current, title: value }
+            : { ...current, body: value };
 
         return {
           ...prev,
@@ -339,8 +348,7 @@ export function NewProblemForm({
   };
 
   const updateSolutionField =
-    (index: number, key: keyof SolutionRow) =>
-    (value: string) => {
+    (index: number, key: keyof SolutionRow) => (value: string) => {
       setValues((prev) => {
         const current = prev.solutions?.[index] ?? createSolutionRow();
         const nextRow: SolutionRow =
@@ -376,8 +384,7 @@ export function NewProblemForm({
   };
 
   const updateTestCaseField =
-    (index: number, key: keyof TestCaseRow) =>
-    (value: string | boolean) => {
+    (index: number, key: keyof TestCaseRow) => (value: string | boolean) => {
       setValues((prev) => {
         const current = prev.testCases?.[index] ?? createTestCaseRow();
         const nextRow: TestCaseRow =
@@ -456,8 +463,17 @@ export function NewProblemForm({
   }
 
   return (
-    <form className="space-y-6" id="admin-new-problem" onSubmit={onSubmit}>
-      {showDevFill ? <DevAdminProblemFill onFill={handleDevFill} /> : null}
+    <form
+      className="flex flex-col gap-6"
+      id="admin-new-problem"
+      onSubmit={onSubmit}
+    >
+      {showDevFill ? (
+        <div className="flex flex-col gap-2 border-muted border border-dashed pb-2 pt-1">
+          <p className="text-muted-foreground text-xs">Development only</p>
+          <DevAdminProblemFill onFill={handleDevFill} />
+        </div>
+      ) : null}
 
       <Accordion
         className="space-y-4"
@@ -477,134 +493,138 @@ export function NewProblemForm({
           title="Problem basics"
           value="basics"
         >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2 sm:col-span-2">
-            <FieldLabel htmlFor="title" required>
-              Title
-            </FieldLabel>
-            <Input
-              autoComplete="off"
-              id="title"
-              onChange={(e) => set("title")(e.target.value)}
-              required
-              value={values.title}
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2 sm:col-span-2">
+              <FieldLabel htmlFor="title" required>
+                Title
+              </FieldLabel>
+              <Input
+                autoComplete="off"
+                id="title"
+                onChange={(e) => set("title")(e.target.value)}
+                required
+                value={values.title}
+              />
+            </div>
+            <div className="space-y-2">
+              <FieldLabel htmlFor="slug" required>
+                Slug (unique)
+              </FieldLabel>
+              <Input
+                autoComplete="off"
+                id="slug"
+                onChange={(e) => set("slug")(e.target.value)}
+                required
+                value={values.slug}
+              />
+            </div>
+            <div className="space-y-2">
+              <FieldLabel htmlFor="difficulty" required>
+                Difficulty
+              </FieldLabel>
+              <select
+                className={SELECT_TRIGGER}
+                id="difficulty"
+                onChange={(e) =>
+                  set("difficulty")(
+                    e.target.value as CreateProblemBody["difficulty"]
+                  )
+                }
+                value={values.difficulty}
+              >
+                <option value="easy">easy</option>
+                <option value="medium">medium</option>
+                <option value="hard">hard</option>
+              </select>
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <FieldLabel htmlFor="description" required>
+                Description
+              </FieldLabel>
+              <Textarea
+                className="min-h-[140px]"
+                id="description"
+                onChange={(e) => set("description")(e.target.value)}
+                required
+                value={values.description}
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="constraints">Constraints (optional)</Label>
+              <Textarea
+                className="min-h-[80px]"
+                id="constraints"
+                onChange={(e) => set("constraints")(e.target.value)}
+                value={values.constraints ?? ""}
+              />
+            </div>
+            <div className="flex items-center gap-2 sm:col-span-2">
+              <input
+                checked={Boolean(values.isPublished)}
+                className="size-4 rounded border"
+                id="isPublished"
+                onChange={(e) => set("isPublished")(e.target.checked)}
+                type="checkbox"
+              />
+              <Label className="font-normal" htmlFor="isPublished">
+                Published
+              </Label>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="patternSlug">Pattern slug (optional)</Label>
+              <Input
+                id="patternSlug"
+                onChange={(e) => set("patternSlug")(e.target.value)}
+                value={values.patternSlug ?? ""}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="loopStructure">Loop structure (optional)</Label>
+              <Input
+                id="loopStructure"
+                onChange={(e) => set("loopStructure")(e.target.value)}
+                value={values.loopStructure ?? ""}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="skillFocus">Skill focus (optional)</Label>
+              <Input
+                id="skillFocus"
+                onChange={(e) => set("skillFocus")(e.target.value)}
+                value={values.skillFocus ?? ""}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tutorLevel">Tutor level (optional)</Label>
+              <Input
+                id="tutorLevel"
+                onChange={(e) => set("tutorLevel")(e.target.value)}
+                value={values.tutorLevel ?? ""}
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="visualizationNotes">
+                Visualization notes (optional)
+              </Label>
+              <Textarea
+                className="min-h-[80px]"
+                id="visualizationNotes"
+                onChange={(e) => set("visualizationNotes")(e.target.value)}
+                value={values.visualizationNotes ?? ""}
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="editorial">Editorial URL (optional)</Label>
+              <Input
+                autoComplete="off"
+                id="editorial"
+                onChange={(e) => set("editorial")(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=..."
+                type="url"
+                value={values.editorial ?? ""}
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <FieldLabel htmlFor="slug" required>
-              Slug (unique)
-            </FieldLabel>
-            <Input
-              autoComplete="off"
-              id="slug"
-              onChange={(e) => set("slug")(e.target.value)}
-              required
-              value={values.slug}
-            />
-          </div>
-          <div className="space-y-2">
-            <FieldLabel htmlFor="difficulty" required>
-              Difficulty
-            </FieldLabel>
-            <select
-              className={SELECT_TRIGGER}
-              id="difficulty"
-              onChange={(e) =>
-                set("difficulty")(e.target.value as CreateProblemBody["difficulty"])
-              }
-              value={values.difficulty}
-            >
-              <option value="easy">easy</option>
-              <option value="medium">medium</option>
-              <option value="hard">hard</option>
-            </select>
-          </div>
-          <div className="space-y-2 sm:col-span-2">
-            <FieldLabel htmlFor="description" required>
-              Description
-            </FieldLabel>
-            <Textarea
-              className="min-h-[140px]"
-              id="description"
-              onChange={(e) => set("description")(e.target.value)}
-              required
-              value={values.description}
-            />
-          </div>
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="constraints">Constraints (optional)</Label>
-            <Textarea
-              className="min-h-[80px]"
-              id="constraints"
-              onChange={(e) => set("constraints")(e.target.value)}
-              value={values.constraints ?? ""}
-            />
-          </div>
-          <div className="flex items-center gap-2 sm:col-span-2">
-            <input
-              checked={Boolean(values.isPublished)}
-              className="size-4 rounded border"
-              id="isPublished"
-              onChange={(e) => set("isPublished")(e.target.checked)}
-              type="checkbox"
-            />
-            <Label className="font-normal" htmlFor="isPublished">
-              Published
-            </Label>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="patternSlug">Pattern slug (optional)</Label>
-            <Input
-              id="patternSlug"
-              onChange={(e) => set("patternSlug")(e.target.value)}
-              value={values.patternSlug ?? ""}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="loopStructure">Loop structure (optional)</Label>
-            <Input
-              id="loopStructure"
-              onChange={(e) => set("loopStructure")(e.target.value)}
-              value={values.loopStructure ?? ""}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="skillFocus">Skill focus (optional)</Label>
-            <Input
-              id="skillFocus"
-              onChange={(e) => set("skillFocus")(e.target.value)}
-              value={values.skillFocus ?? ""}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="tutorLevel">Tutor level (optional)</Label>
-            <Input
-              id="tutorLevel"
-              onChange={(e) => set("tutorLevel")(e.target.value)}
-              value={values.tutorLevel ?? ""}
-            />
-          </div>
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="visualizationNotes">Visualization notes (optional)</Label>
-            <Textarea
-              className="min-h-[80px]"
-              id="visualizationNotes"
-              onChange={(e) => set("visualizationNotes")(e.target.value)}
-              value={values.visualizationNotes ?? ""}
-            />
-          </div>
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="editorial">Editorial URL (optional)</Label>
-            <Input
-              autoComplete="off"
-              id="editorial"
-              onChange={(e) => set("editorial")(e.target.value)}
-              placeholder="https://www.youtube.com/watch?v=..."
-              type="url"
-              value={values.editorial ?? ""}
-          />
-        </div>
-        </div>
         </AccordionSection>
 
         <AccordionSection
@@ -620,7 +640,10 @@ export function NewProblemForm({
           />
           <div className="space-y-4">
             {values.starterCode.map((row, index) => (
-              <div className="space-y-4 rounded-lg border border-border p-4" key={`starter-${index}`}>
+              <div
+                className="space-y-4 rounded-lg border border-border p-4"
+                key={`starter-${index}`}
+              >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="font-medium text-sm">Starter {index + 1}</p>
                   <Button
@@ -642,7 +665,12 @@ export function NewProblemForm({
                     <select
                       className={SELECT_TRIGGER}
                       id={`starter-language-${index}`}
-                      onChange={(e) => updateStarterCodeField(index, "language")(e.target.value)}
+                      onChange={(e) =>
+                        updateStarterCodeField(
+                          index,
+                          "language"
+                        )(e.target.value)
+                      }
                       value={row.language}
                     >
                       <option value="javascript">javascript</option>
@@ -656,7 +684,12 @@ export function NewProblemForm({
                     </FieldLabel>
                     <Input
                       id={`starter-function-${index}`}
-                      onChange={(e) => updateStarterCodeField(index, "functionName")(e.target.value)}
+                      onChange={(e) =>
+                        updateStarterCodeField(
+                          index,
+                          "functionName"
+                        )(e.target.value)
+                      }
                       value={row.functionName ?? ""}
                     />
                   </div>
@@ -667,7 +700,9 @@ export function NewProblemForm({
                     <Textarea
                       className="min-h-[220px] font-mono text-sm"
                       id={`starter-code-${index}`}
-                      onChange={(e) => updateStarterCodeField(index, "code")(e.target.value)}
+                      onChange={(e) =>
+                        updateStarterCodeField(index, "code")(e.target.value)
+                      }
                       required
                       value={row.code}
                     />
@@ -698,7 +733,12 @@ export function NewProblemForm({
                     placeholder="two-pointers"
                     value={tag}
                   />
-                  <Button onClick={() => removeTag(index)} size="icon-sm" type="button" variant="ghost">
+                  <Button
+                    onClick={() => removeTag(index)}
+                    size="icon-sm"
+                    type="button"
+                    variant="ghost"
+                  >
                     <Trash2 />
                   </Button>
                 </div>
@@ -723,10 +763,18 @@ export function NewProblemForm({
           <div className="space-y-4">
             {values.examples && values.examples.length > 0 ? (
               values.examples.map((row, index) => (
-                <div className="space-y-4 rounded-lg border border-border p-4" key={`example-${index}`}>
+                <div
+                  className="space-y-4 rounded-lg border border-border p-4"
+                  key={`example-${index}`}
+                >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="font-medium text-sm">Example {index + 1}</p>
-                    <Button onClick={() => removeExampleRow(index)} size="sm" type="button" variant="ghost">
+                    <Button
+                      onClick={() => removeExampleRow(index)}
+                      size="sm"
+                      type="button"
+                      variant="ghost"
+                    >
                       <Trash2 />
                       Remove
                     </Button>
@@ -737,7 +785,9 @@ export function NewProblemForm({
                       <Textarea
                         className="min-h-[110px] font-mono text-sm"
                         id={`example-input-${index}`}
-                        onChange={(e) => updateExampleField(index, "input")(e.target.value)}
+                        onChange={(e) =>
+                          updateExampleField(index, "input")(e.target.value)
+                        }
                         value={row.input}
                       />
                     </div>
@@ -746,16 +796,25 @@ export function NewProblemForm({
                       <Textarea
                         className="min-h-[110px] font-mono text-sm"
                         id={`example-output-${index}`}
-                        onChange={(e) => updateExampleField(index, "output")(e.target.value)}
+                        onChange={(e) =>
+                          updateExampleField(index, "output")(e.target.value)
+                        }
                         value={row.output}
                       />
                     </div>
                     <div className="space-y-2 sm:col-span-2">
-                      <Label htmlFor={`example-explanation-${index}`}>Explanation (optional)</Label>
+                      <Label htmlFor={`example-explanation-${index}`}>
+                        Explanation (optional)
+                      </Label>
                       <Textarea
                         className="min-h-[90px]"
                         id={`example-explanation-${index}`}
-                        onChange={(e) => updateExampleField(index, "explanation")(e.target.value)}
+                        onChange={(e) =>
+                          updateExampleField(
+                            index,
+                            "explanation"
+                          )(e.target.value)
+                        }
                         value={row.explanation ?? ""}
                       />
                     </div>
@@ -782,20 +841,32 @@ export function NewProblemForm({
           <div className="space-y-4">
             {values.hints && values.hints.length > 0 ? (
               values.hints.map((row, index) => (
-                <div className="space-y-4 rounded-lg border border-border p-4" key={`hint-${index}`}>
+                <div
+                  className="space-y-4 rounded-lg border border-border p-4"
+                  key={`hint-${index}`}
+                >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="font-medium text-sm">Hint {index + 1}</p>
-                    <Button onClick={() => removeHintRow(index)} size="sm" type="button" variant="ghost">
+                    <Button
+                      onClick={() => removeHintRow(index)}
+                      size="sm"
+                      type="button"
+                      variant="ghost"
+                    >
                       <Trash2 />
                       Remove
                     </Button>
                   </div>
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor={`hint-title-${index}`}>Title (optional)</Label>
+                      <Label htmlFor={`hint-title-${index}`}>
+                        Title (optional)
+                      </Label>
                       <Input
                         id={`hint-title-${index}`}
-                        onChange={(e) => updateHintField(index, "title")(e.target.value)}
+                        onChange={(e) =>
+                          updateHintField(index, "title")(e.target.value)
+                        }
                         value={row.title ?? ""}
                       />
                     </div>
@@ -804,7 +875,9 @@ export function NewProblemForm({
                       <Textarea
                         className="min-h-[100px]"
                         id={`hint-body-${index}`}
-                        onChange={(e) => updateHintField(index, "body")(e.target.value)}
+                        onChange={(e) =>
+                          updateHintField(index, "body")(e.target.value)
+                        }
                         value={row.body}
                       />
                     </div>
@@ -831,21 +904,33 @@ export function NewProblemForm({
           <div className="space-y-4">
             {values.solutions && values.solutions.length > 0 ? (
               values.solutions.map((row, index) => (
-                <div className="space-y-4 rounded-lg border border-border p-4" key={`solution-${index}`}>
+                <div
+                  className="space-y-4 rounded-lg border border-border p-4"
+                  key={`solution-${index}`}
+                >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="font-medium text-sm">Solution {index + 1}</p>
-                    <Button onClick={() => removeSolutionRow(index)} size="sm" type="button" variant="ghost">
+                    <Button
+                      onClick={() => removeSolutionRow(index)}
+                      size="sm"
+                      type="button"
+                      variant="ghost"
+                    >
                       <Trash2 />
                       Remove
                     </Button>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor={`solution-language-${index}`}>Language</Label>
+                      <Label htmlFor={`solution-language-${index}`}>
+                        Language
+                      </Label>
                       <select
                         className={SELECT_TRIGGER}
                         id={`solution-language-${index}`}
-                        onChange={(e) => updateSolutionField(index, "language")(e.target.value)}
+                        onChange={(e) =>
+                          updateSolutionField(index, "language")(e.target.value)
+                        }
                         value={row.language}
                       >
                         <option value="javascript">javascript</option>
@@ -854,19 +939,33 @@ export function NewProblemForm({
                       </select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`solution-time-${index}`}>Time complexity (optional)</Label>
+                      <Label htmlFor={`solution-time-${index}`}>
+                        Time complexity (optional)
+                      </Label>
                       <Input
                         id={`solution-time-${index}`}
-                        onChange={(e) => updateSolutionField(index, "timeComplexity")(e.target.value)}
+                        onChange={(e) =>
+                          updateSolutionField(
+                            index,
+                            "timeComplexity"
+                          )(e.target.value)
+                        }
                         placeholder="O(n)"
                         value={row.timeComplexity ?? ""}
                       />
                     </div>
                     <div className="space-y-2 sm:col-span-2">
-                      <Label htmlFor={`solution-space-${index}`}>Space complexity (optional)</Label>
+                      <Label htmlFor={`solution-space-${index}`}>
+                        Space complexity (optional)
+                      </Label>
                       <Input
                         id={`solution-space-${index}`}
-                        onChange={(e) => updateSolutionField(index, "spaceComplexity")(e.target.value)}
+                        onChange={(e) =>
+                          updateSolutionField(
+                            index,
+                            "spaceComplexity"
+                          )(e.target.value)
+                        }
                         placeholder="O(1)"
                         value={row.spaceComplexity ?? ""}
                       />
@@ -876,16 +975,25 @@ export function NewProblemForm({
                       <Textarea
                         className="min-h-[220px] font-mono text-sm"
                         id={`solution-code-${index}`}
-                        onChange={(e) => updateSolutionField(index, "code")(e.target.value)}
+                        onChange={(e) =>
+                          updateSolutionField(index, "code")(e.target.value)
+                        }
                         value={row.code}
                       />
                     </div>
                     <div className="space-y-2 sm:col-span-2">
-                      <Label htmlFor={`solution-explanation-${index}`}>Explanation (optional)</Label>
+                      <Label htmlFor={`solution-explanation-${index}`}>
+                        Explanation (optional)
+                      </Label>
                       <Textarea
                         className="min-h-[110px]"
                         id={`solution-explanation-${index}`}
-                        onChange={(e) => updateSolutionField(index, "explanation")(e.target.value)}
+                        onChange={(e) =>
+                          updateSolutionField(
+                            index,
+                            "explanation"
+                          )(e.target.value)
+                        }
                         value={row.explanation ?? ""}
                       />
                     </div>
@@ -912,10 +1020,18 @@ export function NewProblemForm({
           <div className="space-y-4">
             {values.testCases && values.testCases.length > 0 ? (
               values.testCases.map((row, index) => (
-                <div className="space-y-4 rounded-lg border border-border p-4" key={`testcase-${index}`}>
+                <div
+                  className="space-y-4 rounded-lg border border-border p-4"
+                  key={`testcase-${index}`}
+                >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="font-medium text-sm">Testcase {index + 1}</p>
-                    <Button onClick={() => removeTestCaseRow(index)} size="sm" type="button" variant="ghost">
+                    <Button
+                      onClick={() => removeTestCaseRow(index)}
+                      size="sm"
+                      type="button"
+                      variant="ghost"
+                    >
                       <Trash2 />
                       Remove
                     </Button>
@@ -926,17 +1042,24 @@ export function NewProblemForm({
                       <Textarea
                         className="min-h-[110px] font-mono text-sm"
                         id={`testcase-input-${index}`}
-                        onChange={(e) => updateTestCaseField(index, "input")(e.target.value)}
+                        onChange={(e) =>
+                          updateTestCaseField(index, "input")(e.target.value)
+                        }
                         value={row.input}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`testcase-output-${index}`}>Expected output</Label>
+                      <Label htmlFor={`testcase-output-${index}`}>
+                        Expected output
+                      </Label>
                       <Textarea
                         className="min-h-[110px] font-mono text-sm"
                         id={`testcase-output-${index}`}
                         onChange={(e) =>
-                          updateTestCaseField(index, "expectedOutput")(e.target.value)
+                          updateTestCaseField(
+                            index,
+                            "expectedOutput"
+                          )(e.target.value)
                         }
                         value={row.expectedOutput}
                       />
@@ -946,10 +1069,18 @@ export function NewProblemForm({
                         checked={Boolean(row.isSample)}
                         className="size-4 rounded border"
                         id={`testcase-sample-${index}`}
-                        onChange={(e) => updateTestCaseField(index, "isSample")(e.target.checked)}
+                        onChange={(e) =>
+                          updateTestCaseField(
+                            index,
+                            "isSample"
+                          )(e.target.checked)
+                        }
                         type="checkbox"
                       />
-                      <Label className="font-normal" htmlFor={`testcase-sample-${index}`}>
+                      <Label
+                        className="font-normal"
+                        htmlFor={`testcase-sample-${index}`}
+                      >
                         Sample testcase
                       </Label>
                     </div>
@@ -963,27 +1094,30 @@ export function NewProblemForm({
         </AccordionSection>
       </Accordion>
 
-      {message ? (
-        <output
-          aria-live="polite"
-          className={
-            status === "error"
-              ? "block text-destructive text-sm"
-              : "block text-green-600 text-sm dark:text-green-400"
-          }
-          form="admin-new-problem"
-        >
-          {message}
-        </output>
-      ) : null}
+      <footer className="-mx-6 sticky bottom-0 z-30 flex shrink-0 flex-col gap-3 border-border border-t bg-background/95 px-6 pt-4 pb-4 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        {message ? (
+          <output
+            aria-live="polite"
+            className={
+              status === "error"
+                ? "block text-destructive text-sm"
+                : "block text-green-600 text-sm dark:text-green-400"
+            }
+            form="admin-new-problem"
+          >
+            {message}
+          </output>
+        ) : null}
 
-      <p className="text-muted-foreground text-sm">
-        <span className="text-destructive">*</span> Required fields
-      </p>
-
-      <Button disabled={status === "submitting"} type="submit">
-        {status === "submitting" ? "Submitting..." : resolvedSubmitLabel}
-      </Button>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-muted-foreground text-sm">
+            <span className="text-destructive">*</span> Required fields
+          </p>
+          <Button disabled={status === "submitting"} type="submit">
+            {status === "submitting" ? "Submitting..." : resolvedSubmitLabel}
+          </Button>
+        </div>
+      </footer>
     </form>
   );
 }

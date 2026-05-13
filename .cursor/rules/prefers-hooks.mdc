@@ -1,0 +1,27 @@
+---
+description: Prefer extracting component logic into custom hooks when refactoring
+globs: apps/app/**/*.{ts,tsx},packages/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Prefer hooks for logic
+
+When refactoring React code, **extract logic into a custom hook** (`use-*`) when it is reusable, testable on its own, or makes the component hard to read.
+
+## Move into a hook
+
+- State + setters that form a coherent unit (including `useState` / `useReducer` clusters)
+- `useEffect` / subscriptions / timers / event listeners
+- Derived values and handlers that depend on that state or props
+- Data fetching or mutation orchestration tied to the component lifecycle
+- Anything you would copy-paste into a second component
+
+## Keep in the component
+
+- Mostly presentational layout with props passed through
+- A single trivial `useState` for local UI (e.g. open/closed) **only if** pulling it out adds no clarity—still prefer a hook if the branch grows or the same pattern appears elsewhere
+
+## Conventions
+
+- Name files `use-*.ts` or `use-*.tsx`; export `useThing` matching the filename.
+- Colocate under the feature: e.g. `features/<area>/hooks/use-thing.ts` or next to the component that owns the behavior, consistent with the surrounding folder.

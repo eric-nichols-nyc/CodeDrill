@@ -7,7 +7,7 @@ import {
   AccordionTrigger,
 } from "@repo/design-system/components/ui/accordion";
 import { Badge } from "@repo/design-system/components/ui/badge";
-import type { AdminProblemDetail } from "@/lib/admin/problem-form-values";
+import type { AdminProblemDetail as AdminProblemDetailData } from "@/features/admin/lib/problem-form-values";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (typeof value !== "object" || value === null) {
@@ -27,13 +27,15 @@ function codeBlock(value: unknown) {
 export function AdminProblemDetail({
   detail,
 }: {
-  detail: AdminProblemDetail;
+  detail: AdminProblemDetailData;
 }) {
   const problem = asRecord(detail.problem);
   const tags = Array.isArray(detail.tags) ? detail.tags : [];
   const examples = Array.isArray(detail.examples) ? detail.examples : [];
   const hints = Array.isArray(detail.hints) ? detail.hints : [];
-  const starterCode = Array.isArray(detail.starterCode) ? detail.starterCode : [];
+  const starterCode = Array.isArray(detail.starterCode)
+    ? detail.starterCode
+    : [];
   const solutions = Array.isArray(detail.solutions) ? detail.solutions : [];
   const testCases = Array.isArray(detail.testCases) ? detail.testCases : [];
 
@@ -48,7 +50,9 @@ export function AdminProblemDetail({
           <Badge variant="outline">{textValue(problem?.slug)}</Badge>
         </div>
         <div>
-          <h2 className="font-semibold text-2xl">{textValue(problem?.title)}</h2>
+          <h2 className="font-semibold text-2xl">
+            {textValue(problem?.title)}
+          </h2>
           <p className="mt-2 whitespace-pre-wrap text-muted-foreground text-sm">
             {textValue(problem?.description)}
           </p>
@@ -68,7 +72,10 @@ export function AdminProblemDetail({
         ]}
         type="multiple"
       >
-        <AccordionItem className="rounded-lg border border-border px-4" value="basics">
+        <AccordionItem
+          className="rounded-lg border border-border px-4"
+          value="basics"
+        >
           <AccordionTrigger className="hover:no-underline">
             <span className="font-semibold">Problem basics</span>
           </AccordionTrigger>
@@ -120,7 +127,10 @@ export function AdminProblemDetail({
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem className="rounded-lg border border-border px-4" value="starter-code">
+        <AccordionItem
+          className="rounded-lg border border-border px-4"
+          value="starter-code"
+        >
           <AccordionTrigger className="hover:no-underline">
             <span className="font-semibold">Starter code</span>
           </AccordionTrigger>
@@ -129,10 +139,17 @@ export function AdminProblemDetail({
               starterCode.map((entry, index) => {
                 const row = asRecord(entry);
                 return (
-                  <div className="rounded-lg border border-border p-4" key={`starter-${index}`}>
+                  <div
+                    className="rounded-lg border border-border p-4"
+                    key={`starter-${index}`}
+                  >
                     <div className="mb-3 flex flex-wrap items-center gap-2">
-                      <Badge variant="outline">{textValue(row?.language)}</Badge>
-                      <Badge variant="outline">{textValue(row?.functionName)}</Badge>
+                      <Badge variant="outline">
+                        {textValue(row?.language)}
+                      </Badge>
+                      <Badge variant="outline">
+                        {textValue(row?.functionName)}
+                      </Badge>
                     </div>
                     <pre className="overflow-x-auto rounded bg-muted/50 p-3 text-xs">
                       {codeBlock(row?.code)}
@@ -146,7 +163,10 @@ export function AdminProblemDetail({
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem className="rounded-lg border border-border px-4" value="tags">
+        <AccordionItem
+          className="rounded-lg border border-border px-4"
+          value="tags"
+        >
           <AccordionTrigger className="hover:no-underline">
             <span className="font-semibold">Tags</span>
           </AccordionTrigger>
@@ -168,7 +188,10 @@ export function AdminProblemDetail({
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem className="rounded-lg border border-border px-4" value="examples">
+        <AccordionItem
+          className="rounded-lg border border-border px-4"
+          value="examples"
+        >
           <AccordionTrigger className="hover:no-underline">
             <span className="font-semibold">Examples</span>
           </AccordionTrigger>
@@ -177,17 +200,26 @@ export function AdminProblemDetail({
               examples.map((example, index) => {
                 const row = asRecord(example);
                 return (
-                  <div className="rounded-lg border border-border p-4" key={`example-${index}`}>
+                  <div
+                    className="rounded-lg border border-border p-4"
+                    key={`example-${index}`}
+                  >
                     <p className="font-medium text-sm">Example {index + 1}</p>
-                    <p className="mt-3 font-medium text-xs uppercase tracking-wide">Input</p>
+                    <p className="mt-3 font-medium text-xs uppercase tracking-wide">
+                      Input
+                    </p>
                     <pre className="mt-1 overflow-x-auto rounded bg-muted/50 p-3 text-xs">
                       {codeBlock(row?.input)}
                     </pre>
-                    <p className="mt-3 font-medium text-xs uppercase tracking-wide">Output</p>
+                    <p className="mt-3 font-medium text-xs uppercase tracking-wide">
+                      Output
+                    </p>
                     <pre className="mt-1 overflow-x-auto rounded bg-muted/50 p-3 text-xs">
                       {codeBlock(row?.output)}
                     </pre>
-                    <p className="mt-3 font-medium text-xs uppercase tracking-wide">Explanation</p>
+                    <p className="mt-3 font-medium text-xs uppercase tracking-wide">
+                      Explanation
+                    </p>
                     <p className="mt-1 whitespace-pre-wrap text-muted-foreground text-sm">
                       {textValue(row?.explanation)}
                     </p>
@@ -200,7 +232,10 @@ export function AdminProblemDetail({
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem className="rounded-lg border border-border px-4" value="hints">
+        <AccordionItem
+          className="rounded-lg border border-border px-4"
+          value="hints"
+        >
           <AccordionTrigger className="hover:no-underline">
             <span className="font-semibold">Hints</span>
           </AccordionTrigger>
@@ -209,8 +244,13 @@ export function AdminProblemDetail({
               hints.map((hint, index) => {
                 const row = asRecord(hint);
                 return (
-                  <div className="rounded-lg border border-border p-4" key={`hint-${index}`}>
-                    <p className="font-medium text-sm">{textValue(row?.title)}</p>
+                  <div
+                    className="rounded-lg border border-border p-4"
+                    key={`hint-${index}`}
+                  >
+                    <p className="font-medium text-sm">
+                      {textValue(row?.title)}
+                    </p>
                     <p className="mt-2 whitespace-pre-wrap text-muted-foreground text-sm">
                       {textValue(row?.body)}
                     </p>
@@ -223,7 +263,10 @@ export function AdminProblemDetail({
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem className="rounded-lg border border-border px-4" value="solutions">
+        <AccordionItem
+          className="rounded-lg border border-border px-4"
+          value="solutions"
+        >
           <AccordionTrigger className="hover:no-underline">
             <span className="font-semibold">Solutions</span>
           </AccordionTrigger>
@@ -232,11 +275,20 @@ export function AdminProblemDetail({
               solutions.map((solution, index) => {
                 const row = asRecord(solution);
                 return (
-                  <div className="rounded-lg border border-border p-4" key={`solution-${index}`}>
+                  <div
+                    className="rounded-lg border border-border p-4"
+                    key={`solution-${index}`}
+                  >
                     <div className="mb-3 flex flex-wrap items-center gap-2">
-                      <Badge variant="outline">{textValue(row?.language)}</Badge>
-                      <Badge variant="outline">{textValue(row?.timeComplexity)}</Badge>
-                      <Badge variant="outline">{textValue(row?.spaceComplexity)}</Badge>
+                      <Badge variant="outline">
+                        {textValue(row?.language)}
+                      </Badge>
+                      <Badge variant="outline">
+                        {textValue(row?.timeComplexity)}
+                      </Badge>
+                      <Badge variant="outline">
+                        {textValue(row?.spaceComplexity)}
+                      </Badge>
                     </div>
                     <pre className="overflow-x-auto rounded bg-muted/50 p-3 text-xs">
                       {codeBlock(row?.code)}
@@ -253,7 +305,10 @@ export function AdminProblemDetail({
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem className="rounded-lg border border-border px-4" value="test-cases">
+        <AccordionItem
+          className="rounded-lg border border-border px-4"
+          value="test-cases"
+        >
           <AccordionTrigger className="hover:no-underline">
             <span className="font-semibold">Test cases</span>
           </AccordionTrigger>
@@ -262,14 +317,19 @@ export function AdminProblemDetail({
               testCases.map((testCase, index) => {
                 const row = asRecord(testCase);
                 return (
-                  <div className="rounded-lg border border-border p-4" key={`test-${index}`}>
+                  <div
+                    className="rounded-lg border border-border p-4"
+                    key={`test-${index}`}
+                  >
                     <div className="mb-3 flex flex-wrap items-center gap-2">
                       <Badge variant="outline">Case {index + 1}</Badge>
                       <Badge variant="outline">
                         {row?.isSample === true ? "sample" : "hidden"}
                       </Badge>
                     </div>
-                    <p className="font-medium text-xs uppercase tracking-wide">Input</p>
+                    <p className="font-medium text-xs uppercase tracking-wide">
+                      Input
+                    </p>
                     <pre className="mt-1 overflow-x-auto rounded bg-muted/50 p-3 text-xs">
                       {codeBlock(row?.input)}
                     </pre>

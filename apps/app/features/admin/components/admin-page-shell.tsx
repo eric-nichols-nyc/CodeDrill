@@ -2,6 +2,13 @@
 
 import { Badge } from "@repo/design-system/components/ui/badge";
 import { Button } from "@repo/design-system/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@repo/design-system/components/ui/dialog";
 import { Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -13,9 +20,12 @@ import {
   type AdminProblemListItem,
   detailToFormValues,
   parseAdminProblemListItem,
-} from "@/lib/admin/problem-form-values";
+} from "@/features/admin/lib/problem-form-values";
 
-type Mode = "view" | "edit" | "create";
+type Mode = "view" | "edit";
+
+const adminProblemFormDialogContentClass =
+  "flex max-h-[min(56rem,calc(100dvh-2rem))] max-w-[calc(100%-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-5xl";
 
 const adminProblemEndpoint = (id: string) => `/api/admin/problems/${id}`;
 
@@ -195,34 +205,14 @@ function AdminProblemListPane({
 }
 
 function AdminProblemDetailPane({
-  mode,
   loading,
   detail,
   selectedProblem,
-  onCreateSubmitted,
-  onEditSubmitted,
 }: {
-  mode: Mode;
   loading: boolean;
   detail: AdminProblemDetailData | null;
   selectedProblem: AdminProblemListItem | null;
-  onCreateSubmitted: (body: unknown) => void;
-  onEditSubmitted: (body: unknown) => Promise<void>;
 }) {
-  if (mode === "create") {
-    return (
-      <div className="space-y-4">
-        <div>
-          <h2 className="font-semibold text-xl">New problem</h2>
-          <p className="text-muted-foreground text-sm">
-            Fill out the full authoring form to create a new coding problem.
-          </p>
-        </div>
-        <NewProblemForm onSubmitted={onCreateSubmitted} />
-      </div>
-    );
-  }
-
   if (loading) {
     return (
       <p className="text-muted-foreground text-sm">
@@ -236,28 +226,6 @@ function AdminProblemDetailPane({
       <p className="text-muted-foreground text-sm">
         Select a problem from the list or create a new one.
       </p>
-    );
-  }
-
-  if (mode === "edit") {
-    return (
-      <div className="space-y-4">
-        <div>
-          <h2 className="font-semibold text-xl">Edit problem</h2>
-          <p className="text-muted-foreground text-sm">
-            Update the selected problem and save the full replacement payload.
-          </p>
-        </div>
-        <NewProblemForm
-          endpoint={adminProblemEndpoint(selectedProblem.id)}
-          initialValues={detailToFormValues(detail)}
-          method="PUT"
-          onSubmitted={onEditSubmitted}
-          showDevFill={false}
-          submitLabel="Save changes"
-          successMessage="Problem updated."
-        />
-      </div>
     );
   }
 
@@ -283,13 +251,15 @@ export function AdminPageShell({
   const [selectedId, setSelectedId] = useState<string | null>(
     initialProblems[0]?.id ?? null
   );
-  const [mode, setMode] = useState<Mode>(
-    initialProblems[0] ? "view" : "create"
+  const [mode, setMode] = useState<Mode>("view");
+
+  const [createDialogOpen, setCreateDialogOpen] = useState(
+    initialProblems.length === 0
   );
 
   const { detail, loading, refresh } = useAdminProblemDetail(
     selectedId,
-    mode !== "create"
+    selectedId !== null
   );
 
   useEffect(() => {
@@ -308,8 +278,7 @@ export function AdminPageShell({
   }, []);
 
   const handleCreateClick = useCallback(() => {
-    setMode("create");
-    setSelectedId(null);
+    setCreateDialogOpen(true);
   }, []);
 
   const handleToggleEdit = useCallback(() => {
@@ -324,6 +293,7 @@ export function AdminPageShell({
     setProblems((prev) => [item, ...prev.filter((p) => p.id !== item.id)]);
     setSelectedId(item.id);
     setMode("view");
+    setCreateDialogOpen(false);
   }, []);
 
   const handleEditSubmitted = useCallback(
@@ -340,11 +310,15 @@ export function AdminPageShell({
     [refresh]
   );
 
+  const canEditProblem =
+    selectedProblem !== null && detail !== null && !loading;
+  const editDialogOpen = mode === "edit" && canEditProblem;
+
   return (
     <div className="h-[calc(100dvh-1rem)] p-4">
       <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-background">
         <AdminPageHeader
-          canEdit={Boolean(selectedProblem)}
+          canEdit={canEditProblem}
           isEditing={mode === "edit"}
           onCreateClick={handleCreateClick}
           onToggleEdit={handleToggleEdit}
@@ -355,7 +329,7 @@ export function AdminPageShell({
           defaultLeftPercent={28}
           left={
             <AdminProblemListPane
-              isCreating={mode === "create"}
+              isCreating={createDialogOpen}
               onSelect={handleSelect}
               problems={problems}
               selectedId={selectedId}
@@ -365,19 +339,71 @@ export function AdminPageShell({
           minRightPx={420}
           right={
             <div className="flex h-full min-h-0 flex-col">
-              <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6">
+              <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-6 pb-0">
                 <AdminProblemDetailPane
                   detail={detail}
                   loading={loading}
-                  mode={mode}
-                  onCreateSubmitted={handleCreateSubmitted}
-                  onEditSubmitted={handleEditSubmitted}
                   selectedProblem={selectedProblem}
                 />
               </div>
             </div>
           }
         />
+
+        <Dialog onOpenChange={setCreateDialogOpen} open={createDialogOpen}>
+          <DialogContent
+            className={adminProblemFormDialogContentClass}
+            showCloseButton
+          >
+            <DialogHeader className="shrink-0 border-border border-b px-6 py-4 pr-14 text-left">
+              <DialogTitle>New problem</DialogTitle>
+              <DialogDescription>
+                Fill out the authoring form below. Closing this dialog keeps
+                your current list selection unchanged.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-4 pb-0">
+              <NewProblemForm onSubmitted={handleCreateSubmitted} />
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          onOpenChange={(open) => {
+            if (!open) {
+              setMode("view");
+            }
+          }}
+          open={editDialogOpen}
+        >
+          <DialogContent
+            className={adminProblemFormDialogContentClass}
+            showCloseButton
+          >
+            {selectedProblem !== null && detail !== null ? (
+              <>
+                <DialogHeader className="shrink-0 border-border border-b px-6 py-4 pr-14 text-left">
+                  <DialogTitle>Edit problem</DialogTitle>
+                  <DialogDescription>
+                    Update the stored problem definition and submit the full
+                    replacement payload.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-4 pb-0">
+                  <NewProblemForm
+                    endpoint={adminProblemEndpoint(selectedProblem.id)}
+                    initialValues={detailToFormValues(detail)}
+                    method="PUT"
+                    onSubmitted={handleEditSubmitted}
+                    showDevFill={false}
+                    submitLabel="Save changes"
+                    successMessage="Problem updated."
+                  />
+                </div>
+              </>
+            ) : null}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

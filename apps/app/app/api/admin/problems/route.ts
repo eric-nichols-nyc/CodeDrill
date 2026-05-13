@@ -1,8 +1,8 @@
-import { createProblemBodySchema } from "@/lib/admin/create-problem-schema";
-import { getNeonAuth } from "@/lib/auth/server";
-import { keys } from "@/lib/auth/keys";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { createProblemBodySchema } from "@/features/admin/lib/create-problem-schema";
+import { keys } from "@/lib/auth/keys";
+import { getNeonAuth } from "@/lib/auth/server";
 
 const TRAILING_SLASH = /\/$/;
 

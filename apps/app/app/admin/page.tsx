@@ -3,7 +3,7 @@ import { AdminPageShell } from "@/features/admin/components/admin-page-shell";
 import {
   type AdminProblemListItem,
   parseAdminProblemListItem,
-} from "@/lib/admin/problem-form-values";
+} from "@/features/admin/lib/problem-form-values";
 import { getNeonAuth } from "@/lib/auth/server";
 import { fetchProblemsList } from "@/lib/problems/fetch-problems-list";
 

@@ -1,11 +1,13 @@
-import type { CreateProblemBody } from "@/lib/admin/create-problem-schema";
+import type { CreateProblemBody } from "./create-problem-schema";
 
 function trim(s: string): string {
   return s.trim();
 }
 
 /** JSON body for `POST /problems` (optional fields omitted when empty). */
-export function buildProblemPayload(values: CreateProblemBody): Record<string, unknown> {
+export function buildProblemPayload(
+  values: CreateProblemBody
+): Record<string, unknown> {
   const payload: Record<string, unknown> = {
     title: trim(values.title),
     slug: trim(values.slug),

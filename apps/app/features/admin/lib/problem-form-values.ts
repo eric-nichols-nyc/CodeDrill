@@ -1,4 +1,4 @@
-import type { CreateProblemBody } from "@/lib/admin/create-problem-schema";
+import type { CreateProblemBody } from "./create-problem-schema";
 
 type ProblemRecord = Record<string, unknown>;
 
@@ -91,12 +91,16 @@ export function normalizeCreateProblemBody(
   };
 }
 
-export function detailToFormValues(detail: AdminProblemDetail): CreateProblemBody {
+export function detailToFormValues(
+  detail: AdminProblemDetail
+): CreateProblemBody {
   const problem = asRecord(detail.problem);
   const tags = Array.isArray(detail.tags) ? detail.tags : [];
   const examples = Array.isArray(detail.examples) ? detail.examples : [];
   const hints = Array.isArray(detail.hints) ? detail.hints : [];
-  const starterCode = Array.isArray(detail.starterCode) ? detail.starterCode : [];
+  const starterCode = Array.isArray(detail.starterCode)
+    ? detail.starterCode
+    : [];
   const solutions = Array.isArray(detail.solutions) ? detail.solutions : [];
   const testCases = Array.isArray(detail.testCases) ? detail.testCases : [];
 
