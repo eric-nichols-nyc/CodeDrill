@@ -13,24 +13,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { AppBrandLink } from "@/components/app-brand-link";
+import { AppHeaderInner } from "@/components/app-header-inner";
 import { TimerMenuButton } from "@/components/timer";
-
-function LogoIcon() {
-  return (
-    <svg
-      className="h-7 w-7 shrink-0"
-      fill="none"
-      viewBox="0 0 32 32"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <title>Logo</title>
-      <path
-        d="M16 3C8.82 3 3 8.82 3 16s5.82 13 13 13 13-5.82 13-13S23.18 3 16 3zm-1.5 18.5L8 16l1.5-1.5 5 5 9-9L25 12l-10.5 9.5z"
-        fill="#FFA116"
-      />
-    </svg>
-  );
-}
 
 function SparkleIcon() {
   return (
@@ -141,110 +126,109 @@ export type ProblemSlugNavHeaderProps = {
  */
 export function ProblemSlugNavHeader({ title }: ProblemSlugNavHeaderProps) {
   return (
-    <header className="sticky top-0 z-50 flex h-12 w-full shrink-0 select-none items-center gap-0 border-[var(--nav-border)] border-b bg-[var(--nav-bg)] px-3">
-      <div className="flex min-w-0 items-center gap-1">
-        <Link
-          aria-label="Home"
-          className="flex h-8 w-8 shrink-0 items-center justify-center"
-          href="/"
-        >
-          <LogoIcon />
-        </Link>
+    <header className="sticky top-0 z-50 w-full shrink-0 select-none border-[var(--nav-border)] border-b bg-[var(--nav-bg)]">
+      <AppHeaderInner className="gap-0">
+        <div className="flex min-w-0 items-center gap-1">
+          <AppBrandLink
+            className="group flex h-8 w-8 shrink-0 items-center justify-center text-[var(--nav-icon)] hover:text-[var(--nav-icon-hover)]"
+            iconClassName="h-5 w-5 text-[var(--nav-icon)] group-hover:text-[var(--nav-icon-hover)]"
+          />
 
-        <div
-          aria-hidden="true"
-          className="mx-1 h-4 w-px shrink-0 bg-[var(--nav-border)]"
-        />
+          <div
+            aria-hidden="true"
+            className="mx-1 h-4 w-px shrink-0 bg-[var(--nav-border)]"
+          />
 
-        <Link
-          aria-label="Problem List"
-          className="group flex h-8 shrink-0 items-center gap-1.5 rounded px-1.5 transition-colors hover:bg-white/5"
-          href="/problems"
-        >
-          <AlignLeft className="h-4 w-4 text-[var(--nav-icon)] group-hover:text-[var(--nav-icon-hover)]" />
-          <span className="whitespace-nowrap font-medium text-[var(--nav-icon-hover)] text-sm">
-            Problem List
-          </span>
-        </Link>
-
-        <NavIconButton label="Previous problem">
-          <ChevronLeft className="h-4 w-4" />
-        </NavIconButton>
-        <NavIconButton label="Next problem">
-          <ChevronRight className="h-4 w-4" />
-        </NavIconButton>
-
-        <NavIconButton label="Random problem">
-          <Shuffle className="h-3.5 w-3.5" />
-        </NavIconButton>
-
-        {title.length > 0 ? (
-          <>
-            <div
-              aria-hidden="true"
-              className="mx-1 h-4 w-px shrink-0 bg-[var(--nav-border)]"
-            />
-            <span
-              className="max-w-[min(20rem,28vw)] truncate font-medium text-[var(--nav-icon-hover)] text-sm"
-              title={title}
-            >
-              {title}
+          <Link
+            aria-label="Problem List"
+            className="group flex h-8 shrink-0 items-center gap-1.5 rounded px-1.5 transition-colors hover:bg-white/5"
+            href="/problems"
+          >
+            <AlignLeft className="h-4 w-4 text-[var(--nav-icon)] group-hover:text-[var(--nav-icon-hover)]" />
+            <span className="whitespace-nowrap font-medium text-[var(--nav-icon-hover)] text-sm">
+              Problem List
             </span>
-          </>
-        ) : null}
-      </div>
+          </Link>
 
-      <div className="flex flex-1 items-center justify-center gap-1">
-        <NavIconButton label="Notes">
-          <NotesIcon />
-        </NavIconButton>
+          <NavIconButton label="Previous problem">
+            <ChevronLeft className="h-4 w-4" />
+          </NavIconButton>
+          <NavIconButton label="Next problem">
+            <ChevronRight className="h-4 w-4" />
+          </NavIconButton>
 
-        <NavIconButton label="AI Assistant" sparkle>
-          <SparkleIcon />
-        </NavIconButton>
-      </div>
+          <NavIconButton label="Random problem">
+            <Shuffle className="h-3.5 w-3.5" />
+          </NavIconButton>
 
-      <div className="flex shrink-0 items-center gap-0.5">
-        <NavIconButton label="Layout">
-          <LayoutGrid className="h-4 w-4" />
-        </NavIconButton>
+          {title.length > 0 ? (
+            <>
+              <div
+                aria-hidden="true"
+                className="mx-1 h-4 w-px shrink-0 bg-[var(--nav-border)]"
+              />
+              <span
+                className="max-w-[min(20rem,28vw)] truncate font-medium text-[var(--nav-icon-hover)] text-sm"
+                title={title}
+              >
+                {title}
+              </span>
+            </>
+          ) : null}
+        </div>
 
-        <NavIconButton label="Settings">
-          <Settings className="h-4 w-4" />
-        </NavIconButton>
+        <div className="flex min-w-0 flex-1 items-center justify-center gap-1">
+          <NavIconButton label="Notes">
+            <NotesIcon />
+          </NavIconButton>
 
-        <button
-          aria-label="Streak: 0"
-          className="flex h-8 items-center gap-0.5 rounded px-1 text-[var(--nav-icon)] transition-colors hover:bg-white/5 hover:text-[var(--nav-icon-hover)]"
-          type="button"
-        >
-          <Flame className="h-4 w-4" />
-          <span className="font-medium text-xs">0</span>
-        </button>
+          <NavIconButton label="AI Assistant" sparkle>
+            <SparkleIcon />
+          </NavIconButton>
+        </div>
 
-        <TimerMenuButton
-          className="relative shrink-0"
-          iconClassName="h-4 w-4"
-          triggerClassName="h-8 w-8 rounded bg-transparent text-[var(--nav-icon)] transition-colors duration-150 hover:bg-white/5 hover:text-[var(--nav-icon-hover)]"
-        />
+        <div className="flex shrink-0 items-center gap-0.5">
+          <NavIconButton label="Layout">
+            <LayoutGrid className="h-4 w-4" />
+          </NavIconButton>
 
-        <NavIconButton label="Add friend">
-          <UserPlus className="h-4 w-4" />
-        </NavIconButton>
+          <NavIconButton label="Settings">
+            <Settings className="h-4 w-4" />
+          </NavIconButton>
 
-        <div
-          aria-hidden="true"
-          className="mx-1 h-4 w-px bg-[var(--nav-border)]"
-        />
+          <button
+            aria-label="Streak: 0"
+            className="flex h-8 items-center gap-0.5 rounded px-1 text-[var(--nav-icon)] transition-colors hover:bg-white/5 hover:text-[var(--nav-icon-hover)]"
+            type="button"
+          >
+            <Flame className="h-4 w-4" />
+            <span className="font-medium text-xs">0</span>
+          </button>
 
-        <button
-          aria-label="Profile"
-          className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-blue-500 font-bold text-white text-xs transition-all hover:ring-2 hover:ring-white/20"
-          type="button"
-        >
-          <span aria-hidden="true">U</span>
-        </button>
-      </div>
+          <TimerMenuButton
+            className="relative shrink-0"
+            iconClassName="h-4 w-4"
+            triggerClassName="h-8 w-8 rounded bg-transparent text-[var(--nav-icon)] transition-colors duration-150 hover:bg-white/5 hover:text-[var(--nav-icon-hover)]"
+          />
+
+          <NavIconButton label="Add friend">
+            <UserPlus className="h-4 w-4" />
+          </NavIconButton>
+
+          <div
+            aria-hidden="true"
+            className="mx-1 h-4 w-px bg-[var(--nav-border)]"
+          />
+
+          <button
+            aria-label="Profile"
+            className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-blue-500 font-bold text-white text-xs transition-all hover:ring-2 hover:ring-white/20"
+            type="button"
+          >
+            <span aria-hidden="true">U</span>
+          </button>
+        </div>
+      </AppHeaderInner>
     </header>
   );
 }
