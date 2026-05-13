@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ProblemDetail } from "@/features/problem-detail/components/problem-detail";
+import { ProblemExpandableSidebar } from "@/features/problem-detail/components/problem-expandable-sidebar";
 import { isProblemSolutionRowArray } from "@/features/problem-detail/problem-detail-helpers";
 import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
-import { ProblemExpandableSidebar } from "@/features/problem-detail/components/problem-expandable-sidebar";
 import { fetchProblemBySlug } from "@/lib/problems/fetch-problem-by-slug";
-import { ProblemDetail } from "@/features/problem-detail/components/problem-detail";
 
 type ProblemDetailBundle = {
   problem: unknown;

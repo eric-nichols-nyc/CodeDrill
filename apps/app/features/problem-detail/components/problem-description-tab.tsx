@@ -1,3 +1,12 @@
+"use client";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@repo/design-system/components/ui/accordion";
+import { Lightbulb } from "lucide-react";
 import { ExampleItem } from "@/features/problem-detail/components/example-item";
 import { HintItem } from "@/features/problem-detail/components/hint-item";
 import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
@@ -29,7 +38,7 @@ export function ProblemDescriptionTab({
   showDifficulty: boolean;
 }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-10">
       <header className="space-y-1">
         <h1 className="font-semibold text-xl tracking-tight">
           {p.title ?? "Problem"}
@@ -83,11 +92,31 @@ export function ProblemDescriptionTab({
         {hintList.length === 0 ? (
           <JsonFallback data={hints} />
         ) : (
-          <ol className="list-decimal space-y-3 pl-4 text-sm">
-            {hintList.map((h, i) => (
-              <HintItem hint={h} key={rowKey(asRecord(h), `hint-${i}`)} />
-            ))}
-          </ol>
+          <Accordion
+            className="w-full rounded-lg border border-border"
+            collapsible
+            type="single"
+          >
+            {hintList.map((h, i) => {
+              const o = asRecord(h);
+              return (
+                <AccordionItem key={rowKey(o, `hint-${i}`)} value={`hint-${i}`}>
+                  <AccordionTrigger className="py-3 text-sm">
+                    <span className="flex flex-1 items-center gap-2 text-left">
+                      <Lightbulb
+                        aria-hidden
+                        className="size-4 shrink-0 text-muted-foreground"
+                      />
+                      <span>Hint {i + 1}</span>
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="pl-6 text-sm">
+                    <HintItem hint={h} variant="accordion" />
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
         )}
       </section>
     </div>

@@ -159,11 +159,11 @@ export function ProblemsPageView({
           <ResizableHandle withHandle />
 
           <ResizablePanel
-            className="flex min-h-0 min-w-0 flex-col overflow-hidden"
+            className="flex min-h-0 min-w-0 flex-col overflow-hidden bg-background"
             defaultSize={80}
             minSize={52}
           >
-            <main className="min-h-0 min-w-0 flex-1 overflow-auto p-4">
+            <main className="min-h-0 min-w-0 flex-1 overflow-auto bg-background p-4">
               <div className="mx-auto max-w-5xl">
                 {fetchOk ? null : (
                   <p className="mb-4 text-destructive text-sm">
@@ -231,7 +231,7 @@ export function ProblemsPageView({
 
                 <ProblemsPromoCarousel />
 
-                <div className="overflow-hidden rounded-lg border border-border">
+                <div className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground">
                   {tableSection}
                 </div>
 

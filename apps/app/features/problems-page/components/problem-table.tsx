@@ -19,6 +19,8 @@ import {
   Minus,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type { MouseEvent } from "react";
 import type { Problem, SortDirection, SortField, Status } from "../lib/types";
 
 type ProblemTableProps = {
@@ -68,12 +70,17 @@ function statusCellIcon(status: Status) {
   return null;
 }
 
+function problemHref(slug: string) {
+  return `/problems/${encodeURIComponent(slug)}`;
+}
+
 export function ProblemTable({
   problems,
   sortField,
   sortDirection,
   onSort,
 }: ProblemTableProps) {
+  const router = useRouter();
   const sortedProblems = [...problems].sort((a, b) => {
     let comparison = 0;
     switch (sortField) {
@@ -97,9 +104,9 @@ export function ProblemTable({
   });
 
   return (
-    <Table>
+    <Table className="bg-card">
       <TableHeader>
-        <TableRow className="border-border hover:bg-transparent">
+        <TableRow className="border-border bg-muted/30 hover:bg-muted/50">
           <TableHead className="w-[50px] text-muted-foreground">
             Status
           </TableHead>
@@ -161,46 +168,73 @@ export function ProblemTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {sortedProblems.map((problem, index) => (
-          <TableRow
-            className={cn(
-              "cursor-pointer border-border",
-              index % 2 === 0 ? "bg-transparent" : "bg-secondary/30"
-            )}
-            key={problem.slug}
-          >
-            <TableCell>{statusCellIcon(problem.status)}</TableCell>
-            <TableCell className="text-muted-foreground">
-              {problem.id}
-            </TableCell>
-            <TableCell>
-              <div className="flex items-center gap-2">
-                <Link
-                  className="text-foreground transition-colors hover:text-primary"
-                  href={`/problems/${encodeURIComponent(problem.slug)}`}
-                >
-                  {problem.title}
-                </Link>
-                {problem.isPremium ? (
-                  <Lock className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+        {sortedProblems.map((problem, index) => {
+          const href = problemHref(problem.slug);
+          const go = (e: MouseEvent<HTMLTableRowElement>) => {
+            if (e.defaultPrevented) {
+              return;
+            }
+            if (!(e.target instanceof Element)) {
+              return;
+            }
+            if (e.target.closest("a")) {
+              return;
+            }
+            if (e.metaKey || e.ctrlKey || e.shiftKey) {
+              window.open(href, "_blank", "noopener,noreferrer");
+              return;
+            }
+            router.push(href);
+          };
+          return (
+            <TableRow
+              className={cn(
+                "cursor-pointer border-border",
+                index % 2 === 0 ? "bg-card" : "bg-muted/25"
+              )}
+              key={problem.slug}
+              onAuxClick={(e) => {
+                if (e.button === 1) {
+                  e.preventDefault();
+                  window.open(href, "_blank", "noopener,noreferrer");
+                }
+              }}
+              onClick={go}
+            >
+              <TableCell>{statusCellIcon(problem.status)}</TableCell>
+              <TableCell className="text-muted-foreground">
+                {problem.id}
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <Link
+                    className="text-foreground transition-colors hover:text-primary"
+                    href={href}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {problem.title}
+                  </Link>
+                  {problem.isPremium ? (
+                    <Lock className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                  ) : null}
+                </div>
+              </TableCell>
+              <TableCell>
+                {problem.status === "solved" ? (
+                  <FileText className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-foreground" />
                 ) : null}
-              </div>
-            </TableCell>
-            <TableCell>
-              {problem.status === "solved" ? (
-                <FileText className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-foreground" />
-              ) : null}
-            </TableCell>
-            <TableCell className="text-muted-foreground">
-              {problem.acceptance.toFixed(1)}%
-            </TableCell>
-            <TableCell>
-              <span className={difficultyTextClass(problem.difficulty)}>
-                {problem.difficulty}
-              </span>
-            </TableCell>
-          </TableRow>
-        ))}
+              </TableCell>
+              <TableCell className="text-muted-foreground">
+                {problem.acceptance.toFixed(1)}%
+              </TableCell>
+              <TableCell>
+                <span className={difficultyTextClass(problem.difficulty)}>
+                  {problem.difficulty}
+                </span>
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );
