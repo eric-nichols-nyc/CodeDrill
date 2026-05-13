@@ -15,7 +15,7 @@ import {
 } from "@repo/design-system/components/ui/tabs";
 
 import { useMemo } from "react";
-
+import { TimerPanelBar } from "@/components/timer";
 import type { RunClientTestsOutcome } from "@/features/problem-detail/client-test-run";
 import { normalizeProblemTestCases } from "@/features/problem-detail/client-test-run";
 
@@ -139,6 +139,8 @@ export function ProblemOutputPanel({
           {isBusy ? <Badge>Working</Badge> : null}
         </div>
       </div>
+
+      <TimerPanelBar />
 
       <Tabs
         className="flex min-h-0 flex-1 flex-col overflow-hidden"

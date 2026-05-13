@@ -9,12 +9,11 @@ import {
   LayoutGrid,
   Settings,
   Shuffle,
-  Timer,
   UserPlus,
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { TimerMenuButton } from "@/components/timer";
 
 function LogoIcon() {
   return (
@@ -141,8 +140,6 @@ export type ProblemSlugNavHeaderProps = {
  * routes; other controls are visual placeholders until wired.
  */
 export function ProblemSlugNavHeader({ title }: ProblemSlugNavHeaderProps) {
-  const [isTimerActive, setIsTimerActive] = useState(false);
-
   return (
     <header className="sticky top-0 z-50 flex h-12 w-full shrink-0 select-none items-center gap-0 border-[var(--nav-border)] border-b bg-[var(--nav-bg)] px-3">
       <div className="flex min-w-0 items-center gap-1">
@@ -225,13 +222,11 @@ export function ProblemSlugNavHeader({ title }: ProblemSlugNavHeaderProps) {
           <span className="font-medium text-xs">0</span>
         </button>
 
-        <NavIconButton
-          label="Timer"
-          onClick={() => setIsTimerActive((v) => !v)}
-          teal={isTimerActive}
-        >
-          <Timer className="h-4 w-4" />
-        </NavIconButton>
+        <TimerMenuButton
+          className="relative shrink-0"
+          iconClassName="h-4 w-4"
+          triggerClassName="h-8 w-8 rounded bg-transparent text-[var(--nav-icon)] transition-colors duration-150 hover:bg-white/5 hover:text-[var(--nav-icon-hover)]"
+        />
 
         <NavIconButton label="Add friend">
           <UserPlus className="h-4 w-4" />

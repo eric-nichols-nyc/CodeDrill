@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { TimerProvider } from "@/components/timer";
 import { ProblemDetail } from "@/features/problem-detail/components/problem-detail";
 import { ProblemExpandableSidebar } from "@/features/problem-detail/components/problem-expandable-sidebar";
 import { ProblemSlugNavHeader } from "@/features/problem-detail/components/problem-slug-nav-header";
@@ -62,44 +63,46 @@ export default async function ProblemBySlugPage({
   }
 
   return (
-    <div className="problem-by-slug-page flex h-dvh min-h-0 flex-col overflow-hidden bg-background">
-      <ProblemSlugNavHeader title={title} />
+    <TimerProvider>
+      <div className="problem-by-slug-page flex h-dvh min-h-0 flex-col overflow-hidden bg-background">
+        <ProblemSlugNavHeader title={title} />
 
-      <main className="flex min-h-0 flex-1 flex-row overflow-hidden">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          {result.ok ? null : (
-            <div className="p-6">
-              <p className="text-destructive text-sm">
-                Could not load problem (HTTP {result.status}). Set matching{" "}
-                <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                  INTERNAL_PROBLEMS_SECRET
-                </code>{" "}
-                or use a Better Auth session cookie when calling the API.
-              </p>
-            </div>
-          )}
+        <main className="flex min-h-0 flex-1 flex-row overflow-hidden">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+            {result.ok ? null : (
+              <div className="p-6">
+                <p className="text-destructive text-sm">
+                  Could not load problem (HTTP {result.status}). Set matching{" "}
+                  <code className="rounded bg-muted px-1 py-0.5 text-xs">
+                    INTERNAL_PROBLEMS_SECRET
+                  </code>{" "}
+                  or use a Better Auth session cookie when calling the API.
+                </p>
+              </div>
+            )}
 
-          {bundle ? (
-            <ProblemDetail
-              examples={bundle.examples}
-              hints={bundle.hints}
-              problem={bundle.problem}
-              solutions={bundle.solutions}
-              starterCode={bundle.starterCode}
-              testCases={bundle.testCases}
-            />
-          ) : (
-            <div className="p-6">
-              <pre className="overflow-x-auto rounded-md border border-border bg-muted p-4 text-xs">
-                {typeof result.body === "string"
-                  ? result.body
-                  : JSON.stringify(result.body, null, 2)}
-              </pre>
-            </div>
-          )}
-        </div>
-        <ProblemExpandableSidebar learningNotes={bundle?.learningNotes} />
-      </main>
-    </div>
+            {bundle ? (
+              <ProblemDetail
+                examples={bundle.examples}
+                hints={bundle.hints}
+                problem={bundle.problem}
+                solutions={bundle.solutions}
+                starterCode={bundle.starterCode}
+                testCases={bundle.testCases}
+              />
+            ) : (
+              <div className="p-6">
+                <pre className="overflow-x-auto rounded-md border border-border bg-muted p-4 text-xs">
+                  {typeof result.body === "string"
+                    ? result.body
+                    : JSON.stringify(result.body, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+          <ProblemExpandableSidebar learningNotes={bundle?.learningNotes} />
+        </main>
+      </div>
+    </TimerProvider>
   );
 }
