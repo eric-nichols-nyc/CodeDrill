@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @source "../**/*.{ts,tsx}";
+/* Monorepo apps (path is relative to this file: packages/design-system/styles → repo root) */
+@source "../../../apps/**/*.{ts,tsx}";
 
 @plugin "@tailwindcss/typography";
 
