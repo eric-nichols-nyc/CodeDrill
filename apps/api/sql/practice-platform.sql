@@ -1,4 +1,4 @@
--- CodeDrill practice catalog — apply on Neon for this app (see src/database/practice-schema.ts).
+-- CodeDrill practice catalog — apply on Neon for this app (see src/database/schema.ts).
 -- Run AFTER Better Auth `user` table exists if you use FKs to "user"(id).
 
 -- =============================================================================
