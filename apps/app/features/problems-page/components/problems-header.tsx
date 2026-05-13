@@ -3,12 +3,17 @@
 import { UserButton } from "@neondatabase/neon-js/auth/react/ui";
 import { ModeToggle } from "@repo/design-system/components/mode-toggle";
 import { Button } from "@repo/design-system/components/ui/button";
+import { cn } from "@repo/design-system/lib/utils";
 import { Code2 } from "lucide-react";
 import Link from "next/link";
 
-export function ProblemsHeader() {
+type ProblemsHeaderProps = {
+  className?: string;
+};
+
+export function ProblemsHeader({ className }: ProblemsHeaderProps) {
   return (
-    <header className="border-border border-b bg-card">
+    <header className={cn("border-border border-b bg-card", className)}>
       <div className="flex h-12 items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Link className="flex items-center gap-2" href="/">

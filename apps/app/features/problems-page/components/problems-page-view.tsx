@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@repo/design-system/components/ui/resizable";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { problemMatchesFilters } from "../lib/problem-matches-filters";
@@ -10,10 +15,13 @@ import type {
   SortField,
   Status,
 } from "../lib/types";
+import { Calendar } from "./calendar";
 import { ProblemFilters } from "./problem-filters";
 import { ProblemTable } from "./problem-table";
 import { ProblemsHeader } from "./problems-header";
+import { ProblemsNavSidebar } from "./problems-nav-sidebar";
 import { ProblemsPagination } from "./problems-pagination";
+import { ProblemsPromoCarousel } from "./problems-promo-carousel";
 import { ProblemsSidebar } from "./problems-sidebar";
 
 type ProblemsPageViewProps = {
@@ -130,94 +138,120 @@ export function ProblemsPageView({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <ProblemsHeader />
+    <div className="flex h-dvh max-h-dvh flex-col overflow-hidden bg-background">
+      <ProblemsHeader className="shrink-0" />
 
-      <div className="flex">
-        <main className="flex-1 p-4">
-          <div className="mx-auto max-w-5xl">
-            {fetchOk ? null : (
-              <p className="mb-4 text-destructive text-sm">
-                Could not load problems (HTTP {fetchStatus}). For server-side
-                access from this app, set matching{" "}
-                <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                  INTERNAL_PROBLEMS_SECRET
-                </code>{" "}
-                here and on the Nest API, or call the API with a Better Auth
-                session cookie.
-              </p>
-            )}
+      <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
+        <ResizablePanelGroup
+          autoSaveId="codedrill-problems-layout"
+          className="flex h-full min-h-0 min-w-0 flex-1"
+          direction="horizontal"
+        >
+          <ResizablePanel
+            className="flex min-h-0 min-w-0 flex-col overflow-hidden"
+            defaultSize={20}
+            maxSize={32}
+            minSize={12}
+          >
+            <ProblemsNavSidebar />
+          </ResizablePanel>
 
-            <div className="mb-4 flex flex-wrap items-center gap-4 border-border border-b pb-3">
-              <button
-                className="border-primary border-b-2 pb-2 font-medium text-foreground text-sm"
-                type="button"
-              >
-                All topics
-              </button>
-              <button
-                className="pb-2 text-muted-foreground text-sm hover:text-foreground"
-                type="button"
-              >
-                Algorithms
-              </button>
-              <button
-                className="pb-2 text-muted-foreground text-sm hover:text-foreground"
-                type="button"
-              >
-                Database
-              </button>
-              <button
-                className="pb-2 text-muted-foreground text-sm hover:text-foreground"
-                type="button"
-              >
-                Shell
-              </button>
-              <button
-                className="pb-2 text-muted-foreground text-sm hover:text-foreground"
-                type="button"
-              >
-                Concurrency
-              </button>
-            </div>
+          <ResizableHandle withHandle />
 
-            <ProblemFilters
-              availableTags={availableTags}
-              difficulty={difficulty}
-              onDifficultyChange={setDifficulty}
-              onRandomProblem={handleRandomProblem}
-              onSearchChange={setSearch}
-              onStatusChange={setStatus}
-              onTagsChange={setSelectedTags}
-              search={search}
-              selectedTags={selectedTags}
-              status={status}
-            />
+          <ResizablePanel
+            className="flex min-h-0 min-w-0 flex-col overflow-hidden"
+            defaultSize={80}
+            minSize={52}
+          >
+            <main className="min-h-0 min-w-0 flex-1 overflow-auto p-4">
+              <div className="mx-auto max-w-5xl">
+                {fetchOk ? null : (
+                  <p className="mb-4 text-destructive text-sm">
+                    Could not load problems (HTTP {fetchStatus}). For
+                    server-side access from this app, set matching{" "}
+                    <code className="rounded bg-muted px-1 py-0.5 text-xs">
+                      INTERNAL_PROBLEMS_SECRET
+                    </code>{" "}
+                    here and on the Nest API, or call the API with a Better Auth
+                    session cookie.
+                  </p>
+                )}
 
-            <div className="mt-4 mb-2 flex items-center justify-between">
-              <span className="text-muted-foreground text-sm">
-                {filteredProblems.length} problems
-              </span>
-            </div>
+                <div className="mb-4 flex flex-wrap items-center gap-4 border-border border-b pb-3">
+                  <button
+                    className="border-primary border-b-2 pb-2 font-medium text-foreground text-sm"
+                    type="button"
+                  >
+                    All topics
+                  </button>
+                  <button
+                    className="pb-2 text-muted-foreground text-sm hover:text-foreground"
+                    type="button"
+                  >
+                    Algorithms
+                  </button>
+                  <button
+                    className="pb-2 text-muted-foreground text-sm hover:text-foreground"
+                    type="button"
+                  >
+                    Database
+                  </button>
+                  <button
+                    className="pb-2 text-muted-foreground text-sm hover:text-foreground"
+                    type="button"
+                  >
+                    Shell
+                  </button>
+                  <button
+                    className="pb-2 text-muted-foreground text-sm hover:text-foreground"
+                    type="button"
+                  >
+                    Concurrency
+                  </button>
+                </div>
 
-            <div className="overflow-hidden rounded-lg border border-border">
-              {tableSection}
-            </div>
+                <ProblemFilters
+                  availableTags={availableTags}
+                  difficulty={difficulty}
+                  onDifficultyChange={setDifficulty}
+                  onRandomProblem={handleRandomProblem}
+                  onSearchChange={setSearch}
+                  onStatusChange={setStatus}
+                  onTagsChange={setSelectedTags}
+                  search={search}
+                  selectedTags={selectedTags}
+                  status={status}
+                />
 
-            <ProblemsPagination
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-              onPageSizeChange={handlePageSizeChange}
-              pageSize={pageSize}
-              totalItems={filteredProblems.length}
-              totalPages={totalPages}
-            />
-          </div>
-        </main>
+                <div className="mt-4 mb-2 flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">
+                    {filteredProblems.length} problems
+                  </span>
+                </div>
 
-        <div className="hidden pt-4 pr-4 xl:block">
+                <ProblemsPromoCarousel />
+
+                <div className="overflow-hidden rounded-lg border border-border">
+                  {tableSection}
+                </div>
+
+                <ProblemsPagination
+                  currentPage={currentPage}
+                  onPageChange={setCurrentPage}
+                  onPageSizeChange={handlePageSizeChange}
+                  pageSize={pageSize}
+                  totalItems={filteredProblems.length}
+                  totalPages={totalPages}
+                />
+              </div>
+            </main>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+
+        <aside className="hidden min-h-0 w-80 shrink-0 flex-col gap-4 overflow-y-auto border-border border-l bg-muted/20 p-4 lg:flex">
+          <Calendar />
           <ProblemsSidebar />
-        </div>
+        </aside>
       </div>
     </div>
   );

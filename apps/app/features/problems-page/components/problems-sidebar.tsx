@@ -19,7 +19,7 @@ import {
 
 export function ProblemsSidebar() {
   return (
-    <aside className="w-80 shrink-0 space-y-4">
+    <div className="w-full shrink-0 space-y-4">
       <Card className="border-border bg-card">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 font-medium text-sm">
@@ -153,6 +153,6 @@ export function ProblemsSidebar() {
           <p className="text-muted-foreground text-xs">Day 142 of 365</p>
         </CardContent>
       </Card>
-    </aside>
+    </div>
   );
 }
