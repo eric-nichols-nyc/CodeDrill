@@ -1,4 +1,4 @@
-import { JsonFallback } from "@/features/problem-detail/json-fallback";
+import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
 import {
   asRecord,
   strField,

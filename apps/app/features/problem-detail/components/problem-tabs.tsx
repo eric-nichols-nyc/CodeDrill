@@ -8,7 +8,7 @@ import {
   TabsTrigger,
 } from "@repo/design-system/components/ui/tabs";
 import { cn } from "@repo/design-system/lib/utils";
-import { ProblemSolution } from "@/features/problem-detail/problem-solution";
+import { ProblemSolution } from "@/features/problem-detail/components/problem-solution";
 import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
 
 export type ProblemTabsProps = {

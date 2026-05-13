@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { NewProblemForm } from "@/app/admin/new-problem-form";
+import { NewProblemForm } from "@/features/admin/components/new-problem-form";
 
 const refreshMock = vi.fn();
 

@@ -1,13 +1,13 @@
 "use client";
 
-import { Button } from "@repo/components/ui/button";
-import { ButtonGroup, ButtonGroupText } from "@repo/components/ui/button-group";
+import { Button } from "@repo/design-system/components/ui/button";
+import { ButtonGroup, ButtonGroupText } from "@repo/design-system/components/ui/button-group";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@repo/components/ui/tooltip";
+} from "@repo/design-system/components/ui/tooltip";
 import { cn } from "@repo/design-system/lib/utils";
 import type { FileUIPart, UIMessage } from "ai";
 import {

@@ -7,8 +7,8 @@ import {
   TabsTrigger,
 } from "@repo/design-system/components/ui/tabs";
 import { cn } from "@repo/design-system/lib/utils";
-import { ExpandableChat } from "@/components/expandable-chat";
-import { ProblemNotes } from "@/features/problem-detail/problem-notes";
+import { Chat } from "@/features/problem-detail/chatbot/components/chat";
+import { ProblemNotes } from "@/features/problem-detail/components/problem-notes";
 
 const panelClass =
   "min-h-0 flex-1 overflow-y-auto pr-1 pt-1 outline-none ring-offset-background focus-visible:outline-none";
@@ -36,7 +36,7 @@ export function ProblemSideTabs({
           className={cn(panelClass, "flex min-h-0 flex-col")}
           value="chat"
         >
-          <ExpandableChat embedded />
+          <Chat />
         </TabsContent>
         <TabsContent className={panelClass} value="notes">
           <ProblemNotes learningNotes={learningNotes} />

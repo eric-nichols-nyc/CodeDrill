@@ -13,7 +13,7 @@ import {
 } from "@repo/design-system/components/ui/select";
 import { cn } from "@repo/design-system/lib/utils";
 import { useMemo, useState } from "react";
-import { JsonFallback } from "@/features/problem-detail/json-fallback";
+import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
 import {
   asRecord,
   strField,

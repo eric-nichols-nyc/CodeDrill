@@ -8,13 +8,13 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "@repo/components/ui/command";
+} from "@repo/design-system/components/ui/command";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogTrigger,
-} from "@repo/components/ui/dialog";
+} from "@repo/design-system/components/ui/dialog";
 import { cn } from "@repo/design-system/lib/utils";
 import type { ComponentProps, ReactNode } from "react";
 

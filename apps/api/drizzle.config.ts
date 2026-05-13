@@ -40,7 +40,7 @@ const practiceTablesFilter = [
 export default defineConfig({
   // Point at files that `export const … = pgTable(…)` directly. A barrel that only
   // does `export const schema = { problems, … }` can make `push` see an empty schema.
-  schema: "./src/database/practice-schema.ts",
+  schema: "./src/database/schema.ts",
   out: "./drizzle",
   dialect: "postgresql",
   dbCredentials: {

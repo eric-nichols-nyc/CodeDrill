@@ -5,14 +5,14 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { SplitLayout } from "@/components/split-layout";
 import { Button } from "@repo/design-system/components/ui/button";
 import { Badge } from "@repo/design-system/components/ui/badge";
-import { JsonFallback } from "@/features/problem-detail/json-fallback";
+import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
 import {
   asRecord,
   rowKey,
   strField,
 } from "@/features/problem-detail/problem-detail-helpers";
-import { ProblemOutputPanel } from "@/features/problem-detail/problem-output-panel";
-import { SolutionEditor } from "@/features/problem-detail/solution-editor";
+import { ProblemOutputPanel } from "@/features/problem-detail/components/problem-output-panel";
+import { SolutionEditor } from "@/features/problem-detail/components/solution-editor";
 
 type StarterCodeRow = {
   key: string;

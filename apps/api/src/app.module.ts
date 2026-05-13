@@ -4,12 +4,14 @@ import { auth } from "./auth";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { DatabaseModule } from "./database/database.module";
+import { ProblemChatModule } from "./problem-chat/problem-chat.module";
 import { ProblemsModule } from "./problems/problems.module";
 import { SessionController } from "./session.controller";
 
 @Module({
   imports: [
     DatabaseModule,
+    ProblemChatModule,
     ProblemsModule,
     AuthModule.forRoot({
       auth,

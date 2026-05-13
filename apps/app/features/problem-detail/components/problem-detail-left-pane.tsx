@@ -1,9 +1,9 @@
-import { ProblemDescriptionTab } from "@/features/problem-detail/problem-description-tab";
+import { ProblemDescriptionTab } from "@/features/problem-detail/components/problem-description-tab";
 import type {
   ProblemRow,
   ProblemSolutionRow,
 } from "@/features/problem-detail/problem-detail-types";
-import { ProblemTabs } from "@/features/problem-detail/problem-tabs";
+import { ProblemTabs } from "@/features/problem-detail/components/problem-tabs";
 
 export function ProblemDetailLeftPane({
   p,

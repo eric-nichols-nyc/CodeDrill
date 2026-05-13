@@ -1,6 +1,6 @@
-import { ExampleItem } from "@/features/problem-detail/example-item";
-import { HintItem } from "@/features/problem-detail/hint-item";
-import { JsonFallback } from "@/features/problem-detail/json-fallback";
+import { ExampleItem } from "@/features/problem-detail/components/example-item";
+import { HintItem } from "@/features/problem-detail/components/hint-item";
+import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
 import {
   asRecord,
   rowKey,

@@ -13,12 +13,11 @@ import {
   problemSolutions,
   problemTags,
   problems,
+  schema,
   starterCode,
   tags,
   testCases,
-} from "../database/practice-schema";
-// biome-ignore lint/style/useImportType: typeof schema used for Drizzle generic
-import { schema } from "../database/schema";
+} from "../database/schema";
 import type { CreateProblemDto } from "./dto/create-problem.dto";
 import type { ListProblemsQueryDto } from "./dto/list-problems-query.dto";
 

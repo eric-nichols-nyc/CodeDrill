@@ -1,12 +1,16 @@
-# neon-jwt-api
+# CodeDrill API (`apps/api`)
 
-NestJS API on Neon Postgres with **[Better Auth](https://www.better-auth.com/)** (email/password) and **[@thallesp/nestjs-better-auth](https://github.com/ThallesP/nestjs-better-auth)**. Auth routes live under `/api/auth/*`; session cookies protect everything else unless a route is marked `@AllowAnonymous()`.
+NestJS service on **Neon Postgres** with **[Better Auth](https://www.better-auth.com/)** (email/password), **[@thallesp/nestjs-better-auth](https://github.com/ThallesP/nestjs-better-auth)**, and **Drizzle ORM** for the practice catalog (problems, submissions, chat threads, etc.).
+
+Auth routes are mounted under `/api/auth/*`. Session cookies protect routes unless they use `@AllowAnonymous()` (see `ProblemsController` + `ProblemsAccessGuard` for the problems API).
+
+The pnpm workspace package name is **`neon-jwt-api`**; the app lives in **`apps/api`**.
 
 ## Prerequisites
 
-- Node.js 18+ (nestjs-better-auth’s package may recommend Node 22+; use the version your install resolves to)
+- Node.js 18+ (follow what your Nest / better-auth install resolves to)
 - [pnpm](https://pnpm.io/) (monorepo uses `pnpm@10`)
-- A [Neon](https://neon.tech/) Postgres database and connection string
+- A [Neon](https://neon.tech/) Postgres database and `DATABASE_URL`
 
 ## Setup
 
@@ -20,14 +24,15 @@ pnpm install
 
 ### 2. Environment variables
 
-Copy `.env.example` to `.env` in **this directory** (`apps/neon-jwt-api/`) and fill in values:
+Create **`apps/api/.env`** (see comments in `src/database/database.module.ts` and `src/auth.ts` for required variables). Typical values:
 
 | Variable | Purpose |
 |----------|---------|
-| `DATABASE_URL` | Neon Postgres connection string |
-| `BETTER_AUTH_SECRET` | At least 32 characters; used by Better Auth ([docs](https://www.better-auth.com/docs/installation)) |
-| `BETTER_AUTH_URL` | Public base URL of **this API** (e.g. `http://localhost:3030`). Must match what clients and curl use. |
-| `BETTER_AUTH_TRUSTED_ORIGINS` | Comma-separated browser origins allowed for CORS/cookies (e.g. your Next app at `http://localhost:3010`) |
+| `DATABASE_URL` | Neon Postgres connection string (Better Auth + Drizzle) |
+| `BETTER_AUTH_SECRET` | At least 32 characters ([Better Auth installation](https://www.better-auth.com/docs/installation)) |
+| `BETTER_AUTH_URL` | Public base URL of **this API** (e.g. `http://localhost:3030`). Must match what browsers and `curl` use. |
+| `BETTER_AUTH_TRUSTED_ORIGINS` | Comma-separated origins for CORS/cookies (e.g. Next app `http://localhost:3010`) |
+| `INTERNAL_PROBLEMS_SECRET` | Optional shared secret; when set, `x-internal-problems-secret` can authorize `/problems` routes for server-to-server calls (Next admin BFF). |
 | `PORT` | Optional; defaults to **3030** |
 
 Generate a secret:
@@ -36,25 +41,31 @@ Generate a secret:
 openssl rand -base64 32
 ```
 
-### 3. Database schema (Better Auth tables)
+### 3. Better Auth tables
 
 Required before sign-up works.
 
-**Option A — CLI migrate** (from `apps/neon-jwt-api`):
-
 ```bash
-pnpm auth:migrate
+pnpm --filter neon-jwt-api auth:migrate
 ```
 
-**Option B — SQL in Neon**
-
-If migrate is awkward in your environment, generate SQL and run it in the Neon SQL editor:
+Or generate SQL and run it in the Neon SQL editor:
 
 ```bash
-pnpm auth:generate
+pnpm --filter neon-jwt-api auth:generate
 ```
 
-Then execute the generated file under `better-auth_migrations/` (or the path the CLI prints) once against the same database as `DATABASE_URL`.
+### 4. Practice catalog + chat tables (Drizzle)
+
+Table definitions live in **`src/database/schema.ts`** (single file: tables + exported `schema` object for `drizzle({ schema })`).
+
+Push schema to the database (development):
+
+```bash
+pnpm --filter neon-jwt-api db:push
+```
+
+Reference SQL for Neon is also under **`sql/practice-platform.sql`**.
 
 ## Run
 
@@ -64,7 +75,7 @@ From the monorepo root:
 pnpm --filter neon-jwt-api dev
 ```
 
-Or from `apps/neon-jwt-api`:
+Or from `apps/api`:
 
 ```bash
 pnpm dev
@@ -72,23 +83,42 @@ pnpm dev
 
 Default URL: `http://localhost:3030` (or your `PORT`).
 
-## What’s in the app
+## HTTP surface
 
-- **Better Auth** — `POST /api/auth/sign-up/email`, `POST /api/auth/sign-in/email`, session cookies, etc. ([basic usage](https://www.better-auth.com/docs/basic-usage))
-- **`GET /`** — public (`@AllowAnonymous()`)
-- **`GET /me`** — requires a valid session cookie (example protected route)
+### Better Auth
+
+- `POST /api/auth/sign-up/email`, `POST /api/auth/sign-in/email`, session cookies, etc. ([basic usage](https://www.better-auth.com/docs/basic-usage))
+
+### Session example
+
+- **`GET /me`** — requires a valid Better Auth session cookie (`SessionController`).
+
+### Problems catalog (`ProblemsController`)
+
+Base path: **`/problems`**. Access: **Better Auth session** or **`x-internal-problems-secret`** when `INTERNAL_PROBLEMS_SECRET` is set (see `ProblemsAccessGuard`).
+
+Examples: `GET /problems`, `GET /problems/by-slug/:slug`, `GET /problems/:id/details`, `POST /problems`, `PUT /problems/:id`.
+
+### Problem chat (`ProblemChatController`)
+
+Per-user tutor message history. **Session only** — no internal-secret bypass. `:problemId` is a **UUID** matching `problems.id`.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/problems/:problemId/chat/messages` | Ensures a thread exists, returns `{ thread, messages }` (up to 500 messages, oldest first). |
+| `POST` | `/problems/:problemId/chat/messages` | Body: `{ "content": string, "metadata"?: object }`. Appends a **`user`** row; assistant rows are intended to be written server-side when you add the LLM. |
+
+Use **`@Session()`** / `session.user.id` for other user-scoped features ([NestJS + Better Auth](https://www.better-auth.com/docs/integrations/nestjs)).
 
 ## curl examples
-
-Set a base URL so you can swap host/port easily:
 
 ```bash
 export BASE=http://localhost:3030
 ```
 
-Ensure `BASE` matches **`BETTER_AUTH_URL`** in `.env`.
+`BASE` must match **`BETTER_AUTH_URL`**.
 
-### Sign up (email + password)
+### Sign up
 
 ```bash
 curl -X POST "$BASE/api/auth/sign-up/email" \
@@ -96,9 +126,7 @@ curl -X POST "$BASE/api/auth/sign-up/email" \
   -d '{"email":"test@example.com","password":"password123","name":"Test User"}'
 ```
 
-Password must meet Better Auth’s minimum length (often 8+ characters).
-
-### Sign in and save session cookie
+### Sign in (save cookies)
 
 ```bash
 curl -X POST "$BASE/api/auth/sign-in/email" \
@@ -107,25 +135,19 @@ curl -X POST "$BASE/api/auth/sign-in/email" \
   -c cookies.txt
 ```
 
-### Call a protected route
+### Protected route
 
 ```bash
 curl "$BASE/me" -b cookies.txt
 ```
 
-### Sign out (Better Auth)
+### List chat messages for a problem (after sign-in)
 
 ```bash
-curl -X POST "$BASE/api/auth/sign-out" \
-  -b cookies.txt \
-  -c cookies.txt
+curl "$BASE/problems/00000000-0000-0000-0000-000000000001/chat/messages" -b cookies.txt
 ```
 
-(Exact sign-out path follows your Better Auth version; if this returns 404, check [Better Auth API routes](https://www.better-auth.com/docs) or run `pnpm dlx auth@latest info --config src/auth.ts`.)
-
-## Private API + database access
-
-Use **`@Session()`** from `@thallesp/nestjs-better-auth` on controllers that should only run for logged-in users, and scope your own SQL to `session.user.id` (authorization is still your responsibility). See the [NestJS integration guide](https://www.better-auth.com/docs/integrations/nestjs).
+Replace the UUID with a real `problems.id` from your database.
 
 ## Scripts
 
@@ -134,12 +156,17 @@ Use **`@Session()`** from `@thallesp/nestjs-better-auth` on controllers that sho
 | `pnpm dev` | Nest watch mode |
 | `pnpm build` | Compile to `dist/` |
 | `pnpm start` | Run `node dist/main.js` |
+| `pnpm test` | Jest |
 | `pnpm auth:migrate` | Apply Better Auth schema via CLI |
-| `pnpm auth:generate` | Emit SQL migration files for manual apply |
+| `pnpm auth:generate` | Emit Better Auth SQL for manual apply |
+| `pnpm db:push` | Drizzle: push `schema.ts` to Postgres (`--strict`) |
+| `pnpm db:generate` | Drizzle: generate SQL migrations |
+| `pnpm db:migrate` | Drizzle: run migrations |
+| `pnpm db:studio` | Drizzle Kit Studio |
 
 ## References
 
 - [Better Auth — Installation](https://www.better-auth.com/docs/installation)
-- [Better Auth — CLI](https://www.better-auth.com/docs/concepts/cli)
-- [Better Auth — PostgreSQL adapter](https://www.better-auth.com/docs/adapters/postgresql)
+- [Better Auth — NestJS](https://www.better-auth.com/docs/integrations/nestjs)
+- [Drizzle ORM](https://orm.drizzle.team/)
 - [nestjs-better-auth](https://github.com/ThallesP/nestjs-better-auth)

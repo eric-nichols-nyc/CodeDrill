@@ -1,11 +1,11 @@
 import { SplitLayout } from "@/components/split-layout";
 import { asRecord } from "@/features/problem-detail/problem-detail-helpers";
-import { ProblemDetailLeftPane } from "@/features/problem-detail/problem-detail-left-pane";
+import { ProblemDetailLeftPane } from "@/features/problem-detail/components/problem-detail-left-pane";
 import type {
   ProblemRow,
   ProblemSolutionRow,
 } from "@/features/problem-detail/problem-detail-types";
-import { ProblemWorkspace } from "@/features/problem-detail/problem-workspace";
+import { ProblemWorkspace } from "@/features/problem-detail/components/problem-workspace";
 
 function pickConstraints(raw: unknown): string | null | undefined {
   if (typeof raw === "string") {
