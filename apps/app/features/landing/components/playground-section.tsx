@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@repo/design-system/lib/utils";
 import { Button } from "@repo/design-system/components/ui/button";
+import { cn } from "@repo/design-system/lib/utils";
 import { Copy, Play, SquareTerminal } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -70,8 +70,7 @@ export function PlaygroundSection() {
     setMounted(true);
   }, []);
 
-  const editorTheme =
-    mounted && resolvedTheme === "dark" ? "vs-dark" : "vs";
+  const editorTheme = mounted && resolvedTheme === "dark" ? "vs-dark" : "vs";
 
   const selectLang = useCallback((next: PlaygroundLang) => {
     setLang(next);
@@ -90,6 +89,7 @@ export function PlaygroundSection() {
   }
 
   function runCode() {
+    console.log("[playground-section] runCode", { code });
     // POST /submissions/run when wired
   }
 

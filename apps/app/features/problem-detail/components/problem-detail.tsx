@@ -37,12 +37,14 @@ export function ProblemDetail({
   hints,
   starterCode,
   solutions,
+  testCases,
 }: {
   problem: unknown;
   examples: unknown;
   hints: unknown;
   starterCode: unknown;
   solutions: ProblemSolutionRow[];
+  testCases?: unknown;
 }) {
   const p = problemRow(problem);
   const exampleList = Array.isArray(examples) ? examples : [];
@@ -80,7 +82,9 @@ export function ProblemDetail({
       className="h-full min-h-0 flex-1"
       defaultLeftPercent={46}
       left={left}
-      right={<ProblemWorkspace starterCode={starterCode} />}
+      right={
+        <ProblemWorkspace starterCode={starterCode} testCases={testCases} />
+      }
     />
   );
 }

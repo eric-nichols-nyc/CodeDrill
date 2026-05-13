@@ -1,18 +1,18 @@
 "use client";
 
+import { Badge } from "@repo/design-system/components/ui/badge";
+import { Button } from "@repo/design-system/components/ui/button";
 import { Play, Send } from "lucide-react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { SplitLayout } from "@/components/split-layout";
-import { Button } from "@repo/design-system/components/ui/button";
-import { Badge } from "@repo/design-system/components/ui/badge";
 import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
+import { MonacoSolutionEdtor } from "@/features/problem-detail/components/monaco-solution-edtor";
+import { ProblemOutputPanel } from "@/features/problem-detail/components/problem-output-panel";
 import {
   asRecord,
   rowKey,
   strField,
 } from "@/features/problem-detail/problem-detail-helpers";
-import { ProblemOutputPanel } from "@/features/problem-detail/components/problem-output-panel";
-import { SolutionEditor } from "@/features/problem-detail/components/solution-editor";
 
 type StarterCodeRow = {
   key: string;
@@ -58,62 +58,25 @@ function nowLabel() {
   }).format(new Date());
 }
 
-function formatConsoleValue(value: unknown): string {
-  if (typeof value === "string") {
-    return value;
-  }
-
-  if (value instanceof Error) {
-    return value.stack ?? value.message;
-  }
-
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return String(value);
-  }
+function runClientTests(
+  code: string,
+  functionName: string,
+  tests: unknown
+): void {
+  console.log("[problem-workspace] runClientTests", {
+    code,
+    functionName,
+    tests,
+  });
 }
 
-function runJavaScript(code: string) {
-  const logs: string[] = [];
-  const originalConsole = {
-    log: console.log,
-    info: console.info,
-    warn: console.warn,
-    error: console.error,
-  };
-
-  const capture = (...args: unknown[]) => {
-    logs.push(args.map((arg) => formatConsoleValue(arg)).join(" "));
-  };
-
-  console.log = capture;
-  console.info = capture;
-  console.warn = capture;
-  console.error = capture;
-
-  try {
-    const runner = new Function(code);
-    runner();
-    return {
-      ok: true as const,
-      logs,
-    };
-  } catch (error) {
-    return {
-      ok: false as const,
-      logs,
-      error: formatConsoleValue(error),
-    };
-  } finally {
-    console.log = originalConsole.log;
-    console.info = originalConsole.info;
-    console.warn = originalConsole.warn;
-    console.error = originalConsole.error;
-  }
-}
-
-export function ProblemWorkspace({ starterCode }: { starterCode: unknown }) {
+export function ProblemWorkspace({
+  starterCode,
+  testCases,
+}: {
+  starterCode: unknown;
+  testCases?: unknown;
+}) {
   const rows = useMemo(() => toStarterCodeRows(starterCode), [starterCode]);
   const [drafts, setDrafts] = useState<Record<string, string>>(() =>
     buildInitialDrafts(rows)
@@ -151,62 +114,6 @@ export function ProblemWorkspace({ starterCode }: { starterCode: unknown }) {
     ]);
   }
 
-  function handleRun() {
-    setActiveTab("console");
-    setLastAction("run");
-    startTransition(() => {
-      appendConsole(
-        "info",
-        `Run requested for ${rows.length} file${rows.length === 1 ? "" : "s"} (${totalChars} chars).`
-      );
-
-      if (rows.length === 0) {
-        appendConsole("error", "Nothing to run because no starter files were loaded.");
-        return;
-      }
-
-      const unsupported = rows.filter((row) => {
-        const language = row.language.toLowerCase();
-        return language !== "javascript" && language !== "js";
-      });
-
-      if (unsupported.length > 0) {
-        appendConsole(
-          "error",
-          `Local Run currently supports JavaScript only. Unsupported languages: ${unsupported
-            .map((row) => row.language)
-            .join(", ")}.`
-        );
-        return;
-      }
-
-      const combinedCode = rows.map((row) => drafts[row.key] ?? "").join("\n\n");
-      const result = runJavaScript(combinedCode);
-
-      for (const log of result.logs) {
-        appendConsole("success", log);
-      }
-
-      if (!result.ok) {
-        appendConsole("error", result.error);
-        return;
-      }
-
-      if (result.logs.length === 0) {
-        const namedFunction = rows.find((row) => row.functionName);
-        if (namedFunction?.functionName) {
-          appendConsole(
-            "info",
-            `Program ran with no console output. ${namedFunction.functionName}(...) is defined, but it was not called.`
-          );
-          return;
-        }
-
-        appendConsole("info", "Program ran successfully with no console output.");
-      }
-    });
-  }
-
   function handleSubmit() {
     setActiveTab("results");
     setLastAction("submit");
@@ -234,12 +141,11 @@ export function ProblemWorkspace({ starterCode }: { starterCode: unknown }) {
     if (rows.length === 1) {
       const row = rows[0];
       return (
-        <SolutionEditor
-          fillHeight
+        <MonacoSolutionEdtor
+          className="h-full"
           onChange={(nextValue) =>
             setDrafts((prev) => ({ ...prev, [row.key]: nextValue }))
           }
-          row={row.raw}
           value={drafts[row.key] ?? ""}
         />
       );
@@ -249,12 +155,11 @@ export function ProblemWorkspace({ starterCode }: { starterCode: unknown }) {
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="space-y-4">
           {rows.map((row) => (
-            <SolutionEditor
+            <MonacoSolutionEdtor
               key={row.key}
               onChange={(nextValue) =>
                 setDrafts((prev) => ({ ...prev, [row.key]: nextValue }))
               }
-              row={row.raw}
               value={drafts[row.key] ?? ""}
             />
           ))}
@@ -275,7 +180,21 @@ export function ProblemWorkspace({ starterCode }: { starterCode: unknown }) {
           {rows[0] ? <Badge variant="outline">{rows[0].language}</Badge> : null}
         </div>
         <div className="flex items-center gap-2">
-          <Button disabled={isPending} onClick={handleRun} size="sm" variant="outline">
+          <Button
+            disabled={isPending}
+            onClick={() => {
+              setActiveTab("console");
+              setLastAction("run");
+              const combinedCode = rows
+                .map((row) => drafts[row.key] ?? "")
+                .join("\n\n");
+              const functionName =
+                rows.find((row) => row.functionName)?.functionName ?? "";
+              runClientTests(combinedCode, functionName, testCases);
+            }}
+            size="sm"
+            variant="outline"
+          >
             <Play />
             Run
           </Button>
@@ -285,7 +204,9 @@ export function ProblemWorkspace({ starterCode }: { starterCode: unknown }) {
           </Button>
         </div>
       </div>
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{starterBody}</div>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        {starterBody}
+      </div>
     </div>
   );
 

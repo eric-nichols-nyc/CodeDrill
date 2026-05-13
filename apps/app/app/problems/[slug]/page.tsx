@@ -13,6 +13,7 @@ type ProblemDetailBundle = {
   starterCode: unknown;
   learningNotes: unknown;
   solutions: ProblemSolutionRow[];
+  testCases?: unknown;
 };
 
 function isProblemDetailBundle(value: unknown): value is ProblemDetailBundle {
@@ -38,6 +39,7 @@ export default async function ProblemBySlugPage({
 }) {
   const { slug } = await params;
   const result = await fetchProblemBySlug(slug);
+  console.log("[problems/[slug]]", { slug, body: result.body });
 
   if (result.status === 404) {
     notFound();
@@ -100,6 +102,7 @@ export default async function ProblemBySlugPage({
               problem={bundle.problem}
               solutions={bundle.solutions}
               starterCode={bundle.starterCode}
+              testCases={bundle.testCases}
             />
           ) : (
             <div className="p-6">
