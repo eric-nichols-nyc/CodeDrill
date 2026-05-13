@@ -1,9 +1,8 @@
 "use client";
 
-import CodeMirror from "@uiw/react-codemirror";
-import { dracula } from "@uiw/codemirror-theme-dracula";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
+import { androidStudio } from "@fsegurai/codemirror-theme-android-studio";
 import {
   Select,
   SelectContent,
@@ -12,6 +11,7 @@ import {
   SelectValue,
 } from "@repo/design-system/components/ui/select";
 import { cn } from "@repo/design-system/lib/utils";
+import CodeMirror from "@uiw/react-codemirror";
 import { useMemo, useState } from "react";
 import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
 import {
@@ -50,7 +50,7 @@ export function SolutionEditor({
 
   const extensions = useMemo(
     () => [
-      dracula,
+      androidStudio,
       langExtension,
       EditorView.theme({
         "&": {
@@ -82,7 +82,7 @@ export function SolutionEditor({
         fillHeight ? "h-full min-h-0 flex-1" : ""
       )}
     >
-      <div className="flex shrink-0 items-center justify-between gap-2 border-[#44475a] border-b bg-[#21222c] px-3 py-2">
+      <div className="flex shrink-0 items-center justify-between gap-2 border-[#44475a] border-b bg-[#0c0c0e] px-3 py-2">
         <Select
           onValueChange={(v) => setSyntaxMode(v as SyntaxMode)}
           value={syntaxMode}

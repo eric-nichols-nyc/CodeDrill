@@ -185,6 +185,9 @@ importers:
       '@codemirror/view':
         specifier: ^6.42.1
         version: 6.42.1
+      '@fsegurai/codemirror-theme-android-studio':
+        specifier: ^6.2.5
+        version: 6.2.5(@codemirror/language@6.12.3)(@codemirror/state@6.6.0)(@codemirror/view@6.42.1)(@lezer/highlight@1.2.3)
       '@monaco-editor/react':
         specifier: 4.8.0-rc.3
         version: 4.8.0-rc.3(monaco-editor@0.55.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -3534,6 +3537,14 @@ packages:
 
   '@formatjs/intl-localematcher@0.6.2':
     resolution: {integrity: sha512-XOMO2Hupl0wdd172Y06h6kLpBz6Dv+J4okPLl4LPtzbr8f66WbIoy4ev98EBuZ6ZK4h5ydTN6XneT4QVpD7cdA==}
+
+  '@fsegurai/codemirror-theme-android-studio@6.2.5':
+    resolution: {integrity: sha512-UaIeR1tjGJOv7BZoU39y1lpFiVeZgJqeG5hiIXwLECBOTxqPT/brspGnoOQB7n9WepVL4XMjb6yOaYEUiJkX9g==}
+    peerDependencies:
+      '@codemirror/language': ^6.0.0
+      '@codemirror/state': ^6.0.0
+      '@codemirror/view': ^6.0.0
+      '@lezer/highlight': ^1.0.0
 
   '@google/generative-ai@0.24.1':
     resolution: {integrity: sha512-MqO+MLfM6kjxcKoy0p1wRzG3b4ZZXtPI+z2IE26UogS2Cm/XHO+7gGRBh6gcJsOiIVoH93UwKvW4HdgiOZCy9Q==}
@@ -16694,6 +16705,13 @@ snapshots:
   '@formatjs/intl-localematcher@0.6.2':
     dependencies:
       tslib: 2.8.1
+
+  '@fsegurai/codemirror-theme-android-studio@6.2.5(@codemirror/language@6.12.3)(@codemirror/state@6.6.0)(@codemirror/view@6.42.1)(@lezer/highlight@1.2.3)':
+    dependencies:
+      '@codemirror/language': 6.12.3
+      '@codemirror/state': 6.6.0
+      '@codemirror/view': 6.42.1
+      '@lezer/highlight': 1.2.3
 
   '@google/generative-ai@0.24.1': {}
 
