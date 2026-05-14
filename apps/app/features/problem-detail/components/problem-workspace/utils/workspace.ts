@@ -44,7 +44,7 @@ export function formatConsoleTimeLabel(): string {
   }).format(new Date());
 }
 
-/** Single script string for `new Function` / local Run: files joined in order. */
+/** Joins every starter file in order — not used for local Run (only one language executes). */
 export function combineStarterDrafts(
   rows: StarterCodeRow[],
   drafts: Record<string, string>

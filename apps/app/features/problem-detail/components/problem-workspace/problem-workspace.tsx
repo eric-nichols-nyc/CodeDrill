@@ -1,13 +1,20 @@
 "use client";
 
 /**
- * Problem workspace shell: starter editors (Monaco), Run/Submit actions, and the
- * output split (see `ProblemOutputPanel`). State and handlers live in
- * `useProblemWorkspace`.
+ * Problem workspace shell: one Monaco editor (starter language via dropdown when
+ * multiple), Run/Submit actions, and the output split (`ProblemOutputPanel`).
+ * State and handlers live in `useProblemWorkspace`.
  */
 
 import { Badge } from "@repo/design-system/components/ui/badge";
 import { Button } from "@repo/design-system/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/design-system/components/ui/select";
 import { Play, Send } from "lucide-react";
 import { SplitLayout } from "@/components/split-layout";
 import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
@@ -27,6 +34,8 @@ export function ProblemWorkspace({
     rows,
     drafts,
     setDraftForKey,
+    activeRow,
+    setActiveStarterKey,
     consoleEntries,
     activeTab,
     setActiveTab,
@@ -47,36 +56,41 @@ export function ProblemWorkspace({
       );
     }
 
-    if (rows.length === 1) {
-      const row = rows[0];
-      return (
-        <MonacoSolutionEdtor
-          className="h-full"
-          onChange={(nextValue) => setDraftForKey(row.key, nextValue)}
-          value={drafts[row.key] ?? ""}
-        />
-      );
+    if (!activeRow) {
+      return null;
     }
 
     return (
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-4">
-          {rows.map((row) => (
-            <div
-              className="flex h-[420px] min-h-[320px] flex-col overflow-hidden rounded-md border border-border"
-              key={row.key}
-            >
-              <div className="shrink-0 border-border border-b bg-muted/20 px-3 py-1.5">
-                <Badge variant="outline">{row.language}</Badge>
-              </div>
-              <MonacoSolutionEdtor
-                className="h-full"
-                onChange={(nextValue) => setDraftForKey(row.key, nextValue)}
-                value={drafts[row.key] ?? ""}
-              />
-            </div>
-          ))}
-        </div>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-border">
+        {rows.length > 1 ? (
+          <div className="flex shrink-0 items-center gap-2 border-border border-b bg-muted/20 px-3 py-1.5">
+            <span className="shrink-0 text-muted-foreground text-xs">
+              Language
+            </span>
+            <Select onValueChange={setActiveStarterKey} value={activeRow.key}>
+              <SelectTrigger
+                aria-label="Starter language"
+                className="h-8 w-[min(14rem,100%)]"
+                size="sm"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {rows.map((row) => (
+                  <SelectItem key={row.key} value={row.key}>
+                    {row.language}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ) : null}
+        <MonacoSolutionEdtor
+          className="h-full min-h-0"
+          language={activeRow.language}
+          onChange={(nextValue) => setDraftForKey(activeRow.key, nextValue)}
+          value={drafts[activeRow.key] ?? ""}
+        />
       </div>
     );
   })();
@@ -90,10 +104,17 @@ export function ProblemWorkspace({
             {rows.length} file{rows.length === 1 ? "" : "s"}
           </Badge>
           <Badge variant="outline">{totalChars} chars</Badge>
-          {rows[0] ? <Badge variant="outline">{rows[0].language}</Badge> : null}
+          {activeRow ? (
+            <Badge variant="outline">{activeRow.language}</Badge>
+          ) : null}
         </div>
         <div className="flex items-center gap-2">
-          <Button disabled={isPending} onClick={handleRun} size="sm" variant="outline">
+          <Button
+            disabled={isPending}
+            onClick={handleRun}
+            size="sm"
+            variant="outline"
+          >
             <Play />
             Run
           </Button>

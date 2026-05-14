@@ -6,8 +6,9 @@
  * **Data flow (high level)**
  * - `starterCode` (API-shaped `unknown`) → `toStarterCodeRows` → `rows` (`StarterCodeRow[]`).
  * - Each row has a stable `key`; `drafts[key]` is the live Monaco text for that snippet.
- * - **Run**: joins all drafts (`combineStarterDrafts`), picks `functionName` from rows, calls
- *   `runClientTests` in-browser; stores outcome in `lastRunOutcome`, switches tab to results.
+ * - **Run**: evaluates **only the active starter row** (same as the visible editor / language
+ *   dropdown), then `runClientTests` in-browser; stores outcome in `lastRunOutcome`, switches
+ *   tab to results. (Joining every language into one script breaks `new Function` for TS/Python.)
  * - **Submit**: placeholder UX only — appends synthetic lines to `consoleEntries` inside a
  *   transition; does not call a judge yet.
  *
@@ -25,9 +26,12 @@ import {
 } from "react";
 import type { ConsoleEntry } from "../types";
 import {
+  entryFunctionNameForRun,
+  resolveRunStarterRow,
+  runSourceForStarterRow,
+} from "../utils/run-target";
+import {
   buildInitialDrafts,
-  combineStarterDrafts,
-  firstStarterFunctionName,
   formatConsoleTimeLabel,
   toStarterCodeRows,
   totalDraftChars,
@@ -61,6 +65,9 @@ export function useProblemWorkspace({
   /* ─── Output pane: which tab is visible (`console` | `testcases` | `results`) ─── */
   const [activeTab, setActiveTab] = useState("console");
 
+  /* ─── Editor: which starter row is shown / used for Run (stable key into `rows`) ─ */
+  const [activeStarterKey, setActiveStarterKey] = useState("");
+
   /* ─── Output pane: badge + Results placeholder copy (`run` vs `submit` vs null) ─ */
   const [lastAction, setLastAction] = useState<"run" | "submit" | null>(null);
 
@@ -81,7 +88,18 @@ export function useProblemWorkspace({
     setConsoleEntries([]);
     setLastAction(null);
     setLastRunOutcome(null);
+    setActiveStarterKey((prev) => {
+      if (rows.length === 0) {
+        return "";
+      }
+      return rows.some((r) => r.key === prev) ? prev : rows[0].key;
+    });
   }, [rows]);
+
+  const activeRow = useMemo(
+    () => resolveRunStarterRow(rows, activeStarterKey),
+    [rows, activeStarterKey]
+  );
 
   /* ─── Toolbar / submit copy: total characters across all draft files ───────────── */
   const totalChars = totalDraftChars(rows, drafts);
@@ -113,10 +131,12 @@ export function useProblemWorkspace({
    */
   const handleRun = useCallback(() => {
     setLastAction("run");
-    const combinedCode = combineStarterDrafts(rows, drafts);
-    const functionName = firstStarterFunctionName(rows);
+    const runRow = resolveRunStarterRow(rows, activeStarterKey);
+    const combinedCode = runSourceForStarterRow(runRow, drafts);
+    const functionName = entryFunctionNameForRun(runRow, rows);
     console.log("[problem-workspace] Run clicked", {
       starterFileCount: rows.length,
+      activeStarterKey: activeStarterKey || "(default first row)",
       functionName: functionName || "(none)",
       combinedCodeLength: combinedCode.length,
       hasTestCases: testCases !== undefined && testCases !== null,
@@ -125,7 +145,7 @@ export function useProblemWorkspace({
     console.log("[problem-workspace] runClientTests outcome", outcome);
     setLastRunOutcome(outcome);
     setActiveTab("results");
-  }, [drafts, rows, testCases]);
+  }, [activeStarterKey, drafts, rows, testCases]);
 
   /**
    * **Submit** stub: switches to Results, marks `lastAction` submit, queues console messages.
@@ -153,6 +173,9 @@ export function useProblemWorkspace({
     rows,
     drafts,
     setDraftForKey,
+    activeRow,
+    activeStarterKey,
+    setActiveStarterKey,
     totalChars,
     // Output panel
     consoleEntries,
