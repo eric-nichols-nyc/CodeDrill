@@ -9,6 +9,8 @@ import {
 } from "@repo/design-system/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import type { CreateProblemBody } from "@/features/admin/lib/create-problem-schema";
+import { getDevSampleGroupAnagramsProblem } from "@/features/admin/problems/dev-sample-group-anagrams";
+import { getDevSampleLongestSubstringTwoDistinctProblem } from "@/features/admin/problems/dev-sample-longest-substring-two-distinct";
 import { getDevSampleLongestUniqueSubstringProblem } from "@/features/admin/problems/dev-sample-longest-unique-substring";
 import { getDevSampleProblem } from "@/features/admin/problems/move-zeros";
 
@@ -53,6 +55,22 @@ export function DevAdminProblemFill({ onFill }: DevAdminProblemFillProps) {
           }}
         >
           Longest unique substring (sliding window)
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer text-xs"
+          onSelect={() => {
+            onFill(getDevSampleLongestSubstringTwoDistinctProblem());
+          }}
+        >
+          Longest substring, at most 2 distinct (LC 159)
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer text-xs"
+          onSelect={() => {
+            onFill(getDevSampleGroupAnagramsProblem());
+          }}
+        >
+          Group anagrams (hash map)
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

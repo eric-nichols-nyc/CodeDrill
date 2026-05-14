@@ -1,6 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
 import {
   Tabs,
   TabsContent,
@@ -8,6 +7,7 @@ import {
   TabsTrigger,
 } from "@repo/design-system/components/ui/tabs";
 import { cn } from "@repo/design-system/lib/utils";
+import type { ReactNode } from "react";
 import { ProblemSolution } from "@/features/problem-detail/components/problem-solution";
 import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
 
@@ -19,7 +19,7 @@ export type ProblemTabsProps = {
 };
 
 const panelClass =
-  "min-h-0 flex-1 overflow-y-auto pr-1 pt-1 outline-none ring-offset-background focus-visible:outline-none";
+  "min-h-0 min-w-0 w-full flex-1 overflow-y-auto pr-4 pt-1 outline-none ring-offset-background focus-visible:outline-none";
 
 export function ProblemTabs({
   description,
@@ -30,7 +30,7 @@ export function ProblemTabs({
   return (
     <Tabs
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-hidden",
+        "flex min-h-0 min-w-0 flex-1 flex-col gap-2 overflow-hidden",
         className
       )}
       defaultValue="description"

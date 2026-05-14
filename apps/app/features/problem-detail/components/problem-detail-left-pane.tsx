@@ -23,15 +23,15 @@ function YoutubeEmbed({ videoId }: { videoId: string }) {
 
 function EditorialPanel({ editorial }: { editorial: ProblemEditorial }) {
   return (
-    <div className="space-y-6 pb-4">
+    <div className="w-full min-w-0 max-w-full space-y-6 pb-4">
       {editorial.title?.trim() ? (
-        <h2 className="font-semibold text-foreground text-lg tracking-tight">
+        <h2 className="wrap-break-word break-normal font-semibold text-foreground text-lg tracking-tight">
           {editorial.title}
         </h2>
       ) : null}
       {editorial.content.trim() ? (
         <div
-          className="prose prose-sm max-w-none [&_a]:text-primary [&_p]:text-foreground"
+          className="prose prose-sm wrap-break-word w-full min-w-0 max-w-none text-pretty break-normal [&_a]:text-primary [&_blockquote]:whitespace-normal [&_h1]:whitespace-normal [&_h2]:whitespace-normal [&_h3]:whitespace-normal [&_img]:max-w-full [&_li]:whitespace-normal [&_ol]:whitespace-normal [&_p]:whitespace-normal [&_p]:text-foreground [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:whitespace-pre [&_ul]:whitespace-normal"
           // biome-ignore lint/security/noDangerouslySetInnerHtml: admin-authored editorial HTML (Quill)
           dangerouslySetInnerHTML={{ __html: editorial.content }}
         />
@@ -84,7 +84,7 @@ export function ProblemDetailLeftPane({
   );
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden p-4 pr-3">
+    <div className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden p-4">
       <ProblemTabs
         className="min-h-0 flex-1"
         description={
