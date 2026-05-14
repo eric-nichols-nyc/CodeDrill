@@ -10,7 +10,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import type { CreateProblemBody } from "@/features/admin/lib/create-problem-schema";
 import { getDevSampleLongestUniqueSubstringProblem } from "@/features/admin/problems/dev-sample-longest-unique-substring";
-import { getDevSampleProblem } from "@/features/admin/problems/dev-sample-problem";
+import { getDevSampleProblem } from "@/features/admin/problems/move-zeros";
 
 type DevAdminProblemFillProps = {
   onFill: (sample: CreateProblemBody) => void;
