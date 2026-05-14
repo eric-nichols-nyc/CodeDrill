@@ -1,9 +1,47 @@
 import { ProblemDescriptionTab } from "@/features/problem-detail/components/problem-description-tab";
+import { ProblemTabs } from "@/features/problem-detail/components/problem-tabs";
 import type {
   ProblemRow,
   ProblemSolutionRow,
 } from "@/features/problem-detail/problem-detail-types";
-import { ProblemTabs } from "@/features/problem-detail/components/problem-tabs";
+
+const SOLO_URL_RE = /^https?:\/\/\S+$/i;
+const HTML_CLOSING_TAG_RE = /<\/[a-z][\w-]*>/i;
+
+function isProbablyHtmlFragment(s: string): boolean {
+  const t = s.trim();
+  return t.startsWith("<") && HTML_CLOSING_TAG_RE.test(t);
+}
+
+function EditorialBody({ source }: { source: string }) {
+  const trimmed = source.trim();
+  if (SOLO_URL_RE.test(trimmed)) {
+    return (
+      <a
+        className="text-primary text-sm underline-offset-4 hover:underline"
+        href={trimmed}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        Open link
+      </a>
+    );
+  }
+  if (isProbablyHtmlFragment(trimmed)) {
+    return (
+      <div
+        className="prose prose-sm max-w-none [&_a]:text-primary [&_p]:text-foreground"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: admin-authored editorial; trusted content
+        dangerouslySetInnerHTML={{ __html: trimmed }}
+      />
+    );
+  }
+  return (
+    <div className="max-w-none whitespace-pre-wrap text-foreground text-sm leading-relaxed">
+      {source}
+    </div>
+  );
+}
 
 export function ProblemDetailLeftPane({
   p,
@@ -31,19 +69,10 @@ export function ProblemDetailLeftPane({
   editorial: string | null;
 }) {
   const editorialTab = editorial ? (
-    <div className="space-y-2">
-      <a
-        className="text-primary text-sm underline-offset-4 hover:underline"
-        href={editorial}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        Watch on YouTube
-      </a>
-    </div>
+    <EditorialBody source={editorial} />
   ) : (
     <p className="text-muted-foreground text-sm">
-      No editorial is linked for this problem yet.
+      No editorial has been added for this problem yet.
     </p>
   );
 

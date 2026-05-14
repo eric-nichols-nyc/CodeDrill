@@ -48,7 +48,7 @@ export const createProblemBodySchema = z.object({
   skillFocus: z.string().max(200).optional(),
   tutorLevel: z.string().max(200).optional(),
   visualizationNotes: z.string().max(50_000).optional(),
-  editorial: z.string().url().max(2048).optional(),
+  editorial: z.string().max(50_000).optional(),
   tags: z.array(z.string().min(1).max(100)).optional(),
   examples: z.array(problemExampleSchema).optional(),
   starterCode: z.array(problemStarterCodeSchema).min(1),

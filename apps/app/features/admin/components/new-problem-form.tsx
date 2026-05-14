@@ -614,13 +614,12 @@ export function NewProblemForm({
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="editorial">Editorial URL (optional)</Label>
-              <Input
-                autoComplete="off"
+              <Label htmlFor="editorial">Editorial (optional)</Label>
+              <Textarea
+                className="min-h-[120px] font-mono text-sm"
                 id="editorial"
                 onChange={(e) => set("editorial")(e.target.value)}
-                placeholder="https://www.youtube.com/watch?v=..."
-                type="url"
+                placeholder="Plain text, or simple HTML (e.g. paragraph elements)."
                 value={values.editorial ?? ""}
               />
             </div>

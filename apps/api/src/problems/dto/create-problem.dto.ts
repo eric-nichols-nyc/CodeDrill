@@ -1,4 +1,4 @@
-import { Transform } from "class-transformer";
+import { Transform, Type } from "class-transformer";
 import {
   ArrayMinSize,
   ArrayUnique,
@@ -9,12 +9,10 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUrl,
   MaxLength,
   MinLength,
   ValidateNested,
 } from "class-validator";
-import { Type } from "class-transformer";
 
 const difficulties = ["easy", "medium", "hard"] as const;
 
@@ -177,10 +175,10 @@ export class CreateProblemDto {
   @MaxLength(50_000)
   visualizationNotes?: string;
 
-  /** Optional YouTube walkthrough / editorial link */
+  /** Optional walkthrough text (plain or simple HTML, e.g. <p>...</p>) */
   @IsOptional()
-  @IsUrl({ require_protocol: true })
-  @MaxLength(2048)
+  @IsString()
+  @MaxLength(50_000)
   editorial?: string;
 
   @IsOptional()
