@@ -44,7 +44,7 @@ export function DevAdminProblemFill({ onFill }: DevAdminProblemFillProps) {
             onFill(getDevSampleProblem());
           }}
         >
-          Two Sum
+          Move Zeros
         </DropdownMenuItem>
         <DropdownMenuItem
           className="cursor-pointer text-xs"

@@ -1,9 +1,18 @@
 "use client";
 
 /**
- * Centralizes workspace state: normalized starter rows, per-file draft text,
- * output tabs, console log, and last local test run. Resets when `starterCode`
- * yields new `rows` (problem or API payload changed).
+ * Workspace hook for the problem page editor + output pane.
+ *
+ * **Data flow (high level)**
+ * - `starterCode` (API-shaped `unknown`) → `toStarterCodeRows` → `rows` (`StarterCodeRow[]`).
+ * - Each row has a stable `key`; `drafts[key]` is the live Monaco text for that snippet.
+ * - **Run**: joins all drafts (`combineStarterDrafts`), picks `functionName` from rows, calls
+ *   `runClientTests` in-browser; stores outcome in `lastRunOutcome`, switches tab to results.
+ * - **Submit**: placeholder UX only — appends synthetic lines to `consoleEntries` inside a
+ *   transition; does not call a judge yet.
+ *
+ * **Reset**: when `rows` identity changes (new problem or `starterCode` array changed), drafts
+ * are rebuilt from server code and console / run snapshot / `lastAction` are cleared.
  */
 
 import { runClientTests, type RunClientTestsOutcome } from "@/features/problem-detail/client-test-run";
@@ -24,7 +33,13 @@ import {
   totalDraftChars,
 } from "../utils/workspace";
 
-/** @returns Everything the workspace UI needs; keeps `ProblemWorkspace` mostly presentational. */
+/**
+ * Single source of truth for editor rows, drafts, output tabs, faux console, and last Run.
+ *
+ * @param starterCode - Problem payload field: expected to be an array of starter objects (see
+ *   `toStarterCodeRows`); non-arrays yield `rows === []`.
+ * @param testCases - Passed through to `runClientTests` on Run; optional.
+ */
 export function useProblemWorkspace({
   starterCode,
   testCases,
@@ -32,18 +47,35 @@ export function useProblemWorkspace({
   starterCode: unknown;
   testCases?: unknown;
 }) {
+  /* ─── Derived: normalized starter list (not stored in useState; memo from prop) ─── */
   const rows = useMemo(() => toStarterCodeRows(starterCode), [starterCode]);
+
+  /* ─── Editor: one draft string per `row.key` (Monaco onChange → `setDraftForKey`) ─ */
   const [drafts, setDrafts] = useState<Record<string, string>>(() =>
     buildInitialDrafts(rows)
   );
+
+  /* ─── Output pane: Console tab lines (today mostly Submit-driven) ─────────────── */
   const [consoleEntries, setConsoleEntries] = useState<ConsoleEntry[]>([]);
+
+  /* ─── Output pane: which tab is visible (`console` | `testcases` | `results`) ─── */
   const [activeTab, setActiveTab] = useState("console");
+
+  /* ─── Output pane: badge + Results placeholder copy (`run` vs `submit` vs null) ─ */
   const [lastAction, setLastAction] = useState<"run" | "submit" | null>(null);
+
+  /* ─── Output pane: last `runClientTests` result; cleared when `rows` change ─────── */
   const [lastRunOutcome, setLastRunOutcome] =
     useState<RunClientTestsOutcome | null>(null);
+
+  /* ─── Submit path: `isPending` true while transition callbacks run ─────────────── */
   const [isPending, startTransition] = useTransition();
 
-  /** New problem / starter list → reset drafts, console, and last run snapshot. */
+  /**
+   * `rows` changes ⇒ new problem or starter list from server.
+   * Re-seed drafts from normalized `row.code`, wipe ephemeral output state.
+   * (Does not preserve in-progress edits across navigation — intentional for now.)
+   */
   useEffect(() => {
     setDrafts(buildInitialDrafts(rows));
     setConsoleEntries([]);
@@ -51,8 +83,10 @@ export function useProblemWorkspace({
     setLastRunOutcome(null);
   }, [rows]);
 
+  /* ─── Toolbar / submit copy: total characters across all draft files ───────────── */
   const totalChars = totalDraftChars(rows, drafts);
 
+  /** Append one line to the Console tab (synthetic log, not `window.console`). */
   const appendConsole = useCallback(
     (level: ConsoleEntry["level"], message: string) => {
       setConsoleEntries((prev) => [
@@ -68,10 +102,15 @@ export function useProblemWorkspace({
     []
   );
 
+  /** Update a single file’s draft by stable `StarterCodeRow.key`. */
   const setDraftForKey = useCallback((key: string, value: string) => {
     setDrafts((prev) => ({ ...prev, [key]: value }));
   }, []);
 
+  /**
+   * Local **Run**: evaluate combined user code + official testcases in the browser.
+   * Sets `lastAction` to `run`, stores outcome, jumps to Results tab.
+   */
   const handleRun = useCallback(() => {
     setLastAction("run");
     const combinedCode = combineStarterDrafts(rows, drafts);
@@ -88,6 +127,10 @@ export function useProblemWorkspace({
     setActiveTab("results");
   }, [drafts, rows, testCases]);
 
+  /**
+   * **Submit** stub: switches to Results, marks `lastAction` submit, queues console messages.
+   * Judge / network integration would replace or extend this.
+   */
   const handleSubmit = useCallback(() => {
     setActiveTab("results");
     setLastAction("submit");
@@ -106,16 +149,19 @@ export function useProblemWorkspace({
   }, [appendConsole, drafts, rows]);
 
   return {
+    // Editor
     rows,
     drafts,
     setDraftForKey,
+    totalChars,
+    // Output panel
     consoleEntries,
     activeTab,
     setActiveTab,
     lastAction,
     lastRunOutcome,
     isPending,
-    totalChars,
+    // Actions
     handleRun,
     handleSubmit,
   };

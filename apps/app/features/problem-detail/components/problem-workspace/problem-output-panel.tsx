@@ -21,8 +21,12 @@ import { normalizeProblemTestCases } from "@/features/problem-detail/client-test
 
 import type { ConsoleEntry } from "./types";
 
-/** Renders compile error, empty state, or per-case expected vs actual. */
+/**
+ * ─── Results tab body (when Run produced `lastRunOutcome`) ─────────────────────
+ * Rendered inside `TabsContent value="results"` via `<RunResultsBody />`.
+ */
 function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
+  // Branch: compile / parse failure from `runClientTests`
   if (outcome.compileError) {
     return (
       <div className="rounded-md border border-border/70 bg-background/70 px-3 py-3">
@@ -34,6 +38,7 @@ function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
     );
   }
 
+  // Branch: run succeeded but no normalized cases to show
   if (outcome.caseResults.length === 0) {
     return (
       <div className="rounded-md border border-border/70 bg-background/70 px-3 py-3">
@@ -45,6 +50,7 @@ function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
     );
   }
 
+  // Branch: per-case pass/fail + expected / actual (+ optional runtime error line)
   return (
     <div className="rounded-md border border-border/70 bg-background/70 px-3 py-3">
       <p className="font-medium">
@@ -85,7 +91,10 @@ function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
   );
 }
 
-/** Shown on Results tab before Run, or when Submit was last. */
+/**
+ * ─── Results tab placeholder (no Run snapshot or Submit-only flow) ────────────
+ * Rendered inside `TabsContent value="results"` when `RunResultsBody` is not used.
+ */
 function ResultsPlaceholder({
   lastAction,
 }: {
@@ -106,7 +115,7 @@ function ResultsPlaceholder({
   );
 }
 
-/** Tabbed output UI driven by `useProblemWorkspace` state. */
+/** Right-hand Output column: header → timer → tabbed Console / Testcases / Results. */
 export function ProblemOutputPanel({
   activeTab,
   consoleEntries,
@@ -129,7 +138,9 @@ export function ProblemOutputPanel({
     [testCases]
   );
   return (
+    /* ═══ Root: full-height column for this pane ═══════════════════════════════ */
     <div className="flex h-full min-h-0 flex-col gap-3 p-4 pl-3">
+      {/* ─── Row: "Output" title + status badges (`lastAction`, `isBusy`) ─────── */}
       <div className="flex shrink-0 items-center justify-between gap-3">
         <h2 className="font-medium text-muted-foreground text-sm">Output</h2>
         <div className="flex items-center gap-2">
@@ -140,13 +151,16 @@ export function ProblemOutputPanel({
         </div>
       </div>
 
+      {/* ─── Timer strip (shared above tabs; not tab-specific) ───────────────── */}
       <TimerPanelBar />
 
+      {/* ─── Tab shell: triggers switch `activeTab` via `onTabChange` ─────────── */}
       <Tabs
         className="flex min-h-0 flex-1 flex-col overflow-hidden"
         onValueChange={onTabChange}
         value={activeTab}
       >
+        {/* Tab labels only; panel bodies are sibling `TabsContent` nodes below */}
         <TabsList className="h-auto w-full justify-start gap-1">
           <TabsTrigger className="shrink-0" value="console">
             Console
@@ -159,12 +173,14 @@ export function ProblemOutputPanel({
           </TabsTrigger>
         </TabsList>
 
+        {/* ═══ TAB: Console — `consoleEntries` from workspace hook ═══════════════ */}
         <TabsContent
           className="min-h-0 flex-1 overflow-hidden rounded-md border border-border bg-muted/20"
           value="console"
         >
           <ScrollArea className="h-full">
             <div className="space-y-3 p-3 font-mono text-xs leading-6">
+              {/* Each entry: level + time header, then message */}
               {consoleEntries.length > 0 ? (
                 consoleEntries.map((entry) => (
                   <div
@@ -185,6 +201,7 @@ export function ProblemOutputPanel({
                   </div>
                 ))
               ) : (
+                /* Empty state when `consoleEntries` is [] */
                 <p className="text-muted-foreground">
                   Console output will appear here when you run code.
                 </p>
@@ -193,12 +210,14 @@ export function ProblemOutputPanel({
           </ScrollArea>
         </TabsContent>
 
+        {/* ═══ TAB: Testcases — `testCases` prop → `normalizeProblemTestCases` ═══ */}
         <TabsContent
           className="min-h-0 flex-1 overflow-hidden rounded-md border border-border bg-muted/20"
           value="testcases"
         >
           <ScrollArea className="h-full">
             <div className="p-3 text-sm">
+              {/* One `<li>` per row: badges + Input / Expected `<pre>` blocks */}
               {testCaseRows.length > 0 ? (
                 <ul className="space-y-3">
                   {testCaseRows.map((tc, index) => (
@@ -236,6 +255,7 @@ export function ProblemOutputPanel({
                   ))}
                 </ul>
               ) : (
+                /* Empty state when `testCaseRows` is [] */
                 <p className="text-muted-foreground">
                   No test cases are available for this problem.
                 </p>
@@ -244,12 +264,14 @@ export function ProblemOutputPanel({
           </ScrollArea>
         </TabsContent>
 
+        {/* ═══ TAB: Results — Run outcome vs placeholder ══════════════════════════ */}
         <TabsContent
           className="min-h-0 flex-1 overflow-hidden rounded-md border border-border bg-muted/20"
           value="results"
         >
           <ScrollArea className="h-full">
             <div className="space-y-3 p-3 text-sm">
+              {/* After Run: structured testcase results; else: status copy */}
               {lastRunOutcome !== null && lastAction === "run" ? (
                 <RunResultsBody outcome={lastRunOutcome} />
               ) : (
