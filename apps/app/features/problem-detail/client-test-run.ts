@@ -10,12 +10,27 @@ export type ClientTestCaseResult = {
   error?: string;
 };
 
+/** Lines emitted by user code via `console.log` / `warn` / `error` during a client Run. */
+export type CapturedConsoleLine = {
+  level: "log" | "warn" | "error";
+  message: string;
+};
+
 export type RunClientTestsOutcome = {
   /** Set when user code does not load or `functionName` is missing / not a function */
   compileError: string | null;
   /** True only when there is at least one case and every case passed */
   allPassed: boolean;
   caseResults: ClientTestCaseResult[];
+  /** Calls to `console.log` / `warn` / `error` inside evaluated user code during this run */
+  userConsole: CapturedConsoleLine[];
+};
+
+/** Bound natives so patching `console.log` does not break framework diagnostics */
+const dbg = {
+  log: console.log.bind(console),
+  warn: console.warn.bind(console),
+  error: console.error.bind(console),
 };
 
 function deepEqual(a: unknown, b: unknown): boolean {
@@ -32,6 +47,46 @@ function stringifyUnknown(value: unknown): string {
     // fall through
   }
   return String(value);
+}
+
+function formatConsoleArgs(args: unknown[]): string {
+  if (args.length === 0) {
+    return "";
+  }
+  return args.map((a) => stringifyUnknown(a)).join(" ");
+}
+
+/**
+ * Temporarily routes `console.log` / `warn` / `error` into `sink` and still forwards to the
+ * real console via `dbg` (so devtools keep working and our own logging stays uncaptured).
+ */
+function installUserConsoleCapture(sink: CapturedConsoleLine[]): () => void {
+  const prevLog = console.log;
+  const prevWarn = console.warn;
+  const prevError = console.error;
+
+  const patch =
+    (level: CapturedConsoleLine["level"]) =>
+    (...args: unknown[]) => {
+      sink.push({ level, message: formatConsoleArgs(args) });
+      if (level === "log") {
+        dbg.log(...args);
+      } else if (level === "warn") {
+        dbg.warn(...args);
+      } else {
+        dbg.error(...args);
+      }
+    };
+
+  console.log = patch("log") as typeof console.log;
+  console.warn = patch("warn") as typeof console.warn;
+  console.error = patch("error") as typeof console.error;
+
+  return () => {
+    console.log = prevLog;
+    console.warn = prevWarn;
+    console.error = prevError;
+  };
 }
 
 /**
@@ -95,121 +150,127 @@ export function runClientTests(
 ): RunClientTestsOutcome {
   const rows = normalizeTestRows(tests);
 
-  console.log("[client-test-run] start", {
+  dbg.log("[client-test-run] start", {
     functionName: functionName || "(empty)",
     codeLength: code.length,
     rawTestsIsArray: Array.isArray(tests),
     normalizedCaseCount: rows.length,
   });
 
+  const emptyOutcome = (
+    compileError: string | null,
+    partial: Omit<Partial<RunClientTestsOutcome>, "compileError"> = {}
+  ): RunClientTestsOutcome => ({
+    compileError,
+    allPassed: false,
+    caseResults: [],
+    userConsole: [],
+    ...partial,
+  });
+
   if (!functionName) {
-    console.log("[client-test-run] abort: no function name");
-    return {
-      compileError: "No function name is set on starter code for this run.",
-      allPassed: false,
-      caseResults: [],
-    };
+    dbg.log("[client-test-run] abort: no function name");
+    return emptyOutcome("No function name is set on starter code for this run.");
   }
 
   if (rows.length === 0) {
-    console.log("[client-test-run] abort: zero test rows after normalize");
-    return {
-      compileError: null,
-      allPassed: false,
-      caseResults: [],
-    };
+    dbg.log("[client-test-run] abort: zero test rows after normalize");
+    return emptyOutcome(null);
   }
 
-  let fn: unknown;
+  const userConsole: CapturedConsoleLine[] = [];
+  const restoreCapture = installUserConsoleCapture(userConsole);
+
   try {
-    fn = new Function(`${code}\n;return ${functionName};`)();
-    console.log("[client-test-run] evaluated code; resolved entry:", typeof fn);
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Could not evaluate your code";
-    console.log("[client-test-run] compile/parse error", message);
-    return {
-      compileError: message,
-      allPassed: false,
-      caseResults: [],
-    };
-  }
-
-  if (typeof fn !== "function") {
-    console.log("[client-test-run] not a function:", functionName, typeof fn);
-    return {
-      compileError: `\`${functionName}\` is not a function after running your code`,
-      allPassed: false,
-      caseResults: [],
-    };
-  }
-
-  const callee = fn as (...args: unknown[]) => unknown;
-  const caseResults: ClientTestCaseResult[] = rows.map((row, index) => {
-    let expected: unknown;
+    let fn: unknown;
     try {
-      expected = JSON.parse(row.expectedOutput);
+      fn = new Function(`${code}\n;return ${functionName};`)();
+      dbg.log("[client-test-run] evaluated code; resolved entry:", typeof fn);
     } catch (error) {
-      const err =
-        error instanceof Error
-          ? `Invalid expectedOutput JSON: ${error.message}`
-          : "Invalid expectedOutput JSON";
-      console.log(`[client-test-run] case ${index}: bad expectedOutput`, row.expectedOutput);
-      return {
-        index,
-        passed: false,
-        expectedDisplay: row.expectedOutput,
-        actualDisplay: "",
-        error: err,
-      };
+      const message =
+        error instanceof Error ? error.message : "Could not evaluate your code";
+      dbg.log("[client-test-run] compile/parse error", message);
+      return emptyOutcome(message, { userConsole });
     }
 
-    try {
-      const args = parseCallArgs(row.input);
-      const actual = callee(...args);
-      const passed = deepEqual(actual, expected);
-      console.log(`[client-test-run] case ${index}`, {
-        args,
-        expected,
-        actual,
-        passed,
-      });
-      return {
-        index,
-        passed,
-        expectedDisplay: stringifyUnknown(expected),
-        actualDisplay: stringifyUnknown(actual),
-      };
-    } catch (error) {
-      const errMsg = error instanceof Error ? error.message : "Runtime error";
-      console.log(`[client-test-run] case ${index}: runtime error`, errMsg);
-      return {
-        index,
-        passed: false,
-        expectedDisplay: stringifyUnknown(expected),
-        actualDisplay: "",
-        error: errMsg,
-      };
+    if (typeof fn !== "function") {
+      dbg.log("[client-test-run] not a function:", functionName, typeof fn);
+      return emptyOutcome(
+        `\`${functionName}\` is not a function after running your code`,
+        { userConsole }
+      );
     }
-  });
 
-  const allPassed =
-    caseResults.length > 0 && caseResults.every((r) => r.passed);
+    const callee = fn as (...args: unknown[]) => unknown;
+    const caseResults: ClientTestCaseResult[] = rows.map((row, index) => {
+      let expected: unknown;
+      try {
+        expected = JSON.parse(row.expectedOutput);
+      } catch (error) {
+        const err =
+          error instanceof Error
+            ? `Invalid expectedOutput JSON: ${error.message}`
+            : "Invalid expectedOutput JSON";
+        dbg.log(`[client-test-run] case ${index}: bad expectedOutput`, row.expectedOutput);
+        return {
+          index,
+          passed: false,
+          expectedDisplay: row.expectedOutput,
+          actualDisplay: "",
+          error: err,
+        };
+      }
 
-  const outcome = {
-    compileError: null,
-    allPassed,
-    caseResults,
-  };
-  console.log("[client-test-run] done", {
-    allPassed,
-    compileError: outcome.compileError,
-    summaries: caseResults.map((r) => ({
-      i: r.index,
-      passed: r.passed,
-      err: r.error,
-    })),
-  });
+      try {
+        const args = parseCallArgs(row.input);
+        const actual = callee(...args);
+        const passed = deepEqual(actual, expected);
+        dbg.log(`[client-test-run] case ${index}`, {
+          args,
+          expected,
+          actual,
+          passed,
+        });
+        return {
+          index,
+          passed,
+          expectedDisplay: stringifyUnknown(expected),
+          actualDisplay: stringifyUnknown(actual),
+        };
+      } catch (error) {
+        const errMsg = error instanceof Error ? error.message : "Runtime error";
+        dbg.log(`[client-test-run] case ${index}: runtime error`, errMsg);
+        return {
+          index,
+          passed: false,
+          expectedDisplay: stringifyUnknown(expected),
+          actualDisplay: "",
+          error: errMsg,
+        };
+      }
+    });
 
-  return outcome;
+    const allPassed =
+      caseResults.length > 0 && caseResults.every((r) => r.passed);
+
+    const outcome: RunClientTestsOutcome = {
+      compileError: null,
+      allPassed,
+      caseResults,
+      userConsole,
+    };
+    dbg.log("[client-test-run] done", {
+      allPassed,
+      compileError: outcome.compileError,
+      summaries: caseResults.map((r) => ({
+        i: r.index,
+        passed: r.passed,
+        err: r.error,
+      })),
+    });
+
+    return outcome;
+  } finally {
+    restoreCapture();
+  }
 }

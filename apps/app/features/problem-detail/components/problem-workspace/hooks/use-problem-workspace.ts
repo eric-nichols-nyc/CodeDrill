@@ -6,9 +6,9 @@
  * **Data flow (high level)**
  * - `starterCode` (API-shaped `unknown`) → `toStarterCodeRows` → `rows` (`StarterCodeRow[]`).
  * - Each row has a stable `key`; `drafts[key]` is the live Monaco text for that snippet.
- * - **Run**: evaluates **only the active starter row** (same as the visible editor / language
- *   dropdown), then `runClientTests` in-browser; stores outcome in `lastRunOutcome`, switches
- *   tab to results. (Joining every language into one script breaks `new Function` for TS/Python.)
+ * **Run**: evaluates only the active starter row, wraps `console.log`/`warn`/`error` during
+ *   evaluation and testcase invocation; those strings are appended to **`consoleEntries`** while
+ *   structured results stay in **`lastRunOutcome`**.
  * - **Submit**: placeholder UX only — appends synthetic lines to `consoleEntries` inside a
  *   transition; does not call a judge yet.
  *
@@ -104,7 +104,7 @@ export function useProblemWorkspace({
   /* ─── Toolbar / submit copy: total characters across all draft files ───────────── */
   const totalChars = totalDraftChars(rows, drafts);
 
-  /** Append one line to the Console tab (synthetic log, not `window.console`). */
+  /** Append synthetic info/success lines, or captured user log/warn/error lines from Run. */
   const appendConsole = useCallback(
     (level: ConsoleEntry["level"], message: string) => {
       setConsoleEntries((prev) => [
@@ -143,6 +143,22 @@ export function useProblemWorkspace({
     });
     const outcome = runClientTests(combinedCode, functionName, testCases);
     console.log("[problem-workspace] runClientTests outcome", outcome);
+
+    const runLabel = formatConsoleTimeLabel();
+    const runStamp = Date.now();
+    setConsoleEntries((prev) => {
+      if (outcome.userConsole.length === 0) {
+        return prev;
+      }
+      const appended = outcome.userConsole.map((line, i) => ({
+        id: `${runStamp}-run-${prev.length + i}`,
+        createdAt: runLabel,
+        level: line.level,
+        message: line.message,
+      }));
+      return [...prev, ...appended];
+    });
+
     setLastRunOutcome(outcome);
     setActiveTab("results");
   }, [activeStarterKey, drafts, rows, testCases]);

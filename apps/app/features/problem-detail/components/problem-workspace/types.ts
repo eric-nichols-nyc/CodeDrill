@@ -11,10 +11,10 @@ export type StarterCodeRow = {
   code: string | null;
 };
 
-/** Single line in the workspace Console tab (submit / future run output). */
+/** Single line in the workspace Console tab (submit placeholders or captured user logs). */
 export type ConsoleEntry = {
   id: string;
-  level: "info" | "success" | "error";
+  level: "info" | "success" | "error" | "log" | "warn";
   message: string;
   createdAt: string;
 };

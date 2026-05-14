@@ -21,6 +21,16 @@ import { normalizeProblemTestCases } from "@/features/problem-detail/client-test
 
 import type { ConsoleEntry } from "./types";
 
+function consoleEntryToneClass(level: ConsoleEntry["level"]): string {
+  if (level === "error") {
+    return "text-destructive";
+  }
+  if (level === "warn") {
+    return "text-amber-700 dark:text-amber-400";
+  }
+  return "";
+}
+
 /**
  * ─── Results tab body (when Run produced `lastRunOutcome`) ─────────────────────
  * Rendered inside `TabsContent value="results"` via `<RunResultsBody />`.
@@ -191,11 +201,7 @@ export function ProblemOutputPanel({
                       <span>{entry.level}</span>
                       <span>{entry.createdAt}</span>
                     </div>
-                    <p
-                      className={
-                        entry.level === "error" ? "text-destructive" : ""
-                      }
-                    >
+                    <p className={consoleEntryToneClass(entry.level)}>
                       {entry.message}
                     </p>
                   </div>
