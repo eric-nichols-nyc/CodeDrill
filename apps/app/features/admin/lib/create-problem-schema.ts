@@ -36,6 +36,17 @@ export const problemTestCaseSchema = z.object({
   sortOrder: z.number().int().optional(),
 });
 
+export const editorialYoutubeEmbedSchema = z.object({
+  type: z.literal("youtube"),
+  videoId: z.string().max(32),
+});
+
+export const problemEditorialSchema = z.object({
+  title: z.string().max(500).optional(),
+  content: z.string().max(50_000),
+  embeds: z.array(editorialYoutubeEmbedSchema),
+});
+
 export const createProblemBodySchema = z.object({
   title: z.string().min(1).max(500),
   slug: z.string().min(1).max(200),
@@ -48,7 +59,7 @@ export const createProblemBodySchema = z.object({
   skillFocus: z.string().max(200).optional(),
   tutorLevel: z.string().max(200).optional(),
   visualizationNotes: z.string().max(50_000).optional(),
-  editorial: z.string().max(50_000).optional(),
+  editorial: problemEditorialSchema.optional(),
   tags: z.array(z.string().min(1).max(100)).optional(),
   examples: z.array(problemExampleSchema).optional(),
   starterCode: z.array(problemStarterCodeSchema).min(1),

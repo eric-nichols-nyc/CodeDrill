@@ -20,6 +20,7 @@ import {
 } from "../database/schema";
 import type { CreateProblemDto } from "./dto/create-problem.dto";
 import type { ListProblemsQueryDto } from "./dto/list-problems-query.dto";
+import { editorialDtoToDbText } from "./editorial-db";
 
 type AppDb = NeonHttpDatabase<typeof schema>;
 
@@ -46,7 +47,7 @@ export class ProblemsService {
         skillFocus: dto.skillFocus,
         tutorLevel: dto.tutorLevel,
         visualizationNotes: dto.visualizationNotes,
-        editorial: dto.editorial,
+        editorial: editorialDtoToDbText(dto.editorial),
       })
       .returning();
 
@@ -70,7 +71,7 @@ export class ProblemsService {
         skillFocus: dto.skillFocus,
         tutorLevel: dto.tutorLevel,
         visualizationNotes: dto.visualizationNotes,
-        editorial: dto.editorial,
+        editorial: editorialDtoToDbText(dto.editorial),
         updatedAt: new Date(),
       })
       .where(eq(problems.id, id))

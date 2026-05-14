@@ -1,4 +1,5 @@
 import type { CreateProblemBody } from "./create-problem-schema";
+import { parseProblemEditorial } from "@/features/problem-detail/parse-editorial";
 
 type ProblemRecord = Record<string, unknown>;
 
@@ -72,7 +73,7 @@ export function normalizeCreateProblemBody(
     skillFocus: value?.skillFocus ?? "",
     tutorLevel: value?.tutorLevel ?? "",
     visualizationNotes: value?.visualizationNotes ?? "",
-    editorial: value?.editorial ?? "",
+    editorial: parseProblemEditorial(value?.editorial),
     tags: value?.tags ?? [],
     examples: value?.examples ?? [],
     starterCode:

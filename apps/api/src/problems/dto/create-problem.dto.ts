@@ -121,6 +121,34 @@ export class ProblemTestCaseDto {
   sortOrder?: number;
 }
 
+export class EditorialYoutubeEmbedDto {
+  @IsIn(["youtube"])
+  type!: "youtube";
+
+  @IsString()
+  @MinLength(1)
+  @MaxLength(32)
+  videoId!: string;
+}
+
+export class ProblemEditorialDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50_000)
+  content?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => EditorialYoutubeEmbedDto)
+  embeds?: EditorialYoutubeEmbedDto[];
+}
+
 export class CreateProblemDto {
   @IsString()
   @MinLength(1)
@@ -175,11 +203,11 @@ export class CreateProblemDto {
   @MaxLength(50_000)
   visualizationNotes?: string;
 
-  /** Optional walkthrough text (plain or simple HTML, e.g. <p>...</p>) */
+  /** Optional walkthrough: HTML body + structured embeds (e.g. YouTube). */
   @IsOptional()
-  @IsString()
-  @MaxLength(50_000)
-  editorial?: string;
+  @ValidateNested()
+  @Type(() => ProblemEditorialDto)
+  editorial?: ProblemEditorialDto;
 
   @IsOptional()
   @IsArray()

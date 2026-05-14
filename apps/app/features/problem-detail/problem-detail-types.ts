@@ -1,9 +1,17 @@
+export type EditorialYoutubeEmbed = { type: "youtube"; videoId: string };
+
+export type ProblemEditorial = {
+  title?: string;
+  content: string;
+  embeds: EditorialYoutubeEmbed[];
+};
+
 export type ProblemRow = {
   title?: string;
   description?: string;
   constraints?: string | null;
   difficulty?: string;
-  editorial?: string | null;
+  editorial?: ProblemEditorial;
 };
 
 /** Serialized `problem_solutions` row from the problems API (Drizzle / Nest JSON). */
