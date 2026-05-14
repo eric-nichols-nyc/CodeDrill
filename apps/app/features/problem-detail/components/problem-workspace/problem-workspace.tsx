@@ -60,13 +60,21 @@ export function ProblemWorkspace({
 
     return (
       <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {rows.map((row) => (
-            <MonacoSolutionEdtor
+            <div
+              className="flex h-[420px] min-h-[320px] flex-col overflow-hidden rounded-md border border-border"
               key={row.key}
-              onChange={(nextValue) => setDraftForKey(row.key, nextValue)}
-              value={drafts[row.key] ?? ""}
-            />
+            >
+              <div className="shrink-0 border-border border-b bg-muted/20 px-3 py-1.5">
+                <Badge variant="outline">{row.language}</Badge>
+              </div>
+              <MonacoSolutionEdtor
+                className="h-full"
+                onChange={(nextValue) => setDraftForKey(row.key, nextValue)}
+                value={drafts[row.key] ?? ""}
+              />
+            </div>
           ))}
         </div>
       </div>
