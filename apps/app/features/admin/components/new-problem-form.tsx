@@ -13,7 +13,7 @@ import { Textarea } from "@repo/design-system/components/ui/textarea";
 import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
-import { DevAdminProblemFill } from "@/components/dev-admin-problem-fill";
+import { DevAdminProblemFill } from "@/features/admin/components/dev-admin-problem-fill";
 import {
   buildProblemPayload,
   formatSubmitError,

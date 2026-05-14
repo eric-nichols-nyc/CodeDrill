@@ -1,4 +1,4 @@
-import type { CreateProblemBody } from "./create-problem-schema";
+import type { CreateProblemBody } from "../lib/create-problem-schema";
 
 /** Deterministic copy for local testing; slug gets a unique suffix when applied. */
 export function getDevSampleLongestUniqueSubstringProblem(): CreateProblemBody {
@@ -29,17 +29,20 @@ export function getDevSampleLongestUniqueSubstringProblem(): CreateProblemBody {
       {
         input: 'str = "abcabcbb"',
         output: "3",
-        explanation: 'The longest substring without repeating characters is "abc".',
+        explanation:
+          'The longest substring without repeating characters is "abc".',
       },
       {
         input: 'str = "bbbbb"',
         output: "1",
-        explanation: 'The longest substring without repeating characters is "b".',
+        explanation:
+          'The longest substring without repeating characters is "b".',
       },
       {
         input: 'str = "pwwkew"',
         output: "3",
-        explanation: 'The longest substring without repeating characters is "wke".',
+        explanation:
+          'The longest substring without repeating characters is "wke".',
       },
     ],
 
@@ -85,8 +88,7 @@ export function getDevSampleLongestUniqueSubstringProblem(): CreateProblemBody {
       },
       {
         title: "left shrinks",
-        body:
-          "If the Set already has str[right], the window is invalid. Delete str[left] and move left until the duplicate is gone.",
+        body: "If the Set already has str[right], the window is invalid. Delete str[left] and move left until the duplicate is gone.",
       },
       {
         title: "Measure the window",

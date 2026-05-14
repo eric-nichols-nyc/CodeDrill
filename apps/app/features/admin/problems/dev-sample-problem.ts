@@ -1,4 +1,4 @@
-import type { CreateProblemBody } from "./create-problem-schema";
+import type { CreateProblemBody } from "../lib/create-problem-schema";
 
 /** Deterministic copy for local testing; slug gets a unique suffix when applied. */
 export function getDevSampleProblem(): CreateProblemBody {
