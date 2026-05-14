@@ -26,6 +26,49 @@ export type RunClientTestsOutcome = {
   userConsole: CapturedConsoleLine[];
 };
 
+/** Merges identical consecutive captures (usual when logs run inside solution code invoked per testcase). */
+export function collapseAdjacentCapturedConsoleLines(
+  lines: CapturedConsoleLine[]
+): CapturedConsoleLine[] {
+  if (lines.length === 0) {
+    return [];
+  }
+
+  type Accum = CapturedConsoleLine & { repeat: number };
+  const out: CapturedConsoleLine[] = [];
+  const head = lines[0];
+  if (!head) {
+    return [];
+  }
+  let cur: Accum = { ...head, repeat: 1 };
+
+  const flush = (x: Accum) => {
+    if (x.repeat <= 1) {
+      out.push({ level: x.level, message: x.message });
+      return;
+    }
+    out.push({
+      level: x.level,
+      message: `${x.message} (×${x.repeat})`,
+    });
+  };
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line) {
+      continue;
+    }
+    if (line.level === cur.level && line.message === cur.message) {
+      cur.repeat += 1;
+    } else {
+      flush(cur);
+      cur = { ...line, repeat: 1 };
+    }
+  }
+  flush(cur);
+  return out;
+}
+
 /** Bound natives so patching `console.log` does not break framework diagnostics */
 const dbg = {
   log: console.log.bind(console),
@@ -124,7 +167,7 @@ export function normalizeProblemTestCases(tests: unknown): ProblemTestCaseView[]
       out.push({
         input,
         expectedOutput,
-        isSample: o.isSample === true,
+        isSample: o !== null && o.isSample === true,
       });
     }
   }

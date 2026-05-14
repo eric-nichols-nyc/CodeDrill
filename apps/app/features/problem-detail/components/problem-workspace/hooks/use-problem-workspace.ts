@@ -16,7 +16,11 @@
  * are rebuilt from server code and console / run snapshot / `lastAction` are cleared.
  */
 
-import { runClientTests, type RunClientTestsOutcome } from "@/features/problem-detail/client-test-run";
+import {
+  collapseAdjacentCapturedConsoleLines,
+  runClientTests,
+  type RunClientTestsOutcome,
+} from "@/features/problem-detail/client-test-run";
 import {
   useCallback,
   useEffect,
@@ -146,11 +150,12 @@ export function useProblemWorkspace({
 
     const runLabel = formatConsoleTimeLabel();
     const runStamp = Date.now();
+    const condensed = collapseAdjacentCapturedConsoleLines(outcome.userConsole);
     setConsoleEntries((prev) => {
-      if (outcome.userConsole.length === 0) {
+      if (condensed.length === 0) {
         return prev;
       }
-      const appended = outcome.userConsole.map((line, i) => ({
+      const appended = condensed.map((line, i) => ({
         id: `${runStamp}-run-${prev.length + i}`,
         createdAt: runLabel,
         level: line.level,
