@@ -36,7 +36,22 @@ export function buildProblemPayload(
   addIfNonEmpty("skillFocus", values.skillFocus);
   addIfNonEmpty("tutorLevel", values.tutorLevel);
   addIfNonEmpty("visualizationNotes", values.visualizationNotes);
-  addIfNonEmpty("editorial", values.editorial);
+
+  const editorial = values.editorial;
+  if (editorial) {
+    const title = trim(editorial.title ?? "");
+    const content = editorial.content ?? "";
+    const embeds = editorial.embeds
+      .filter((e) => e.type === "youtube" && trim(e.videoId))
+      .map((e) => ({ type: "youtube" as const, videoId: trim(e.videoId) }));
+    if (title || content.trim() || embeds.length > 0) {
+      payload.editorial = {
+        content,
+        embeds,
+        ...(title ? { title } : {}),
+      };
+    }
+  }
 
   const tags = values.tags?.map(trim).filter(Boolean);
   if (tags && tags.length > 0) {

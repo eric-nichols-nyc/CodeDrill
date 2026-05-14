@@ -63,7 +63,7 @@ export function PlaygroundSection() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [lang, setLang] = useState<PlaygroundLang>("javascript");
-  const [code, setCode] = useState(starters.javascript);
+  const [code, setCode] = useState<string>(starters.javascript);
   const [copyLabel, setCopyLabel] = useState("Copy");
 
   useEffect(() => {

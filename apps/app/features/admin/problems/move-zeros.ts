@@ -27,7 +27,12 @@ export function getDevSampleProblem(): CreateProblemBody {
     visualizationNotes:
       "Use a left pointer to track the next non-zero placement position while the right pointer scans the array.",
 
-    editorial: "https://www.youtube.com/watch?v=aayNRwUN3Do",
+    editorial: {
+      title: "Walkthrough",
+      content:
+        "<p>Keep a write index <code>k</code> for the next non-zero slot; swap non-zero elements forward.</p>",
+      embeds: [{ type: "youtube", videoId: "aayNRwUN3Do" }],
+    },
 
     tags: ["array", "two-pointers"],
 

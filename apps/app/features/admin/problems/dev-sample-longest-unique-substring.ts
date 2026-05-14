@@ -21,7 +21,7 @@ export function getDevSampleLongestUniqueSubstringProblem(): CreateProblemBody {
     tutorLevel: "pattern-rep",
     visualizationNotes:
       "right is the reader/expander. left is the shrinker/cleaner. Grow the window until a duplicate appears, then shrink from the left until the duplicate is removed.",
-    editorial: "",
+    editorial: { content: "", embeds: [] },
 
     tags: ["string", "set", "sliding-window", "two-pointers"],
 

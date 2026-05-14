@@ -18,7 +18,10 @@ export function getDevSampleProblem(): CreateProblemBody {
     tutorLevel: "beginner",
     visualizationNotes:
       "Walk the array once; for each value v, check whether (target - v) was seen. If yes, return both indices.",
-    editorial: "https://www.youtube.com/watch?v=KLlXCFG5TnA",
+    editorial: {
+      content: "",
+      embeds: [{ type: "youtube", videoId: "KLlXCFG5TnA" }],
+    },
     tags: ["array", "hash-table"],
     examples: [
       {

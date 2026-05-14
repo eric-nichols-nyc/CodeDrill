@@ -13,6 +13,7 @@ import { Textarea } from "@repo/design-system/components/ui/textarea";
 import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
+import { AdminEditorialQuill } from "@/features/admin/components/admin-editorial-quill";
 import { DevAdminProblemFill } from "@/features/admin/components/dev-admin-problem-fill";
 import {
   buildProblemPayload,
@@ -26,11 +27,16 @@ type ExampleRow = NonNullable<CreateProblemBody["examples"]>[number];
 type HintRow = NonNullable<CreateProblemBody["hints"]>[number];
 type SolutionRow = NonNullable<CreateProblemBody["solutions"]>[number];
 type TestCaseRow = NonNullable<CreateProblemBody["testCases"]>[number];
+type EditorialModel = NonNullable<CreateProblemBody["editorial"]>;
 
 const SELECT_TRIGGER =
   "h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30";
 
 const STARTER_LANGUAGES = ["javascript", "typescript", "python"] as const;
+
+function createYoutubeEmbedRow(): EditorialModel["embeds"][number] {
+  return { type: "youtube", videoId: "" };
+}
 
 function createStarterCodeRow(language = "javascript"): StarterCodeRow {
   return {
@@ -415,6 +421,60 @@ export function NewProblemForm({
     }));
   };
 
+  const updateEditorialTitle = (title: string) => {
+    setValues((prev) => {
+      const ed = prev.editorial ?? { content: "", embeds: [] };
+      const base = { content: ed.content, embeds: ed.embeds };
+      return {
+        ...prev,
+        editorial: title.trim() ? { ...base, title: title.trim() } : base,
+      };
+    });
+  };
+
+  const updateEditorialContent = (content: string) => {
+    setValues((prev) => {
+      const ed = prev.editorial ?? { content: "", embeds: [] };
+      return { ...prev, editorial: { ...ed, content } };
+    });
+  };
+
+  const updateYoutubeEmbed = (index: number, videoId: string) => {
+    setValues((prev) => {
+      const ed = prev.editorial ?? { content: "", embeds: [] };
+      const embeds = [...ed.embeds];
+      const row = embeds[index];
+      if (!row) {
+        return prev;
+      }
+      embeds[index] = { type: "youtube", videoId };
+      return { ...prev, editorial: { ...ed, embeds } };
+    });
+  };
+
+  const addYoutubeEmbed = () => {
+    setValues((prev) => {
+      const ed = prev.editorial ?? { content: "", embeds: [] };
+      return {
+        ...prev,
+        editorial: {
+          ...ed,
+          embeds: [...ed.embeds, createYoutubeEmbedRow()],
+        },
+      };
+    });
+  };
+
+  const removeYoutubeEmbed = (index: number) => {
+    setValues((prev) => {
+      const ed = prev.editorial ?? { content: "", embeds: [] };
+      return {
+        ...prev,
+        editorial: { ...ed, embeds: removeAt(ed.embeds, index) },
+      };
+    });
+  };
+
   const handleDevFill = useCallback((sample: CreateProblemBody) => {
     setValues(sample);
     setMessage(null);
@@ -469,7 +529,7 @@ export function NewProblemForm({
       onSubmit={onSubmit}
     >
       {showDevFill ? (
-        <div className="flex flex-col gap-2 border-muted border border-dashed pb-2 pt-1">
+        <div className="flex flex-col gap-2 border border-muted border-dashed pt-1 pb-2">
           <p className="text-muted-foreground text-xs">Development only</p>
           <DevAdminProblemFill onFill={handleDevFill} />
         </div>
@@ -614,14 +674,81 @@ export function NewProblemForm({
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="editorial">Editorial (optional)</Label>
-              <Textarea
-                className="min-h-[120px] font-mono text-sm"
-                id="editorial"
-                onChange={(e) => set("editorial")(e.target.value)}
-                placeholder="Plain text, or simple HTML (e.g. paragraph elements)."
-                value={values.editorial ?? ""}
+              <Label htmlFor="editorialTitle">Editorial title (optional)</Label>
+              <Input
+                autoComplete="off"
+                id="editorialTitle"
+                onChange={(e) => updateEditorialTitle(e.target.value)}
+                placeholder="e.g. Intuition & approach"
+                value={values.editorial?.title ?? ""}
               />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label>Editorial body</Label>
+              <AdminEditorialQuill
+                key={values.slug || "new-problem-editorial"}
+                onChange={updateEditorialContent}
+                value={values.editorial?.content ?? ""}
+              />
+              <p className="text-muted-foreground text-xs">
+                Rich text is stored as HTML; YouTube players use the video IDs
+                below. All of this is saved as JSON in the editorial column.
+              </p>
+            </div>
+            <div className="space-y-3 sm:col-span-2">
+              <div className="flex flex-wrap items-end justify-between gap-2">
+                <div>
+                  <p className="font-medium text-sm">YouTube embeds</p>
+                  <p className="text-muted-foreground text-xs">
+                    Video ID only (from youtube.com/watch?v=…).
+                  </p>
+                </div>
+                <Button
+                  onClick={addYoutubeEmbed}
+                  size="sm"
+                  type="button"
+                  variant="outline"
+                >
+                  <Plus />
+                  Add video
+                </Button>
+              </div>
+              <div className="space-y-3">
+                {(values.editorial?.embeds ?? []).length === 0 ? (
+                  <p className="text-muted-foreground text-sm">No videos.</p>
+                ) : (
+                  (values.editorial?.embeds ?? []).map((row, index) => (
+                    <div
+                      className="flex flex-wrap items-end gap-2 rounded-md border border-border p-3"
+                      key={`yt-${values.slug}-${String(index)}`}
+                    >
+                      <div className="min-w-[200px] flex-1 space-y-1">
+                        <Label htmlFor={`youtube-id-${String(index)}`}>
+                          Video ID {index + 1}
+                        </Label>
+                        <Input
+                          autoComplete="off"
+                          id={`youtube-id-${String(index)}`}
+                          onChange={(e) =>
+                            updateYoutubeEmbed(index, e.target.value)
+                          }
+                          placeholder="dQw4w9WgXcQ"
+                          value={row.videoId}
+                        />
+                      </div>
+                      <Button
+                        onClick={() => removeYoutubeEmbed(index)}
+                        size="sm"
+                        type="button"
+                        variant="ghost"
+                      >
+                        <Trash2 />
+                        Remove
+                      </Button>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </AccordionSection>

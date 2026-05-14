@@ -1,44 +1,51 @@
 import { ProblemDescriptionTab } from "@/features/problem-detail/components/problem-description-tab";
 import { ProblemTabs } from "@/features/problem-detail/components/problem-tabs";
 import type {
+  ProblemEditorial,
   ProblemRow,
   ProblemSolutionRow,
 } from "@/features/problem-detail/problem-detail-types";
 
-const SOLO_URL_RE = /^https?:\/\/\S+$/i;
-const HTML_CLOSING_TAG_RE = /<\/[a-z][\w-]*>/i;
-
-function isProbablyHtmlFragment(s: string): boolean {
-  const t = s.trim();
-  return t.startsWith("<") && HTML_CLOSING_TAG_RE.test(t);
+function YoutubeEmbed({ videoId }: { videoId: string }) {
+  const src = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`;
+  return (
+    <div className="aspect-video w-full max-w-2xl overflow-hidden rounded-md border border-border">
+      <iframe
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+        className="h-full w-full"
+        src={src}
+        title="YouTube video player"
+      />
+    </div>
+  );
 }
 
-function EditorialBody({ source }: { source: string }) {
-  const trimmed = source.trim();
-  if (SOLO_URL_RE.test(trimmed)) {
-    return (
-      <a
-        className="text-primary text-sm underline-offset-4 hover:underline"
-        href={trimmed}
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        Open link
-      </a>
-    );
-  }
-  if (isProbablyHtmlFragment(trimmed)) {
-    return (
-      <div
-        className="prose prose-sm max-w-none [&_a]:text-primary [&_p]:text-foreground"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: admin-authored editorial; trusted content
-        dangerouslySetInnerHTML={{ __html: trimmed }}
-      />
-    );
-  }
+function EditorialPanel({ editorial }: { editorial: ProblemEditorial }) {
   return (
-    <div className="max-w-none whitespace-pre-wrap text-foreground text-sm leading-relaxed">
-      {source}
+    <div className="space-y-6 pb-4">
+      {editorial.title?.trim() ? (
+        <h2 className="font-semibold text-foreground text-lg tracking-tight">
+          {editorial.title}
+        </h2>
+      ) : null}
+      {editorial.content.trim() ? (
+        <div
+          className="prose prose-sm max-w-none [&_a]:text-primary [&_p]:text-foreground"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: admin-authored editorial HTML (Quill)
+          dangerouslySetInnerHTML={{ __html: editorial.content }}
+        />
+      ) : null}
+      {editorial.embeds.length > 0 ? (
+        <div className="flex flex-col gap-4">
+          {editorial.embeds.map((embed, index) => (
+            <YoutubeEmbed
+              key={`${embed.videoId}-${String(index)}`}
+              videoId={embed.videoId}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -66,10 +73,10 @@ export function ProblemDetailLeftPane({
   showDescription: boolean;
   showConstraints: boolean;
   showDifficulty: boolean;
-  editorial: string | null;
+  editorial: ProblemEditorial | null;
 }) {
   const editorialTab = editorial ? (
-    <EditorialBody source={editorial} />
+    <EditorialPanel editorial={editorial} />
   ) : (
     <p className="text-muted-foreground text-sm">
       No editorial has been added for this problem yet.

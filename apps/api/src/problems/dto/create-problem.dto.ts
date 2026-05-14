@@ -126,7 +126,6 @@ export class EditorialYoutubeEmbedDto {
   type!: "youtube";
 
   @IsString()
-  @MinLength(1)
   @MaxLength(32)
   videoId!: string;
 }

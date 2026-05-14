@@ -35,6 +35,8 @@ const practiceTablesFilter = [
   "submissions",
   "problem_progress",
   "submission_test_results",
+  "problem_chat_thread",
+  "problem_chat_message",
 ] as const;
 
 export default defineConfig({

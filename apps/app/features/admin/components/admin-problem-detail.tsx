@@ -8,6 +8,10 @@ import {
 } from "@repo/design-system/components/ui/accordion";
 import { Badge } from "@repo/design-system/components/ui/badge";
 import type { AdminProblemDetail as AdminProblemDetailData } from "@/features/admin/lib/problem-form-values";
+import {
+  isProblemEditorialEmpty,
+  parseProblemEditorial,
+} from "@/features/problem-detail/parse-editorial";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (typeof value !== "object" || value === null) {
@@ -38,6 +42,8 @@ export function AdminProblemDetail({
     : [];
   const solutions = Array.isArray(detail.solutions) ? detail.solutions : [];
   const testCases = Array.isArray(detail.testCases) ? detail.testCases : [];
+
+  const editorialSummary = parseProblemEditorial(problem?.editorial);
 
   return (
     <div className="space-y-6">
@@ -111,11 +117,30 @@ export function AdminProblemDetail({
                   {textValue(problem?.tutorLevel)}
                 </p>
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <p className="font-medium text-sm">Editorial</p>
-                <p className="mt-1 break-all text-muted-foreground text-sm">
-                  {textValue(problem?.editorial)}
-                </p>
+                {isProblemEditorialEmpty(editorialSummary) ? (
+                  <p className="mt-1 text-muted-foreground text-sm">—</p>
+                ) : (
+                  <ul className="mt-1 list-inside list-disc text-muted-foreground text-sm">
+                    {editorialSummary.title ? (
+                      <li>Title: {editorialSummary.title}</li>
+                    ) : null}
+                    {editorialSummary.content.trim() ? (
+                      <li>
+                        Body: HTML ({editorialSummary.content.length} chars)
+                      </li>
+                    ) : null}
+                    {editorialSummary.embeds.length > 0 ? (
+                      <li>
+                        YouTube IDs:{" "}
+                        {editorialSummary.embeds
+                          .map((e) => e.videoId)
+                          .join(", ")}
+                      </li>
+                    ) : null}
+                  </ul>
+                )}
               </div>
               <div className="sm:col-span-2">
                 <p className="font-medium text-sm">Visualization notes</p>

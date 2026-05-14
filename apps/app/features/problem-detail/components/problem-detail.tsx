@@ -1,11 +1,15 @@
 import { SplitLayout } from "@/components/split-layout";
-import { asRecord } from "@/features/problem-detail/problem-detail-helpers";
 import { ProblemDetailLeftPane } from "@/features/problem-detail/components/problem-detail-left-pane";
+import { ProblemWorkspace } from "@/features/problem-detail/components/problem-workspace/problem-workspace";
+import {
+  isProblemEditorialEmpty,
+  parseProblemEditorial,
+} from "@/features/problem-detail/parse-editorial";
+import { asRecord } from "@/features/problem-detail/problem-detail-helpers";
 import type {
   ProblemRow,
   ProblemSolutionRow,
 } from "@/features/problem-detail/problem-detail-types";
-import { ProblemWorkspace } from "@/features/problem-detail/components/problem-workspace/problem-workspace";
 
 function pickConstraints(raw: unknown): string | null | undefined {
   if (typeof raw === "string") {
@@ -22,12 +26,15 @@ function problemRow(problem: unknown): ProblemRow {
   if (!o) {
     return {};
   }
+  const editorialParsed = parseProblemEditorial(o.editorial);
   return {
     title: typeof o.title === "string" ? o.title : undefined,
     description: typeof o.description === "string" ? o.description : undefined,
     constraints: pickConstraints(o.constraints),
     difficulty: typeof o.difficulty === "string" ? o.difficulty : undefined,
-    editorial: pickConstraints(o.editorial),
+    editorial: isProblemEditorialEmpty(editorialParsed)
+      ? undefined
+      : editorialParsed,
   };
 }
 
@@ -56,10 +63,7 @@ export function ProblemDetail({
     p.constraints !== undefined &&
     p.constraints !== null &&
     p.constraints.length > 0;
-  const editorial =
-    typeof p.editorial === "string" && p.editorial.length > 0
-      ? p.editorial
-      : null;
+  const editorial = p.editorial ?? null;
 
   const left = (
     <ProblemDetailLeftPane

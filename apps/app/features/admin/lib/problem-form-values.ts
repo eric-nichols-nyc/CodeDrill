@@ -120,7 +120,7 @@ export function detailToFormValues(
     skillFocus: stringField(problem?.skillFocus),
     tutorLevel: stringField(problem?.tutorLevel),
     visualizationNotes: stringField(problem?.visualizationNotes),
-    editorial: stringField(problem?.editorial),
+    editorial: parseProblemEditorial(problem?.editorial),
     tags: tags
       .map((tag) => asRecord(tag))
       .filter(Boolean)
