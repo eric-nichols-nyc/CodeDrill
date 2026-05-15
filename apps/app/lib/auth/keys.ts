@@ -48,6 +48,11 @@ export const keys = () =>
         emptyToUndefined,
         z.string().min(8).optional()
       ),
+      /** Optional — `POST /api/admin/problems/generate` (natural language → problem JSON). */
+      OPENAI_API_KEY: z.preprocess(
+        emptyToUndefined,
+        z.string().min(10).optional()
+      ),
     },
     client: {
       NEXT_PUBLIC_SITE_URL: z.preprocess(
@@ -63,5 +68,6 @@ export const keys = () =>
       NEON_AUTH_TEST_NAME: process.env.NEON_AUTH_TEST_NAME,
       NEON_JWT_API_URL: process.env.NEON_JWT_API_URL,
       INTERNAL_PROBLEMS_SECRET: process.env.INTERNAL_PROBLEMS_SECRET,
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     },
   });

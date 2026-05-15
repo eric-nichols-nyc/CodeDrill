@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { AdminEditorialQuill } from "@/features/admin/components/admin-editorial-quill";
 import { DevAdminProblemFill } from "@/features/admin/components/dev-admin-problem-fill";
+import { GenerateProblemFromPrompt } from "@/features/admin/components/generate-problem-from-prompt";
 import {
   buildProblemPayload,
   formatSubmitError,
@@ -529,9 +530,18 @@ export function NewProblemForm({
       onSubmit={onSubmit}
     >
       {showDevFill ? (
-        <div className="flex flex-col gap-2 border border-muted border-dashed pt-1 pb-2">
-          <p className="text-muted-foreground text-xs">Development only</p>
-          <DevAdminProblemFill onFill={handleDevFill} />
+        <div className="flex flex-col gap-6 border border-muted border-dashed px-2 py-3">
+          <div className="flex flex-col gap-2">
+            <p className="text-muted-foreground text-xs">Development only</p>
+            <DevAdminProblemFill onFill={handleDevFill} />
+          </div>
+          <div className="flex flex-col gap-2 border-muted border-t border-dashed pt-4">
+            <p className="text-muted-foreground text-xs">
+              OpenAI — set <code className="text-foreground">OPENAI_API_KEY</code> in{" "}
+              <code className="text-foreground">apps/app</code> env
+            </p>
+            <GenerateProblemFromPrompt onFilled={handleDevFill} />
+          </div>
         </div>
       ) : null}
 

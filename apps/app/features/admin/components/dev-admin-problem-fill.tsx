@@ -10,6 +10,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import type { CreateProblemBody } from "@/features/admin/lib/create-problem-schema";
 import { getDevSampleGroupAnagramsProblem } from "@/features/admin/problems/dev-sample-group-anagrams";
+import { getDevSampleLongestConsecutiveSequenceProblem } from "@/features/admin/problems/dev-sample-longest-consecutive-sequence";
 import { getDevSampleLongestSubstringTwoDistinctProblem } from "@/features/admin/problems/dev-sample-longest-substring-two-distinct";
 import { getDevSampleLongestUniqueSubstringProblem } from "@/features/admin/problems/dev-sample-longest-unique-substring";
 import { getDevSampleProblem } from "@/features/admin/problems/move-zeros";
@@ -71,6 +72,14 @@ export function DevAdminProblemFill({ onFill }: DevAdminProblemFillProps) {
           }}
         >
           Group anagrams (hash map)
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer text-xs"
+          onSelect={() => {
+            onFill(getDevSampleLongestConsecutiveSequenceProblem());
+          }}
+        >
+          Longest consecutive sequence (hash set)
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
