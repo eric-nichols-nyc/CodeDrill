@@ -21,12 +21,15 @@ import { JsonFallback } from "@/features/problem-detail/components/json-fallback
 import { useProblemWorkspace } from "./hooks/use-problem-workspace";
 import { MonacoSolutionEdtor } from "./monaco-solution-edtor";
 import { ProblemOutputPanel } from "./problem-output-panel";
+import { WorkspaceCodeStatusBanner } from "./workspace-code-status-banner";
 
-/** Right-hand pane of the problem page: code editing + console / testcase / results tabs. */
+/** Right-hand pane of the problem page: code editing + testcase / test result tabs. */
 export function ProblemWorkspace({
+  problemId,
   starterCode,
   testCases,
 }: {
+  problemId?: string;
   starterCode: unknown;
   testCases?: unknown;
 }) {
@@ -45,7 +48,11 @@ export function ProblemWorkspace({
     totalChars,
     handleRun,
     handleSubmit,
-  } = useProblemWorkspace({ starterCode, testCases });
+    isSavingCode,
+    workspaceCodeLoadError,
+    workspaceCodeSaveError,
+    clearWorkspaceCodeSaveError,
+  } = useProblemWorkspace({ problemId, starterCode, testCases });
 
   const starterBody = (() => {
     if (rows.length === 0) {
@@ -97,6 +104,11 @@ export function ProblemWorkspace({
 
   const starterPanel = (
     <div className="flex h-full min-h-0 flex-col p-4 pl-3">
+      <WorkspaceCodeStatusBanner
+        loadError={workspaceCodeLoadError}
+        onDismissSaveError={clearWorkspaceCodeSaveError}
+        saveError={workspaceCodeSaveError}
+      />
       <div className="mb-3 flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-muted/20 px-3 py-2">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <h2 className="font-medium text-sm">Workspace</h2>
@@ -110,7 +122,7 @@ export function ProblemWorkspace({
         </div>
         <div className="flex items-center gap-2">
           <Button
-            disabled={isPending}
+            disabled={isPending || isSavingCode}
             onClick={handleRun}
             size="sm"
             variant="outline"

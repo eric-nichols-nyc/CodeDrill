@@ -224,6 +224,28 @@ export const submissions = pgTable(
   })
 );
 
+/** Last saved editor text per user, problem, and language (e.g. after Run). */
+export const problemWorkspaceCode = pgTable(
+  "problem_workspace_code",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    problemId: uuid("problem_id")
+      .notNull()
+      .references(() => problems.id, { onDelete: "cascade" }),
+    language: text("language").notNull(),
+    code: text("code").notNull(),
+    updatedAt: timestamptz("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    userProblemLangUnique: uniqueIndex(
+      "problem_workspace_code_user_problem_language_key"
+    ).on(t.userId, t.problemId, t.language),
+    userIdx: index("problem_workspace_code_user_id_idx").on(t.userId),
+    problemIdx: index("problem_workspace_code_problem_id_idx").on(t.problemId),
+  })
+);
+
 export const problemProgress = pgTable(
   "problem_progress",
   {
@@ -345,6 +367,7 @@ export const schema = {
   problemSolutions,
   problemLearningNotes,
   submissions,
+  problemWorkspaceCode,
   problemProgress,
   submissionTestResults,
   problemChatThreads,

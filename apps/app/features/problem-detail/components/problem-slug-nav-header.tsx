@@ -15,6 +15,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { AppBrandLink } from "@/components/app-brand-link";
 import { AppHeaderInner } from "@/components/app-header-inner";
+import { NavUserMenu } from "@/components/nav-user-menu";
 import { TimerMenuButton } from "@/components/timer";
 
 function SparkleIcon() {
@@ -220,13 +221,7 @@ export function ProblemSlugNavHeader({ title }: ProblemSlugNavHeaderProps) {
             className="mx-1 h-4 w-px bg-[var(--nav-border)]"
           />
 
-          <button
-            aria-label="Profile"
-            className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-violet-500 to-blue-500 font-bold text-white text-xs transition-all hover:ring-2 hover:ring-white/20"
-            type="button"
-          >
-            <span aria-hidden="true">U</span>
-          </button>
+          <NavUserMenu />
         </div>
       </AppHeaderInner>
     </header>

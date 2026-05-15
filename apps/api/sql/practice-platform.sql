@@ -183,6 +183,22 @@ create index submissions_problem_id_idx on submissions (problem_id);
 create index submissions_created_at_idx on submissions (created_at desc);
 
 -- -----------------------------------------------------------------------------
+-- Per-user saved editor code (e.g. after Run)
+-- -----------------------------------------------------------------------------
+create table problem_workspace_code (
+  id uuid primary key default gen_random_uuid(),
+  user_id text not null,
+  problem_id uuid not null references problems (id) on delete cascade,
+  language text not null,
+  code text not null,
+  updated_at timestamptz not null default now(),
+  unique (user_id, problem_id, language)
+);
+
+create index problem_workspace_code_user_id_idx on problem_workspace_code (user_id);
+create index problem_workspace_code_problem_id_idx on problem_workspace_code (problem_id);
+
+-- -----------------------------------------------------------------------------
 -- Per-user progress
 -- -----------------------------------------------------------------------------
 create table problem_progress (

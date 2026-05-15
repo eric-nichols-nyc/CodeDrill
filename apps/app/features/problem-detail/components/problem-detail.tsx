@@ -21,6 +21,12 @@ function pickConstraints(raw: unknown): string | null | undefined {
   return;
 }
 
+function problemIdFrom(problem: unknown): string | undefined {
+  const o = asRecord(problem);
+  const id = o?.id;
+  return typeof id === "string" && id.length > 0 ? id : undefined;
+}
+
 function problemRow(problem: unknown): ProblemRow {
   const o = asRecord(problem);
   if (!o) {
@@ -54,6 +60,7 @@ export function ProblemDetail({
   testCases?: unknown;
 }) {
   const p = problemRow(problem);
+  const problemId = problemIdFrom(problem);
   const exampleList = Array.isArray(examples) ? examples : [];
   const hintList = Array.isArray(hints) ? hints : [];
   const showDifficulty = p.difficulty !== undefined && p.difficulty.length > 0;
@@ -87,7 +94,11 @@ export function ProblemDetail({
       defaultLeftPercent={46}
       left={left}
       right={
-        <ProblemWorkspace starterCode={starterCode} testCases={testCases} />
+        <ProblemWorkspace
+          problemId={problemId}
+          starterCode={starterCode}
+          testCases={testCases}
+        />
       }
     />
   );

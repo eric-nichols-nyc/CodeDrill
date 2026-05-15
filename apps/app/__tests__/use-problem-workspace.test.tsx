@@ -1,6 +1,19 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useProblemWorkspace } from "@/features/problem-detail/components/problem-workspace/hooks/use-problem-workspace";
+
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+  };
+}
 
 const singleJsStarter = [
   {
@@ -33,14 +46,24 @@ const addTestCases = [
 describe("useProblemWorkspace", () => {
   beforeEach(() => {
     vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => [],
+      })
+    );
   });
 
   it("runs client tests against the active starter only (single row passes)", () => {
-    const { result } = renderHook(() =>
-      useProblemWorkspace({
-        starterCode: [...singleJsStarter],
-        testCases: [...addTestCases],
-      })
+    const { result } = renderHook(
+      () =>
+        useProblemWorkspace({
+          starterCode: [...singleJsStarter],
+          testCases: [...addTestCases],
+        }),
+      { wrapper: createWrapper() }
     );
 
     act(() => {
@@ -48,18 +71,20 @@ describe("useProblemWorkspace", () => {
     });
 
     expect(result.current.lastAction).toBe("run");
-    expect(result.current.activeTab).toBe("results");
+    expect(result.current.activeTab).toBe("test-result");
     expect(result.current.lastRunOutcome?.compileError).toBeNull();
     expect(result.current.lastRunOutcome?.allPassed).toBe(true);
     expect(result.current.lastRunOutcome?.caseResults).toHaveLength(1);
   });
 
   it("uses the selected starter row so Run results change when the language key changes", () => {
-    const { result } = renderHook(() =>
-      useProblemWorkspace({
-        starterCode: [...multiJsStarters],
-        testCases: [{ input: "[]", expectedOutput: "1", isSample: true }],
-      })
+    const { result } = renderHook(
+      () =>
+        useProblemWorkspace({
+          starterCode: [...multiJsStarters],
+          testCases: [{ input: "[]", expectedOutput: "1", isSample: true }],
+        }),
+      { wrapper: createWrapper() }
     );
 
     const key1 = result.current.rows[0]?.key;
@@ -84,24 +109,26 @@ describe("useProblemWorkspace", () => {
   });
 
   it("does not concatenate another language into the same new Function eval (python row fails parse alone)", () => {
-    const { result } = renderHook(() =>
-      useProblemWorkspace({
-        starterCode: [
-          {
-            id: "js",
-            language: "javascript",
-            functionName: "f",
-            code: "function f() { return 1; }",
-          },
-          {
-            id: "py",
-            language: "python",
-            functionName: "f",
-            code: "def f():\n    return 2\n",
-          },
-        ],
-        testCases: [{ input: "[]", expectedOutput: "1", isSample: true }],
-      })
+    const { result } = renderHook(
+      () =>
+        useProblemWorkspace({
+          starterCode: [
+            {
+              id: "js",
+              language: "javascript",
+              functionName: "f",
+              code: "function f() { return 1; }",
+            },
+            {
+              id: "py",
+              language: "python",
+              functionName: "f",
+              code: "def f():\n    return 2\n",
+            },
+          ],
+          testCases: [{ input: "[]", expectedOutput: "1", isSample: true }],
+        }),
+      { wrapper: createWrapper() }
     );
 
     act(() => {

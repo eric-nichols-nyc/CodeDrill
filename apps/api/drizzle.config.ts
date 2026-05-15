@@ -33,6 +33,7 @@ const practiceTablesFilter = [
   "problem_solutions",
   "problem_learning_notes",
   "submissions",
+  "problem_workspace_code",
   "problem_progress",
   "submission_test_results",
   "problem_chat_thread",

@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Output region beside the editor: Console (log lines), Testcases (official
- * cases from the problem), Results (last `runClientTests` outcome from Run).
+ * Output region beside the editor: Testcase (official cases) and Test Result
+ * (run outcome + console; result tab refined in a follow-up).
  */
 
 import { Badge } from "@repo/design-system/components/ui/badge";
@@ -13,30 +13,16 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/design-system/components/ui/tabs";
-
+import { CheckSquare, Terminal } from "lucide-react";
 import { useMemo } from "react";
 import { TimerPanelBar } from "@/components/timer";
 import type { RunClientTestsOutcome } from "@/features/problem-detail/client-test-run";
 import { normalizeProblemTestCases } from "@/features/problem-detail/client-test-run";
 
+import { TestcasePanel } from "./testcase-panel";
 import type { ConsoleEntry } from "./types";
 
-function consoleEntryToneClass(level: ConsoleEntry["level"]): string {
-  if (level === "error") {
-    return "text-destructive";
-  }
-  if (level === "warn") {
-    return "text-amber-700 dark:text-amber-400";
-  }
-  return "";
-}
-
-/**
- * ─── Results tab body (when Run produced `lastRunOutcome`) ─────────────────────
- * Rendered inside `TabsContent value="results"` via `<RunResultsBody />`.
- */
 function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
-  // Branch: compile / parse failure from `runClientTests`
   if (outcome.compileError) {
     return (
       <div className="rounded-md border border-border/70 bg-background/70 px-3 py-3">
@@ -48,7 +34,6 @@ function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
     );
   }
 
-  // Branch: run succeeded but no normalized cases to show
   if (outcome.caseResults.length === 0) {
     return (
       <div className="rounded-md border border-border/70 bg-background/70 px-3 py-3">
@@ -60,7 +45,6 @@ function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
     );
   }
 
-  // Branch: per-case pass/fail + expected / actual (+ optional runtime error line)
   return (
     <div className="rounded-md border border-border/70 bg-background/70 px-3 py-3">
       <p className="font-medium">
@@ -101,10 +85,6 @@ function RunResultsBody({ outcome }: { outcome: RunClientTestsOutcome }) {
   );
 }
 
-/**
- * ─── Results tab placeholder (no Run snapshot or Submit-only flow) ────────────
- * Rendered inside `TabsContent value="results"` when `RunResultsBody` is not used.
- */
 function ResultsPlaceholder({
   lastAction,
 }: {
@@ -114,7 +94,7 @@ function ResultsPlaceholder({
   if (lastAction === "submit") {
     message = "Submission UI is ready to connect to your judge.";
   } else if (lastAction === "run") {
-    message = "Run completed; open this tab after Run to see testcase results.";
+    message = "Run completed; open Test Result to see outcomes.";
   }
 
   return (
@@ -125,10 +105,10 @@ function ResultsPlaceholder({
   );
 }
 
-/** Right-hand Output column: header → timer → tabbed Console / Testcases / Results. */
+/** Right-hand Output column: header → timer → Testcase / Test Result tabs. */
 export function ProblemOutputPanel({
   activeTab,
-  consoleEntries,
+  consoleEntries: _consoleEntries,
   isBusy,
   lastAction,
   lastRunOutcome = null,
@@ -147,10 +127,9 @@ export function ProblemOutputPanel({
     () => normalizeProblemTestCases(testCases ?? null),
     [testCases]
   );
+
   return (
-    /* ═══ Root: full-height column for this pane ═══════════════════════════════ */
     <div className="flex h-full min-h-0 flex-col gap-3 p-4 pl-3">
-      {/* ─── Row: "Output" title + status badges (`lastAction`, `isBusy`) ─────── */}
       <div className="flex shrink-0 items-center justify-between gap-3">
         <h2 className="font-medium text-muted-foreground text-sm">Output</h2>
         <div className="flex items-center gap-2">
@@ -161,123 +140,45 @@ export function ProblemOutputPanel({
         </div>
       </div>
 
-      {/* ─── Timer strip (shared above tabs; not tab-specific) ───────────────── */}
       <TimerPanelBar />
 
-      {/* ─── Tab shell: triggers switch `activeTab` via `onTabChange` ─────────── */}
       <Tabs
-        className="flex min-h-0 flex-1 flex-col overflow-hidden"
+        className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-border bg-muted/20"
         onValueChange={onTabChange}
         value={activeTab}
       >
-        {/* Tab labels only; panel bodies are sibling `TabsContent` nodes below */}
-        <TabsList className="h-auto w-full justify-start gap-1">
-          <TabsTrigger className="shrink-0" value="console">
-            Console
-          </TabsTrigger>
-          <TabsTrigger className="shrink-0" value="testcases">
-            Testcases
-          </TabsTrigger>
-          <TabsTrigger className="shrink-0" value="results">
-            Results
-          </TabsTrigger>
-        </TabsList>
+        <div className="shrink-0 border-border/60 border-b px-2 pt-1">
+          <TabsList className="h-auto w-full justify-start gap-0 bg-transparent p-0">
+            <TabsTrigger
+              className="h-8 shrink-0 gap-1.5 rounded-none border-transparent border-b-2 bg-transparent px-3 text-muted-foreground shadow-none data-[state=active]:border-foreground/30 data-[state=active]:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
+              value="testcase"
+            >
+              <CheckSquare className="size-3.5 text-green-600 dark:text-green-400" />
+              Testcase
+            </TabsTrigger>
+            <TabsTrigger
+              className="h-8 shrink-0 gap-1.5 rounded-none border-transparent border-b-2 bg-transparent px-3 text-muted-foreground shadow-none data-[state=active]:border-foreground/30 data-[state=active]:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
+              value="test-result"
+            >
+              <Terminal className="size-3.5" />
+              Test Result
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-        {/* ═══ TAB: Console — `consoleEntries` from workspace hook ═══════════════ */}
         <TabsContent
-          className="min-h-0 flex-1 overflow-hidden rounded-md border border-border bg-muted/20"
-          value="console"
+          className="mt-0 flex min-h-0 flex-1 flex-col overflow-hidden"
+          value="testcase"
         >
-          <ScrollArea className="h-full">
-            <div className="space-y-3 p-3 font-mono text-xs leading-6">
-              {/* Each entry: level + time header, then message */}
-              {consoleEntries.length > 0 ? (
-                consoleEntries.map((entry) => (
-                  <div
-                    className="rounded-md border border-border/70 bg-background/70 px-3 py-2"
-                    key={entry.id}
-                  >
-                    <div className="mb-1 flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
-                      <span>{entry.level}</span>
-                      <span>{entry.createdAt}</span>
-                    </div>
-                    <p className={consoleEntryToneClass(entry.level)}>
-                      {entry.message}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                /* Empty state when `consoleEntries` is [] */
-                <p className="text-muted-foreground">
-                  Console output will appear here when you run code.
-                </p>
-              )}
-            </div>
-          </ScrollArea>
+          <TestcasePanel testCaseRows={testCaseRows} />
         </TabsContent>
 
-        {/* ═══ TAB: Testcases — `testCases` prop → `normalizeProblemTestCases` ═══ */}
         <TabsContent
-          className="min-h-0 flex-1 overflow-hidden rounded-md border border-border bg-muted/20"
-          value="testcases"
-        >
-          <ScrollArea className="h-full">
-            <div className="p-3 text-sm">
-              {/* One `<li>` per row: badges + Input / Expected `<pre>` blocks */}
-              {testCaseRows.length > 0 ? (
-                <ul className="space-y-3">
-                  {testCaseRows.map((tc, index) => (
-                    <li
-                      className="rounded-md border border-border/70 bg-background/70 px-3 py-3"
-                      key={`${index}-${tc.input}`}
-                    >
-                      <div className="mb-2 flex flex-wrap items-center gap-2">
-                        <Badge variant="outline">Case {index + 1}</Badge>
-                        {tc.isSample ? (
-                          <Badge variant="secondary">Sample</Badge>
-                        ) : (
-                          <Badge variant="outline">Hidden</Badge>
-                        )}
-                      </div>
-                      <div className="space-y-2 font-mono text-muted-foreground text-xs leading-relaxed">
-                        <div>
-                          <span className="font-medium font-sans text-foreground text-xs">
-                            Input
-                          </span>
-                          <pre className="mt-0.5 whitespace-pre-wrap break-all">
-                            {tc.input}
-                          </pre>
-                        </div>
-                        <div>
-                          <span className="font-medium font-sans text-foreground text-xs">
-                            Expected
-                          </span>
-                          <pre className="mt-0.5 whitespace-pre-wrap break-all">
-                            {tc.expectedOutput}
-                          </pre>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                /* Empty state when `testCaseRows` is [] */
-                <p className="text-muted-foreground">
-                  No test cases are available for this problem.
-                </p>
-              )}
-            </div>
-          </ScrollArea>
-        </TabsContent>
-
-        {/* ═══ TAB: Results — Run outcome vs placeholder ══════════════════════════ */}
-        <TabsContent
-          className="min-h-0 flex-1 overflow-hidden rounded-md border border-border bg-muted/20"
-          value="results"
+          className="mt-0 min-h-0 flex-1 overflow-hidden"
+          value="test-result"
         >
           <ScrollArea className="h-full">
             <div className="space-y-3 p-3 text-sm">
-              {/* After Run: structured testcase results; else: status copy */}
               {lastRunOutcome !== null && lastAction === "run" ? (
                 <RunResultsBody outcome={lastRunOutcome} />
               ) : (
