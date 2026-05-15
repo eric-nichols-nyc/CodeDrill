@@ -1,39 +1,41 @@
-# Product Requirements Document: Modern LeetCode-Style Practice Platform
+# Product Requirements Document: CodeDrill (LeetCode-style practice platform)
 
 | Field | Value |
 |--------|--------|
-| **Product** | Coding practice platform (LeetCode-style clone, v2) — codename **codedrill** |
-| **Implementation repo** | `codedrill` (this repo) — Turborepo + pnpm monorepo, primary app: `apps/app` (see §6.1) |
+| **Product** | **CodeDrill** — coding practice platform (modern successor to a LeetCode-style tutorial baseline) |
+| **Implementation repo** | `codedrill` (this repo) — Turborepo + pnpm monorepo; primary UI: `apps/app`; practice API: `apps/api` (see §6.1) |
 | **Reference repo** | `leetcode-clone-youtube` (legacy tutorial — UX/feature reference only, see §6) |
-| **Document status** | Draft |
-| **Last updated** | 2026-05-10 |
+| **Document status** | Living document (synced to repo) |
+| **Last updated** | 2026-05-14 |
 
 ---
 
 ## 1. Executive summary
 
-This PRD defines a **modernized successor** to the legacy tutorial application: same core user journey (discover problems → read statement → write code → validate → track progress) but built on **current frameworks**, a **real content and grading model**, and **safe, scalable code execution**. The legacy `leetcode-clone-youtube` repo remains the **UX and feature reference**; the v2 implementation lives in **this monorepo (`codedrill`)**, primarily in `apps/app`, with shared functionality in `packages/*` and the judge as its own app (see §6.1 and §9).
+This PRD defines the **CodeDrill** product: the same core user journey as the legacy baseline (discover problems → read statement → write code → validate → track progress), implemented on **current frameworks**, a **database-backed catalog**, and a path toward **safe server-side judging**. The legacy `leetcode-clone-youtube` repo remains a **UX and feature reference**; implementation lives in **this monorepo**.
 
-**Primary bet:** Ship a trustworthy **run / submit** loop with **server-side or sandboxed judging** before adding social or advanced gamification.
+**Where the codebase is today:** The **problem catalog and rich problem definitions** are served from **`apps/api`** (NestJS, Postgres on Neon, **Drizzle ORM**, **Better Auth**). The **Next.js 16** app in **`apps/app`** renders the marketing landing page, **problems list** and **problem-by-slug workspace** (split layout, Monaco editor, output panel), and **admin** flows that proxy to the API. **Run** executes **sample tests in the browser** (structured evaluation of user JavaScript — still not an isolated judge). **Submit** is **placeholder UI only** (no full-suite execution or persistence wired from the workspace yet). **Per-problem AI chat** HTTP endpoints exist on the API (user messages stored; assistant replies to be added server-side).
+
+**Primary bet (unchanged):** Ship a trustworthy **run / submit** loop with **server-side or sandboxed judging** before leaning on social or heavy gamification.
 
 ---
 
 ## 2. Problem statement
 
-The baseline app demonstrates the loop well for learning but has structural limits:
+The baseline tutorial app demonstrates the loop for learning but has structural limits that CodeDrill is meant to overcome:
 
-- **Problems and tests** live in TypeScript modules and ship with the frontend; adding content requires a deploy.
-- **Submission** uses `new Function` in the browser to execute user code against bundled handlers—fine for a demo, **unsafe and non-portable** for a real product (no isolation, no multi-language path, easy to abuse).
-- **Stack age:** Next.js 13 Pages, patterns that predate App Router and modern data-fetching conventions.
-- **Progress** is partially stored in Firestore (`solvedProblems`) but the catalog and “truth” of tests stay in code.
+- **Problems and tests** coupled to the frontend-only world — CodeDrill has moved **catalog + schema** to the API and Neon Postgres; content can be managed via API/admin without redeploying static maps for every change.
+- **Unsafe evaluation** — the product still uses **in-browser execution** for **Run** today; **Submit** and **hidden tests** must move to a **documented, rate-limited, isolated** path (see §9).
+- **Stack age (baseline)** — addressed for v2: **App Router**, strict TypeScript, Biome/Ultracite, Vitest, CI-oriented scripts.
+- **Progress truth** — Drizzle schema includes **`problem_progress`**, **`submissions`**, and related tables; **HTTP handlers for submissions from the app are not fully wired** end-to-end yet.
 
-**Opportunity:** Rebuild the same mental model with a **database-backed catalog**, **isolated judge**, and **clear API boundaries** so the product can grow (more problems, languages, optional paywall) without re-architecting.
+**Ongoing opportunity:** Finish **judge + submit**, unify **end-user auth** between the Neon Auth–powered app and Better Auth–protected API where needed, and harden rate limits on execution endpoints.
 
 ---
 
 ## 3. Vision
 
-A fast, accessible place to practice coding problems with **reliable automated feedback**, clear statements, optional video explanations, and **durable progress**—without the fragility of client-only evaluation.
+A fast, accessible place to practice coding problems with **reliable automated feedback**, clear statements, optional explanations and tutor affordances, and **durable progress** — without relying on client-only evaluation for scored submits.
 
 ---
 
@@ -44,11 +46,11 @@ A fast, accessible place to practice coding problems with **reliable automated f
 | ID | Goal |
 |----|------|
 | G1 | Preserve the **core loop**: catalog → problem → editor → run (samples) → submit (full suite) → outcome + progress. |
-| G2 | **Decouple content from deploys** via DB, CMS, or build-time MDX pipeline (choose one in §9). |
-| G3 | **Replace in-browser `eval`/`new Function`** with a documented, rate-limited execution path (sandbox or dedicated worker). |
-| G4 | **Modern application shell:** current Next.js (App Router), strict TypeScript, CI, lint/format, environment-based config. |
-| G5 | **Auth + persistence:** signed-in users have submissions and completion state tied to their account. |
-| G6 | **Polish:** keyboard-friendly modals, sensible empty/loading/error states, dark theme parity with baseline where applicable. |
+| G2 | **Decouple content from deploys** via API + DB (in progress: catalog and definitions live in **`apps/api`** schema). |
+| G3 | **Replace in-browser grading for Submit** with a documented, rate-limited execution path (sandbox or dedicated worker). **Run** may remain client-only for samples for longer if clearly labeled. |
+| G4 | **Modern application shell:** Next.js App Router, strict TypeScript, CI, lint/format, environment-based config. |
+| G5 | **Auth + persistence:** signed-in users have submissions and completion state tied to their account (schema ready; wiring in flight). |
+| G6 | **Polish:** keyboard-friendly flows, sensible empty/loading/error states, dark theme support via shared design system. |
 
 ### 4.2 Non-goals (initial releases)
 
@@ -62,10 +64,10 @@ A fast, accessible place to practice coding problems with **reliable automated f
 ## 5. Users and personas
 
 | Persona | Needs |
-|---------|--------|
+|---------|-------|
 | **Practitioner** | Filter/browse problems, run and submit code, see failures clearly, resume later. |
 | **Returning user** | See solved/attempted state, stable sessions, preferences (font, theme). |
-| **Content owner (you)** | Add/edit problems and tests without touching app source for each change. |
+| **Content owner** | Add/edit problems and tests via **admin UI** / API without shipping new static modules for each change. |
 
 ---
 
@@ -87,30 +89,46 @@ Use this for migration and parity checks.
 | **UI state** | Recoil for auth modal atom; `react-toastify`; confetti on success. |
 | **Other** | Timer, settings modal, font size in `localStorage`, Topbar/Navbar, problems table with difficulty/category/solution (YouTube). |
 
-**Explicit technical debt to retire in v2:** client execution of arbitrary user JavaScript; bundling secret or hidden tests only as obscured client logic (if any); coupling of “grader” and “statement” in one TS module per problem.
+**Explicit technical debt to retire in v2:** client execution of arbitrary user JavaScript for **scored Submit**; bundling hidden tests only as obscured client logic; coupling of “grader” and “statement” in one TS module per problem (largely addressed for **storage**; **Run** still evaluates in-browser today).
 
 ---
 
 ## 6.1 Current repository (`codedrill` monorepo)
 
-This is the actual workspace v2 will be built in. Treat it as the source of truth for paths, package names, and tooling.
+This section is the **source of truth** for what exists in the repo **today**.
+
+### Layout and tooling
 
 | Area | Reality |
 |------|---------|
-| **Layout** | Turborepo + pnpm workspaces. Workspace globs: `apps/*`, `apps/security-lab/*`, `packages/*` (see `pnpm-workspace.yaml`). |
-| **Root tooling** | `turbo` (build/dev/test/analyze), **Biome 2** + **Ultracite** for lint/format (`pnpm check`, `pnpm fix`), `vitest`, TS 5.9, Node ≥ 18, `pnpm@10`. No ESLint/Prettier. |
-| **Primary product app** | `apps/app` — Next.js **16** (App Router), React 19, Tailwind 4. Currently scaffolded as `neon-auth` starter and is the intended home for the practice platform UI (rename when product naming is confirmed). |
-| **Sibling apps (labs / experiments)** | `apps/ai-chatbots`, `apps/neon-jwt-api`, `apps/storybook`, `apps/system-design-lab`, `apps/testing-lab`, `apps/with-nest`, `apps/with-optimization`, `apps/with-solid`, `apps/with-sse`. Not part of P0 unless explicitly pulled in (e.g. judge could live as its own `apps/*` service). |
-| **Shared packages** | `@repo/database` + `@repo/prisma-neon` (Prisma on Neon Postgres), `@repo/auth`, `@repo/design-system`, `@repo/rate-limit`, `@repo/security`, `@repo/observability`, `@repo/schemas`, `@repo/ai`, `@repo/analytics`, `@repo/email`, `@repo/feature-flags`, `@repo/storage`, `@repo/notifications`, `@repo/payments`, `@repo/webhooks`, `@repo/seo`, `@repo/internationalization`, `@repo/collaboration`, `@repo/next-config`, `@repo/typescript-config`. Prefer reusing these over adding new packages. |
-| **DB workflow** | `pnpm migrate` runs `prisma format && prisma generate && prisma db push` from `packages/database`. New schema lives there, not inside an app. |
+| **Workspace** | `pnpm-workspace.yaml`: `apps/*`, `packages/*` (optional `apps/security-lab/*` if present in a branch). Root **`docs/`** may exist as documentation content but is not always a pnpm workspace package — prefer `apps/api/README.md` for API setup. |
+| **Root tooling** | `turbo` (build/dev/test/analyze), **Biome** + **Ultracite** (`pnpm check`, `pnpm fix`), **Vitest**, TypeScript **5.9**, Node **≥ 18**, **pnpm 10**. |
+| **Primary UI** | **`apps/app`** — Next.js **16** (App Router), React **19**, Tailwind **4**, port **3010** in dev. Package name remains **`neon-auth`** historically; product-facing name is **CodeDrill**. Uses **Neon Auth** (`@neondatabase/neon-auth-next`, `neon-js`) for sign-in/account flows and **`@repo/prisma-neon` / `@repo/database`** where the template wires Prisma. |
+| **Practice API** | **`apps/api`** — NestJS, **Better Auth** (email/password), **Drizzle ORM** on **Neon Postgres**. pnpm package name **`neon-jwt-api`**; default port **3030**. See **`apps/api/README.md`**. |
+| **Other apps under `apps/`** | Examples and tooling: `ai-chatbots`, `storybook`, `system-design-lab`, `testing-lab`, `with-nest`, `with-solid`, `with-sse`. Treat as **labs** unless promoted into the product boundary. |
+| **Shared packages** | `@repo/database` + `@repo/prisma-neon` (Prisma — largely template/auth-adjacent usage in the app), `@repo/design-system`, `@repo/auth`, `@repo/rate-limit`, `@repo/security`, `@repo/observability`, `@repo/schemas`, `@repo/ai`, `@repo/analytics`, `@repo/email`, `@repo/feature-flags`, `@repo/storage`, `@repo/notifications`, `@repo/payments`, `@repo/webhooks`, `@repo/seo`, `@repo/internationalization`, `@repo/collaboration`, `@repo/next-config`, `@repo/typescript-config`. Prefer reusing over new packages. |
+| **DB workflows** | **Practice catalog:** Drizzle in `apps/api` — `pnpm --filter neon-jwt-api db:push` (schema in `apps/api/src/database/schema.ts`; reference SQL in `apps/api/sql/practice-platform.sql`). **Prisma (template):** `pnpm migrate` at root runs Prisma against `packages/database`. |
 
-**Implications for v2 implementation:**
+### Practice domain (Drizzle / `apps/api`)
 
-- The practice platform UI/API ships **inside `apps/app`** (or a renamed sibling app), not at the repo root.
-- Catalog, problems, test cases, submissions, and user state belong in **`packages/database`** Prisma schema; consumed by app via `@repo/database`.
-- Auth uses **`@repo/auth`** (with Neon Auth in `apps/app` today) — pick one provider and remove the Firebase assumptions from §6.
-- Rate limiting and security headers come from **`@repo/rate-limit`** + **`@repo/security`**; do not roll new ones.
-- The **judge** should be its own `apps/*` service (e.g. `apps/judge`) so it can be deployed and scaled independently and CPU/memory-capped per §9.
+Tables include (non-exhaustive): **`problems`**, **`tags`** / **`problem_tags`**, **`problem_examples`**, **`test_cases`**, **`starter_code`**, **`problem_hints`**, **`problem_solutions`**, **`problem_learning_notes`**, **`submissions`**, **`submission_test_results`**, **`problem_progress`**, **`problem_chat_thread`**, **`problem_chat_message`**. REST surface today centers on **`/problems`** (catalog, by slug, details, CRUD with access guard) and **`/problems/:problemId/chat/messages`** (see API README).
+
+### Next app integration
+
+| Concern | Reality |
+|---------|---------|
+| **Fetching catalog / detail** | Server Components call **`NEON_JWT_API_URL`** (default `http://localhost:3030`) with forwarded **`Cookie`** and optional **`x-internal-problems-secret`** (`INTERNAL_PROBLEMS_SECRET`) — see `apps/app/lib/problems/fetch-problems-list.ts` and `fetch-problem-by-slug.ts`. |
+| **Admin** | Next **Route Handlers** under `apps/app/app/api/admin/problems/*` proxy to the Nest API for create/update and detail fetch. |
+| **Workspace** | **Run:** `client-test-run.ts` + `use-problem-workspace` evaluate the active starter snippet against **sample** cases in the browser. **Submit:** **not implemented** (placeholder messages only). |
+| **Editor** | **Monaco** (`@monaco-editor/react`) primary; CodeMirror packages also present in dependencies. |
+| **Timer** | `TimerProvider` wraps the problem-by-slug page (cosmetic / UX continuity with baseline). |
+| **Problem chat UI** | Client chat components under `features/problem-detail/chatbot/` intended to use the API thread/message routes. |
+
+### Implications
+
+- **Catalog and problem JSON** should continue to live in **`apps/api`** + Neon, not static maps in the Next app.
+- **Judge** should still be a **separate deployable** (e.g. future `apps/judge` or managed sandbox) for CPU/memory caps and isolation; **not present in the repo yet**.
+- **Auth alignment** is an active design area: **Neon Auth** in the Next app vs **Better Auth** sessions for **`/problems`** — document cookie/CORS and user-id mapping when wiring user-scoped catalog and submissions from the browser.
 
 ---
 
@@ -118,25 +136,25 @@ This is the actual workspace v2 will be built in. Treat it as the source of trut
 
 ### 7.1 P0 — Must ship (“v1 modern clone”)
 
-| ID | Requirement | Acceptance criteria (examples) |
-|----|-------------|--------------------------------|
-| **F1** | **Problem catalog** | Lists title, difficulty, categories/tags; loads from API or DB (not only static imports). Pagination or virtual scroll for large lists. |
-| **F2** | **Problem detail** | Route per stable `slug`/`id`; 404 for unknown ids; statement renders markdown (code blocks, lists); optional embedded video URL preserved from baseline behavior. |
-| **F3** | **Editor** | Syntax highlighting for chosen language(s); monospaced font; font size preference persisted; basic undo/redo via editor. |
-| **F4** | **Run** | Executes against **visible** sample cases; shows stdout/stderr or structured diff per case; completes within documented timeout for samples. |
-| **F5** | **Submit** | Executes against **full** test suite server-side or in sandbox; returns pass/fail/wrong answer/TLE/RTE with **no** raw stack traces to end users (map to friendly codes). |
-| **F6** | **Auth** | Sign up, sign in, sign out, password reset (parity with baseline); session available to server for protected routes/APIs. |
-| **F7** | **Progress** | Persist at minimum: `solved` / `attempted` per problem per user; optional store of last submitted code. Catalog reflects status. |
-| **F8** | **Rate limiting** | Run and submit endpoints limited per user/IP to mitigate abuse. |
+| ID | Requirement | Acceptance criteria (examples) | Status (2026-05) |
+|----|-------------|--------------------------------|------------------|
+| **F1** | **Problem catalog** | Lists title, difficulty, tags; loads from API/DB; scales to many rows. | **Partial** — list from `GET /problems`; polish pagination/virtualization as needed. |
+| **F2** | **Problem detail** | Route per stable `slug`; 404 for unknown; statement from API; examples/test metadata from API. | **Partial** — `/problems/[slug]` + API bundle; continue hardening parsing and empty states. |
+| **F3** | **Editor** | Syntax highlighting; monospaced font; font size preference if required by parity. | **Partial** — Monaco wired; preferences as needed. |
+| **F4** | **Run** | Executes against **visible** sample cases; structured per-case results; timeout UX. | **Partial** — client-side Run on samples; document limits; consider server path later. |
+| **F5** | **Submit** | Full suite **server-side or sandbox**; friendly status codes; no raw stacks to users. | **Not done** — UI placeholder; schema supports submissions. |
+| **F6** | **Auth** | Sign up, sign in, sign out, session for protected APIs. | **Partial** — Neon Auth in app; Better Auth on API; unify for user-scoped features. |
+| **F7** | **Progress** | `solved` / `attempted` per user per problem; catalog reflects status. | **Not done** — `problem_progress` exists; end-to-end wiring TBD. |
+| **F8** | **Rate limiting** | Run/submit endpoints limited per user/IP. | **Partial** — use `@repo/rate-limit` when exposing public judge/submit routes. |
 
 ### 7.2 P1 — Strong follow-ons
 
 | ID | Requirement | Notes |
 |----|-------------|--------|
-| **F9** | **Admin or import path** | CLI or UI to upsert problems + tests; validate schema before publish. |
-| **F10** | **Discuss or hints** | Threaded comments or collapsible hints per problem. |
+| **F9** | **Admin or import path** | **In progress** — admin UI + BFF routes calling Nest `POST/PUT /problems`. |
+| **F10** | **Discuss or hints** | Hints/solutions/learning notes in schema; discuss threads TBD. |
 | **F11** | **Streaks / goals** | Lightweight engagement (optional). |
-| **F12** | **Collections** | Curated lists (“Blind 75”, “Arrays week 1”). |
+| **F12** | **Collections** | Curated lists (“Blind 75”, …). |
 
 ### 7.3 P2 — Later
 
@@ -148,44 +166,45 @@ This is the actual workspace v2 will be built in. Treat it as the source of trut
 
 | Category | Requirement |
 |----------|-------------|
-| **Security** | User code never runs with full Node privileges on shared tenancy without isolation; no secrets in client bundles; CSRF/cookie rules documented for same-site APIs. |
-| **Performance** | Catalog LCP target defined per environment (e.g. p75 &lt; 2.5s on simulated 4G); judge p95 latency budget (e.g. &lt; 10s for reference problems). |
-| **Reliability** | Submissions idempotent or deduplicated by client token; structured error responses for judge outages. |
-| **Accessibility** | WCAG 2.1 AA for catalog and chrome; editor has accessible name; focus trap in modals. |
-| **Observability** | Structured logs for judge failures; metrics for submit volume, error rate, latency histograms. |
+| **Security** | User code must not run with full Node privileges on shared tenancy for **Submit**; no secrets in client bundles; CSRF/cookie rules documented for same-site API calls. |
+| **Performance** | Catalog LCP targets per environment; judge p95 latency budget once live. |
+| **Reliability** | Submissions idempotent or deduplicated by client token; structured errors for judge outages. |
+| **Accessibility** | WCAG 2.1 AA for catalog and chrome; editor has accessible name; focus management in modals. |
+| **Observability** | Structured logs for judge failures; metrics for submit volume, error rate, latency. |
 
 ---
 
 ## 9. Technical direction (recommended defaults)
 
-Decisions here should be copied into an Architecture Decision Record (ADR) set as they are finalized.
+Decisions here should be copied into ADRs as they are finalized.
 
 | Topic | Direction |
 |-------|-----------|
-| **App framework** | Next.js **App Router** (Next 16 already in `apps/app`), React 19, TypeScript strict. |
-| **API** | App Router Route Handlers in `apps/app` for catalog/run/submit; optional internal HTTP boundary to the judge service. Avoid tRPC unless a clear need emerges. |
-| **Database** | **Postgres on Neon via `@repo/database` (Prisma)** — already wired. New tables: `problems`, `test_cases`, `submissions`, `user_problem_state` (plus existing user/auth tables). Migrations live in `packages/database`. |
-| **Auth** | Use **`@repo/auth`** as the single source. `apps/app` is currently on Neon Auth; standardize the rest of the product on the same provider rather than reintroducing Firebase. |
-| **Client state** | Minimize global state; URL for filters; reach for Zustand/Jotai only where needed. No Recoil. |
-| **Editor** | CodeMirror 6 or Monaco; match baseline shortcuts where possible. |
-| **Judge** | Separate service (recommended: new `apps/judge` in this monorepo) running user code in an isolated process: Docker sidecar, Fly Machines, or Cloud Run job. **Documented** CPU/time/memory caps; called from `apps/app` over HTTP with a shared secret. |
-| **Rate limiting / security** | Use `@repo/rate-limit` and `@repo/security` from `apps/app` route handlers; do not implement ad-hoc limiters. |
-| **Content** | **Preferred:** problems and public samples in DB (`packages/database`); hidden tests only on server. **Alternative:** MDX in repo + build step importing into DB (still no `new Function` for grading). |
+| **UI** | Next.js **App Router** (`apps/app`), React 19, TypeScript strict. |
+| **Practice API** | **NestJS** in **`apps/api`**: Better Auth, Drizzle, Neon. Next app consumes it over HTTP (cookies and/or internal secret for server-side fetches). |
+| **Catalog DB** | **Postgres on Neon** — practice tables owned by **`apps/api`** Drizzle schema. |
+| **Template / Prisma** | **`packages/database`** remains for Prisma-based template features; **do not** duplicate practice tables in Prisma unless consolidating intentionally. |
+| **Auth** | Short term: **Better Auth** owns session for **`/problems`**; **Neon Auth** owns Next app account UX — **align user identity** (or consolidate on one stack) before production user progress. |
+| **Client state** | Minimize global state; URL for filters; add Zustand/Jotai only where justified. |
+| **Editor** | Monaco primary; keep CodeMirror optional/alternate where useful. |
+| **Judge** | Separate service (e.g. future **`apps/judge`**) with CPU/time/memory caps; called from API or Next over HTTP with a shared secret. **Not implemented.** |
+| **Rate limiting / security** | Use **`@repo/rate-limit`** and **`@repo/security`** on exposed execution and admin routes. |
+| **Run vs Submit** | **Run** may stay client for rapid feedback on samples; **Submit** must use server/sandbox and hidden tests only on the server. |
 
-**Migration note:** Existing `src/utils/problems/*.ts` definitions should be **exported** via a one-time script into JSON/SQL seed format (statement markdown, starter code, public + hidden test vectors, reference solution for internal validation only).
+**Migration note:** Legacy `src/utils/problems/*.ts` style definitions can be **seeded** into Neon via scripts or admin payloads (statement markdown, starter code, public + hidden test vectors, reference solution for internal QA only).
 
 ---
 
 ## 10. Phased delivery plan
 
-| Phase | Scope | Exit criteria |
-|-------|--------|----------------|
-| **0** | Tooling baseline (Turborepo, pnpm, Biome/Ultracite, Vitest, TS strict) — **already in place**. Ensure CI on `pnpm check` + `turbo build` + `turbo test`; env template current. | Green CI on `main`. |
-| **1** | Practice UI shell in `apps/app`: App Router layout, catalog page reading from a **seed API** or static JSON. | Deployable stub with 5+ problems listed. |
-| **2** | Prisma schema in `packages/database` (`problems`, `test_cases`, `submissions`, `user_problem_state`); `apps/app` catalog + problem page read from DB via `@repo/database`; auth via `@repo/auth`. | No hardcoded problems map; signed-in users persist `solved`/`attempted`. |
-| **3** | Stand up `apps/judge` (or chosen sandbox) + run/submit Route Handlers in `apps/app`; migrate seed problems from legacy repo. | All P0 functional reqs F4–F5 met in staging with load-test smoke. |
-| **4** | Progress sync, polish, a11y pass; remove any legacy-style assumptions from §6 that snuck into code. | P0 complete; baseline parity on “solved” UX. |
-| **5** | P1 items per roadmap priority. | First admin/import path live. |
+| Phase | Scope | Exit criteria | Status |
+|-------|--------|----------------|--------|
+| **0** | Tooling baseline (Turborepo, pnpm, Biome/Ultracite, Vitest, TS strict). | Green CI on `main`. | **Done** |
+| **1** | Practice UI shell: layout, catalog, problem page from **real API**. | Deployable app listing problems from Neon API. | **Largely done** |
+| **2** | Drizzle schema + Nest problems API; admin create/edit; chat thread persistence. | Problems manageable without app redeploy; chat messages API usable. | **In progress** |
+| **3** | **`apps/judge`** (or vendor sandbox) + submit pipeline + API persistence; wire workspace Submit. | F5 met in staging; hidden tests never shipped to client. | **Not started** |
+| **4** | Progress sync, polish, a11y pass. | F7 + catalog status chips; baseline parity on “solved” UX. | **Not started** |
+| **5** | P1 roadmap items. | First-class hints/collections/etc. as prioritized. | **Future** |
 
 ---
 
@@ -195,31 +214,32 @@ Decisions here should be copied into an Architecture Decision Record (ADR) set a
 |--------|------------|
 | **Activation** | % of new accounts that open a problem and hit **Run** at least once within 24h. |
 | **Core engagement** | Median problems **submitted** per active user per week. |
-| **Judge health** | Submit **5xx** rate &lt; 0.5%; p95 judge duration under budget (§8). |
-| **Content velocity** | Median time from “draft problem” to “published” (once F9 exists). |
+| **Judge health** | Submit **5xx** rate under 0.5%; p95 judge duration under budget (§8). |
+| **Content velocity** | Median time from “draft problem” to “published” (admin path). |
 
 ---
 
 ## 12. Open questions
 
-1. **Languages for v1:** JavaScript only (closest to baseline) vs add Python from the start.
+1. **Languages for v1:** JavaScript only vs add Python from the start.
 2. **Judge hosting:** self-managed containers vs managed sandbox vendor (cost vs control).
-3. **Monetization:** none vs “Pro” (more problems, video, discuss) vs course bundle.
-4. **YouTube:** remain first-class “Solution” column vs generic “Resources” links.
-5. **Product app naming:** keep `apps/app` (currently the Neon Auth starter) and grow it into the practice platform, or rename it (e.g. `apps/practice`) and reserve `apps/app` for something else.
-6. **Judge placement:** new `apps/judge` service in this monorepo vs a third-party sandbox vendor.
+3. **Monetization:** none vs “Pro” vs course bundle.
+4. **YouTube / video:** first-class “Solution” column vs generic “Resources” links.
+5. **Package rename:** keep `neon-auth` / `neon-jwt-api` names or rename to `app` / `api` for clarity.
+6. **Auth model:** single provider vs documented bridge between Neon Auth (Next) and Better Auth (API) for the same user.
+7. **Client Run long-term:** keep for samples only vs move behind a lightweight server endpoint.
 
 ---
 
-## 13. Appendix: parity checklist (baseline → v2)
+## 13. Appendix: parity checklist (baseline → CodeDrill)
 
-- [ ] Problem list with status, title, difficulty, category, solution link.
-- [ ] Split workspace: description + editor + test case UI.
-- [ ] Starter code + function name constraint (or full-file mode for non-JS).
-- [ ] Toast feedback for success/failure; optional celebration UX (confetti optional).
-- [ ] Login-gated submit; persisted solved state.
-- [ ] Timer (if retained: define whether it affects scoring or is cosmetic only).
-- [ ] Settings: font size, modal for preferences.
+- [x] Problem list (title, difficulty, tags from API).
+- [x] Split workspace: description + editor + output tabs (console / test cases / results).
+- [x] Starter code from API; Run against sample cases (client-side).
+- [ ] Starter parity: toasts/confetti (optional); full **Submit** with persisted outcome.
+- [ ] Login-gated submit aligned with API session; persisted **solved** state in DB driving catalog.
+- [x] Timer provider on problem page (define whether cosmetic vs scored).
+- [ ] Settings: font size, global preferences modal (as needed).
 
 ---
 
