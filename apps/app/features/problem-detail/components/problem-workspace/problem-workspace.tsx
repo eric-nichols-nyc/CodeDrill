@@ -6,7 +6,6 @@
  * State and handlers live in `useProblemWorkspace`.
  */
 
-import { Badge } from "@repo/design-system/components/ui/badge";
 import { Button } from "@repo/design-system/components/ui/button";
 import {
   Select,
@@ -44,7 +43,6 @@ export function ProblemWorkspace({
     lastAction,
     lastRunOutcome,
     isPending,
-    totalChars,
     handleRun,
     handleSubmit,
     isSavingCode,
@@ -70,9 +68,6 @@ export function ProblemWorkspace({
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-border">
         {rows.length > 1 ? (
           <div className="flex shrink-0 items-center gap-2 border-border border-b bg-muted/20 px-3 py-1.5">
-            <span className="shrink-0 text-muted-foreground text-xs">
-              Language
-            </span>
             <Select onValueChange={setActiveStarterKey} value={activeRow.key}>
               <SelectTrigger
                 aria-label="Starter language"
@@ -108,17 +103,10 @@ export function ProblemWorkspace({
         onDismissSaveError={clearWorkspaceCodeSaveError}
         saveError={workspaceCodeSaveError}
       />
-      <div className="mb-3 flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-muted/20 px-3 py-2">
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <h2 className="font-medium text-sm">Workspace</h2>
-          <Badge variant="outline">
-            {rows.length} file{rows.length === 1 ? "" : "s"}
-          </Badge>
-          <Badge variant="outline">{totalChars} chars</Badge>
-          {activeRow ? (
-            <Badge variant="outline">{activeRow.language}</Badge>
-          ) : null}
-        </div>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        {starterBody}
+      </div>
+      <div className="mt-3 flex shrink-0 flex-wrap items-center justify-end gap-3 rounded-md border border-border bg-muted/20 px-3 py-2">
         <div className="flex items-center gap-2">
           <Button
             disabled={isPending || isSavingCode}
@@ -134,9 +122,6 @@ export function ProblemWorkspace({
             Submit
           </Button>
         </div>
-      </div>
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        {starterBody}
       </div>
     </div>
   );

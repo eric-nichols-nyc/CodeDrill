@@ -3,6 +3,24 @@
 @import "react-quill-new/dist/quill.snow.css";
 @import "@repo/design-system/styles/globals.css";
 
+/* Slightly larger type scale (rem-based utilities follow html font size). */
+@layer base {
+  html {
+    font-size: 106.25%;
+  }
+  body {
+    line-height: 1.6;
+  }
+}
+
+/* Dark mode: primary copy reads as white on cards / main surfaces. */
+.dark {
+  --foreground: oklch(1 0 0);
+  --card-foreground: oklch(1 0 0);
+  --popover-foreground: oklch(1 0 0);
+  --sidebar-foreground: oklch(1 0 0);
+}
+
 /* Problem detail page: dark nav bar tokens used by `ProblemSlugNavHeader`. */
 .problem-by-slug-page {
   --nav-bg: #282828;
@@ -33,6 +51,6 @@
   overflow-y: auto;
 }
 
-.ql-container.ql-snow{
+.ql-container.ql-snow {
   border: none;
 }

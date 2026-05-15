@@ -6,4 +6,5 @@ The root [`docs/`](../../../docs/) project is the next-forge **Geistdocs / Fumad
 
 | Doc | Description |
 |-----|-------------|
+| [Problems list toolbar & filters](./problems-list-filtering.md) | Search, sort popover, multi-row AND filters, zebra table |
 | [Workspace code save/load](./workspace-code-save-flow.md) | Persist editor text on **Run**, restore on page load |

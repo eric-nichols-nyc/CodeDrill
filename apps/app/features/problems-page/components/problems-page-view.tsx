@@ -6,22 +6,16 @@ import {
   ResizablePanelGroup,
 } from "@repo/design-system/components/ui/resizable";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { problemMatchesFilters } from "../lib/problem-matches-filters";
-import type {
-  Difficulty,
-  Problem,
-  SortDirection,
-  SortField,
-  Status,
-} from "../lib/types";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { Problem, SortDirection, SortField } from "../lib/types";
+import { ProblemsList } from "../problems-list/components/problems-list";
+import { ProblemsListToolbar } from "../problems-list/components/problems-list-toolbar";
+import { useProblemsListFilterRows } from "../problems-list/hooks/use-problems-list-filter-rows";
+import { problemMatchesProblemsListQuery } from "../problems-list/utils/matches-problems-list-query";
 import { Calendar } from "./calendar";
-import { ProblemFilters } from "./problem-filters";
-import { ProblemTable } from "./problem-table";
 import { ProblemsHeader } from "./problems-header";
 import { ProblemsNavSidebar } from "./problems-nav-sidebar";
 import { ProblemsPagination } from "./problems-pagination";
-import { ProblemsPromoCarousel } from "./problems-promo-carousel";
 import { ProblemsSidebar } from "./problems-sidebar";
 
 type ProblemsPageViewProps = {
@@ -37,13 +31,56 @@ export function ProblemsPageView({
 }: ProblemsPageViewProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [difficulty, setDifficulty] = useState<Difficulty | "all">("all");
-  const [status, setStatus] = useState<Status | "all">("all");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const {
+    rows: filterRows,
+    addRow: onFilterAddRow,
+    removeRow: onFilterRemoveRow,
+    updateRow: onFilterUpdateRow,
+    reset: onFilterReset,
+    activeCount: filterActiveCount,
+  } = useProblemsListFilterRows();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [sortField, setSortField] = useState<SortField>("id");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+
+  const resetPagination = useCallback(() => {
+    setCurrentPage(1);
+  }, []);
+
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearch(value);
+      resetPagination();
+    },
+    [resetPagination]
+  );
+
+  const handleFilterAddRow = useCallback(() => {
+    onFilterAddRow();
+    resetPagination();
+  }, [onFilterAddRow, resetPagination]);
+
+  const handleFilterRemoveRow = useCallback(
+    (id: string) => {
+      onFilterRemoveRow(id);
+      resetPagination();
+    },
+    [onFilterRemoveRow, resetPagination]
+  );
+
+  const handleFilterUpdateRow = useCallback(
+    (id: string, patch: Parameters<typeof onFilterUpdateRow>[1]) => {
+      onFilterUpdateRow(id, patch);
+      resetPagination();
+    },
+    [onFilterUpdateRow, resetPagination]
+  );
+
+  const handleFilterReset = useCallback(() => {
+    onFilterReset();
+    resetPagination();
+  }, [onFilterReset, resetPagination]);
 
   const availableTags = useMemo(() => {
     const tagSet = new Set<string>();
@@ -55,14 +92,17 @@ export function ProblemsPageView({
     return [...tagSet].sort((a, b) => a.localeCompare(b));
   }, [initialProblems]);
 
-  const filterState = useMemo(
-    () => ({ search, difficulty, status, selectedTags }),
-    [search, difficulty, status, selectedTags]
+  const listQuery = useMemo(
+    () => ({ search, filterRows }),
+    [search, filterRows]
   );
 
   const filteredProblems = useMemo(
-    () => initialProblems.filter((p) => problemMatchesFilters(p, filterState)),
-    [initialProblems, filterState]
+    () =>
+      initialProblems.filter((p) =>
+        problemMatchesProblemsListQuery(p, listQuery)
+      ),
+    [initialProblems, listQuery]
   );
 
   const totalPages =
@@ -90,6 +130,11 @@ export function ProblemsPageView({
     }
   };
 
+  const handleSortToolbar = (field: SortField, direction: SortDirection) => {
+    setSortField(field);
+    setSortDirection(direction);
+  };
+
   const handleRandomProblem = () => {
     if (filteredProblems.length === 0) {
       return;
@@ -106,29 +151,29 @@ export function ProblemsPageView({
     setCurrentPage(1);
   };
 
-  let tableSection: React.ReactNode;
+  let listSection: React.ReactNode;
   if (!fetchOk) {
-    tableSection = (
+    listSection = (
       <p className="p-6 text-center text-muted-foreground text-sm">
         Problems list unavailable. Fix the connection issue above, then refresh
         the page.
       </p>
     );
   } else if (initialProblems.length === 0) {
-    tableSection = (
+    listSection = (
       <p className="p-6 text-center text-muted-foreground text-sm">
         No problems yet.
       </p>
     );
   } else if (filteredProblems.length === 0) {
-    tableSection = (
+    listSection = (
       <p className="p-6 text-center text-muted-foreground text-sm">
         No problems match your filters.
       </p>
     );
   } else {
-    tableSection = (
-      <ProblemTable
+    listSection = (
+      <ProblemsList
         onSort={handleSort}
         problems={paginatedProblems}
         sortDirection={sortDirection}
@@ -177,62 +222,26 @@ export function ProblemsPageView({
                   </p>
                 )}
 
-                <div className="mb-4 flex flex-wrap items-center gap-4 border-border border-b pb-3">
-                  <button
-                    className="border-primary border-b-2 pb-2 font-medium text-foreground text-sm"
-                    type="button"
-                  >
-                    All topics
-                  </button>
-                  <button
-                    className="pb-2 text-muted-foreground text-sm hover:text-foreground"
-                    type="button"
-                  >
-                    Algorithms
-                  </button>
-                  <button
-                    className="pb-2 text-muted-foreground text-sm hover:text-foreground"
-                    type="button"
-                  >
-                    Database
-                  </button>
-                  <button
-                    className="pb-2 text-muted-foreground text-sm hover:text-foreground"
-                    type="button"
-                  >
-                    Shell
-                  </button>
-                  <button
-                    className="pb-2 text-muted-foreground text-sm hover:text-foreground"
-                    type="button"
-                  >
-                    Concurrency
-                  </button>
-                </div>
-
-                <ProblemFilters
-                  availableTags={availableTags}
-                  difficulty={difficulty}
-                  onDifficultyChange={setDifficulty}
+                <ProblemsListToolbar
+                  availableTopics={availableTags}
+                  className="mt-2"
+                  filterActiveCount={filterActiveCount}
+                  filteredCount={filteredProblems.length}
+                  filterRows={filterRows}
+                  onFilterAddRow={handleFilterAddRow}
+                  onFilterRemoveRow={handleFilterRemoveRow}
+                  onFilterReset={handleFilterReset}
+                  onFilterUpdateRow={handleFilterUpdateRow}
                   onRandomProblem={handleRandomProblem}
-                  onSearchChange={setSearch}
-                  onStatusChange={setStatus}
-                  onTagsChange={setSelectedTags}
+                  onSearchChange={handleSearchChange}
+                  onSortChange={handleSortToolbar}
                   search={search}
-                  selectedTags={selectedTags}
-                  status={status}
+                  sortDirection={sortDirection}
+                  sortField={sortField}
                 />
 
-                <div className="mt-4 mb-2 flex items-center justify-between">
-                  <span className="text-muted-foreground text-sm">
-                    {filteredProblems.length} problems
-                  </span>
-                </div>
-
-                <ProblemsPromoCarousel />
-
                 <div className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground">
-                  {tableSection}
+                  {listSection}
                 </div>
 
                 <ProblemsPagination
