@@ -7,37 +7,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/design-system/components/ui/tabs";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { ProblemTestCaseView } from "@/features/problem-detail/client-test-run";
 
-import { formatTestcaseInputFields } from "./utils/format-testcase-input-fields";
-
-function TestcaseCaseFields({ input }: { input: string }) {
-  const fields = useMemo(() => formatTestcaseInputFields(input), [input]);
-
-  if (fields.length === 0) {
-    return (
-      <p className="text-muted-foreground text-sm">
-        No input fields for this case.
-      </p>
-    );
-  }
-
-  return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4 p-4">
-      {fields.map((field) => (
-        <div className="flex flex-col gap-1.5" key={field.label}>
-          <span className="font-mono text-muted-foreground text-xs">
-            {field.label} =
-          </span>
-          <div className="rounded-md border border-border/60 bg-muted/40 px-3 py-2.5 font-mono text-foreground text-sm leading-relaxed">
-            {field.value}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
+import { TestcaseInputFields } from "./testcase-field-blocks";
 
 export function TestcasePanel({
   testCaseRows,
@@ -85,7 +58,9 @@ export function TestcasePanel({
           value={String(index)}
         >
           <ScrollArea className="h-full">
-            <TestcaseCaseFields input={tc.input} />
+            <div className="p-4">
+              <TestcaseInputFields input={tc.input} />
+            </div>
           </ScrollArea>
         </TabsContent>
       ))}

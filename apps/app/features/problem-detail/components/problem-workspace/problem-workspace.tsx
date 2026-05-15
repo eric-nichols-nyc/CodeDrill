@@ -39,7 +39,6 @@ export function ProblemWorkspace({
     setDraftForKey,
     activeRow,
     setActiveStarterKey,
-    consoleEntries,
     activeTab,
     setActiveTab,
     lastAction,
@@ -153,7 +152,6 @@ export function ProblemWorkspace({
       right={
         <ProblemOutputPanel
           activeTab={activeTab}
-          consoleEntries={consoleEntries}
           isBusy={isPending}
           lastAction={lastAction}
           lastRunOutcome={lastRunOutcome}

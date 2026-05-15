@@ -13,8 +13,8 @@ describe("formatTestcaseInputFields", () => {
 
   it("parses JSON argument lists", () => {
     expect(formatTestcaseInputFields("[1, 2]")).toEqual([
-      { label: "arg0", value: "1" },
-      { label: "arg1", value: "2" },
+      { label: "param 1", value: "1" },
+      { label: "param 2", value: "2" },
     ]);
   });
 

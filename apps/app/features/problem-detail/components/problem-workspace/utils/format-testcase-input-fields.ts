@@ -8,7 +8,6 @@ export type TestcaseInputField = {
  * Supports LeetCode-style (`nums = [1,2], target = 3`) and JSON argument lists.
  */
 export function formatTestcaseInputFields(input: string): TestcaseInputField[] {
-  console.log("formatTestcaseInputFields", input);
   const trimmed = input.trim();
   if (trimmed.length === 0) {
     return [];

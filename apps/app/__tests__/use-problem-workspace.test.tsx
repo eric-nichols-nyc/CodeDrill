@@ -4,6 +4,29 @@ import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useProblemWorkspace } from "@/features/problem-detail/components/problem-workspace/hooks/use-problem-workspace";
 
+vi.mock(
+  "@/features/problem-detail/components/problem-workspace/queries/use-workspace-code-query",
+  () => ({
+    useWorkspaceCodeQuery: () => ({
+      data: [],
+      isLoading: false,
+      error: null,
+    }),
+  })
+);
+
+vi.mock(
+  "@/features/problem-detail/components/problem-workspace/queries/use-save-workspace-code-mutation",
+  () => ({
+    useSaveWorkspaceCodeMutation: () => ({
+      mutate: vi.fn(),
+      isPending: false,
+      error: null,
+      reset: vi.fn(),
+    }),
+  })
+);
+
 function createWrapper() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -43,6 +66,25 @@ const addTestCases = [
   { input: "[1, 2]", expectedOutput: "3", isSample: true },
 ] as const;
 
+const jsAndPythonStarters = [
+  {
+    id: "js",
+    language: "javascript",
+    functionName: "f",
+    code: "function f() { return 1; }",
+  },
+  {
+    id: "py",
+    language: "python",
+    functionName: "f",
+    code: "def f():\n    return 2\n",
+  },
+] as const;
+
+const emptyInputTestCase = [
+  { input: "[]", expectedOutput: "1", isSample: true },
+] as const;
+
 describe("useProblemWorkspace", () => {
   beforeEach(() => {
     vi.spyOn(console, "log").mockImplementation(() => {});
@@ -60,8 +102,8 @@ describe("useProblemWorkspace", () => {
     const { result } = renderHook(
       () =>
         useProblemWorkspace({
-          starterCode: [...singleJsStarter],
-          testCases: [...addTestCases],
+          starterCode: singleJsStarter,
+          testCases: addTestCases,
         }),
       { wrapper: createWrapper() }
     );
@@ -81,8 +123,8 @@ describe("useProblemWorkspace", () => {
     const { result } = renderHook(
       () =>
         useProblemWorkspace({
-          starterCode: [...multiJsStarters],
-          testCases: [{ input: "[]", expectedOutput: "1", isSample: true }],
+          starterCode: multiJsStarters,
+          testCases: emptyInputTestCase,
         }),
       { wrapper: createWrapper() }
     );
@@ -112,21 +154,8 @@ describe("useProblemWorkspace", () => {
     const { result } = renderHook(
       () =>
         useProblemWorkspace({
-          starterCode: [
-            {
-              id: "js",
-              language: "javascript",
-              functionName: "f",
-              code: "function f() { return 1; }",
-            },
-            {
-              id: "py",
-              language: "python",
-              functionName: "f",
-              code: "def f():\n    return 2\n",
-            },
-          ],
-          testCases: [{ input: "[]", expectedOutput: "1", isSample: true }],
+          starterCode: jsAndPythonStarters,
+          testCases: emptyInputTestCase,
         }),
       { wrapper: createWrapper() }
     );
