@@ -1,6 +1,6 @@
 # CodeDrill app docs
 
-Developer notes for **`apps/app`** (the practice UI). For monorepo-wide product scope, see [`PRD.md`](../../../PRD.md) at the repo root.
+Developer notes for **`apps/app`** (the practice UI). For monorepo-wide product scope, see [`prd.md`](./prd.md).
 
 The root [`docs/`](../../../docs/) project is the next-forge **Geistdocs / Fumadocs** site template — use that when you want a published documentation website, not for day-to-day feature notes.
 
