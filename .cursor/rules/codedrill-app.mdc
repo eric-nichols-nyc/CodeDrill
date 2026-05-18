@@ -1,0 +1,26 @@
+---
+description: CodeDrill app — read agent context and keep progress-tracker in sync
+globs: apps/app/**/*
+alwaysApply: false
+---
+
+# CodeDrill app context
+
+When working on files under `apps/app/`:
+
+## At task start
+
+1. Read `apps/app/docs/AGENTS.md` and follow its read order for context files under `apps/app/docs/context/`.
+2. Read `apps/app/docs/context/progress-tracker.md` and align with **Current Goal** and **In Progress** — do not contradict shipped state in `apps/app/docs/prd.md`.
+
+## While implementing
+
+- Feature UI: `apps/app/features/<name>/` with `components/`, `hooks/`, `utils/` per `apps/app/docs/context/features-spec/design-system.md`.
+- Primitives: `@repo/design-system` — not `apps/app/components/ui/`.
+- Routes in `apps/app/app/` stay thin.
+
+## Before marking work done
+
+Update `apps/app/docs/context/progress-tracker.md` (Completed, Current Goal, In Progress, Next Up, Open Questions, Session Notes as needed) unless the user explicitly excludes doc updates.
+
+Run `pnpm typecheck` from `apps/app` when the change touches types, routes, or shared modules.

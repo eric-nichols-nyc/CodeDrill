@@ -9,12 +9,23 @@ export function DocsSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="shrink-0 border-border border-b lg:w-56 lg:border-r lg:border-b-0">
+    <aside className="shrink-0 border-border border-b lg:w-56 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:border-r lg:border-b-0">
       <nav
         aria-label="Documentation"
-        className="flex gap-1 overflow-x-auto p-3 lg:flex-col lg:gap-0 lg:p-4"
+        className="flex gap-1 overflow-x-auto p-3 lg:flex-col lg:gap-0 lg:overflow-visible lg:p-4"
       >
         {DOCS_NAV.map((entry) => {
+          if (entry.kind === "section") {
+            return (
+              <p
+                className="mt-3 px-3 py-1 font-semibold text-muted-foreground text-xs uppercase tracking-wide first:mt-0"
+                key={`section-${entry.label}`}
+              >
+                {entry.label}
+              </p>
+            );
+          }
+
           const href =
             entry.kind === "root" ? entry.href : `/docs/${entry.slug}`;
           const label = entry.label;

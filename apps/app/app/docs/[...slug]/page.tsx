@@ -6,17 +6,24 @@ import { DocsMarkdown } from "@/features/docs/components/docs-markdown";
 import { getAllowedDocSlugs, getDocNavLabel } from "@/lib/docs/nav";
 
 type DocsSlugPageProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string[] }>;
 };
 
+function toDocSlug(segments: string[]): string {
+  return segments.join("/");
+}
+
 export function generateStaticParams() {
-  return getAllowedDocSlugs().map((slug) => ({ slug }));
+  return getAllowedDocSlugs().map((slug) => ({
+    slug: slug.split("/"),
+  }));
 }
 
 export async function generateMetadata({
   params,
 }: DocsSlugPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: segments } = await params;
+  const slug = toDocSlug(segments);
   const label = getDocNavLabel(slug);
   if (!label) {
     return { title: "Documentation" };
@@ -28,8 +35,10 @@ export async function generateMetadata({
 }
 
 export default async function DocsSlugPage({ params }: DocsSlugPageProps) {
-  const { slug } = await params;
-  if (!getAllowedDocSlugs().includes(slug)) {
+  const { slug: segments } = await params;
+  const slug = toDocSlug(segments);
+
+  if (!getAllowedDocSlugs().includes(slug) || slug.includes("..")) {
     notFound();
   }
 
