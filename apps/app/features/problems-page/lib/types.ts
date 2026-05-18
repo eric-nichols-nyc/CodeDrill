@@ -4,6 +4,8 @@ export type Status = "solved" | "attempted" | "unsolved";
 
 export type Problem = {
   id: number;
+  /** Postgres UUID from the catalog API; required for progress/favorite. */
+  problemId?: string;
   slug: string;
   title: string;
   acceptance: number;

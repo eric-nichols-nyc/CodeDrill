@@ -2,6 +2,16 @@
 
 Read **[AGENTS.md](../../AGENTS.md)** and **[ui-context.md](../ui-context.md)** before starting.
 
+## Feature specs (required)
+
+When you add or materially extend a feature under `features/<name>/`:
+
+1. Add or update a spec in **[features-spec/](./00-index.md)** (`NN-<feature-name>.md`). Copy **[99-feature-spec-template.md](./99-feature-spec-template.md)** if starting fresh.
+2. Register the feature in **[00-index.md](./00-index.md)**.
+3. Do not implement product behavior that is not written in that spec (or `prd.md`).
+
+API modules in `apps/api` and BFF routes are documented **in the same feature spec** (system boundaries table), not in a second app feature folder.
+
 ## Where code lives
 
 All feature UI belongs under **`apps/app/features/<feature-name>/`**, not in `apps/app/components/` unless it is truly shared across multiple features (e.g. `split-layout`).

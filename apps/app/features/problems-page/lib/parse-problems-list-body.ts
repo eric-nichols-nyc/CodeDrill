@@ -14,6 +14,7 @@ export function parseProblemsListBody(body: unknown): ApiProblemRow[] {
     }
     return [
       {
+        id: typeof o.id === "string" ? o.id : undefined,
         slug: o.slug,
         title: o.title,
         difficulty: typeof o.difficulty === "string" ? o.difficulty : undefined,

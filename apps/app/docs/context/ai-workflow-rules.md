@@ -54,6 +54,16 @@ changes:
 - Code conventions or standards
 - Feature scope
 
+### New or extended features
+
+Before or with the first implementation PR for a feature:
+
+1. Copy `apps/app/docs/context/features-spec/99-feature-spec-template.md` to `NN-<feature-name>.md`.
+2. Fill goal, boundaries, API, file structure, acceptance criteria.
+3. Add a row to `apps/app/docs/context/features-spec/00-index.md`.
+
+Do not ship new product behavior under `features/<name>/` without an entry in the index (spec file or explicit **Spec TODO** with a tracking line in `progress-tracker.md`).
+
 ## Before Moving to the Next Unit
 
 1. The current unit works end to end within its defined scope

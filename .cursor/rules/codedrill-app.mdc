@@ -15,7 +15,8 @@ When working on files under `apps/app/`:
 
 ## While implementing
 
-- Feature UI: `apps/app/features/<name>/` with `components/`, `hooks/`, `utils/` per `apps/app/docs/context/features-spec/design-system.md`.
+- Feature UI: `apps/app/features/<name>/` with `components/`, `hooks/`, `utils/` per `apps/app/docs/context/features-spec/01-design-system.md`.
+- New features: add `apps/app/docs/context/features-spec/NN-<name>.md` and register in `00-index.md` (copy `99-feature-spec-template.md`).
 - Primitives: `@repo/design-system` — not `apps/app/components/ui/`.
 - Routes in `apps/app/app/` stay thin.
 

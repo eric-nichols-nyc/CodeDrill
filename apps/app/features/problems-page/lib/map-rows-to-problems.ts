@@ -26,6 +26,7 @@ function stableAcceptance(slug: string): number {
 }
 
 export type ApiProblemRow = {
+  id?: string;
   slug: string;
   title: string;
   difficulty?: string;
@@ -34,6 +35,7 @@ export type ApiProblemRow = {
 export function mapRowsToProblems(rows: ApiProblemRow[]): Problem[] {
   return rows.map((row, i) => ({
     id: i + 1,
+    problemId: row.id,
     slug: row.slug,
     title: row.title,
     difficulty: normalizeDifficulty(row.difficulty),

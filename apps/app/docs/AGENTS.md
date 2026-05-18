@@ -9,6 +9,7 @@ Instructions for AI agents working in **`apps/app`** (Next.js UI). The spec pack
 3. **[context/ui-context.md](./context/ui-context.md)** — `@repo/design-system`, tokens, layout patterns.
 4. **[context/code-standards.md](./context/code-standards.md)** — TypeScript, Next.js, styling, API conventions.
 5. **[context/progress-tracker.md](./context/progress-tracker.md)** — current phase, done / next / open questions.
+6. **[context/features-spec/00-index.md](./context/features-spec/00-index.md)** — per-feature specs; read the spec for any feature you touch.
 
 Always follow **[context/ai-workflow-rules.md](./context/ai-workflow-rules.md)** for scoping, protected files, and keeping docs in sync.
 
@@ -41,7 +42,7 @@ API for problem fetches defaults to `NEON_JWT_API_URL` → `http://localhost:303
 - **Spec-driven:** Do not invent product behavior missing from context files or `prd.md`. Ambiguity → note in `context/progress-tracker.md` before coding.
 - **UI:** Import from `@repo/design-system/components/ui/*`; use semantic tokens per `context/ui-context.md` (no random hex in features).
 - **Next.js:** Prefer Server Components; add `"use client"` only for browser APIs and interactivity.
-- **Features:** Colocate under `apps/app/features/<area>/` with `components/`, `hooks/`, and `utils/` — see **[context/features-spec/design-system.md](./context/features-spec/design-system.md)** (SOLID, design tokens).
+- **Features:** Colocate under `apps/app/features/<area>/` with `components/`, `hooks/`, and `utils/` — see **[context/features-spec/01-design-system.md](./context/features-spec/01-design-system.md)** (SOLID, design tokens). **Add or update `context/features-spec/NN-<name>.md` and [00-index.md](./context/features-spec/00-index.md) when introducing a feature.**
 - **Routes:** Stay thin in `apps/app/app/`.
 - **Run vs Submit:** Run = in-browser sample tests today; Submit = not fully wired — see `prd.md` § current state.
 

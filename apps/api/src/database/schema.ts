@@ -255,6 +255,7 @@ export const problemProgress = pgTable(
       .notNull()
       .references(() => problems.id, { onDelete: "cascade" }),
     status: text("status").notNull().default("not_started"),
+    isFavorite: boolean("is_favorite").notNull().default(false),
     bestRuntimeMs: integer("best_runtime_ms"),
     bestMemoryKb: integer("best_memory_kb"),
     lastSubmissionId: uuid("last_submission_id").references(() => submissions.id, {

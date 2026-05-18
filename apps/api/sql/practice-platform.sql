@@ -207,6 +207,7 @@ create table problem_progress (
   problem_id uuid not null references problems (id) on delete cascade,
   status text not null default 'not_started'
     check (status in ('not_started', 'attempted', 'solved')),
+  is_favorite boolean not null default false,
   best_runtime_ms int,
   best_memory_kb int,
   last_submission_id uuid references submissions (id) on delete set null,

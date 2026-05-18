@@ -87,6 +87,7 @@ export function ProblemsListHeader({
           />
         </span>
       </button>
+      <span className="sr-only justify-self-end">Favorite</span>
     </div>
   );
 }
