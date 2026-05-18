@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@repo/design-system/lib/utils";
-import { Code2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export type AppBrandLinkProps = {
@@ -27,9 +27,14 @@ export function AppBrandLink({
       className={cn("inline-flex items-center gap-2", className)}
       href={href}
     >
-      <Code2
+      <Image
+        alt=""
         aria-hidden
-        className={cn("h-6 w-6 shrink-0 text-foreground", iconClassName)}
+        className={cn("h-8 w-8 shrink-0 object-contain", iconClassName)}
+        height={32}
+        priority
+        src="/logo.png"
+        width={32}
       />
       {showLabel ? (
         <span className="font-semibold text-foreground">{label}</span>

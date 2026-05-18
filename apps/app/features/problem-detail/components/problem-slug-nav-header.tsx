@@ -130,10 +130,7 @@ export function ProblemSlugNavHeader({ title }: ProblemSlugNavHeaderProps) {
     <header className="sticky top-0 z-50 w-full shrink-0 select-none border-[var(--nav-border)] border-b bg-[var(--nav-bg)]">
       <AppHeaderInner className="gap-0">
         <div className="flex min-w-0 items-center gap-1">
-          <AppBrandLink
-            className="group flex h-8 w-8 shrink-0 items-center justify-center text-[var(--nav-icon)] hover:text-[var(--nav-icon-hover)]"
-            iconClassName="h-5 w-5 text-[var(--nav-icon)] group-hover:text-[var(--nav-icon-hover)]"
-          />
+          <AppBrandLink className="flex h-10 w-10 shrink-0 items-center justify-center" />
 
           <div
             aria-hidden="true"

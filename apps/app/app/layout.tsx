@@ -22,6 +22,10 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
   applicationName: "Codedrill",
   title: {
     default: "Codedrill",
