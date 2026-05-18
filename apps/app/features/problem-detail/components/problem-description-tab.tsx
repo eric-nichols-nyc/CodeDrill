@@ -6,15 +6,22 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@repo/design-system/components/ui/accordion";
+import { Badge } from "@repo/design-system/components/ui/badge";
+import { cn } from "@repo/design-system/lib/utils";
 import { Lightbulb } from "lucide-react";
 import { ExampleItem } from "@/features/problem-detail/components/example-item";
 import { HintItem } from "@/features/problem-detail/components/hint-item";
 import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
 import {
   asRecord,
+  normalizeDifficultyForDisplay,
   rowKey,
 } from "@/features/problem-detail/problem-detail-helpers";
-import type { ProblemRow } from "@/features/problem-detail/problem-detail-types";
+import type {
+  ProblemRow,
+  ProblemTag,
+} from "@/features/problem-detail/problem-detail-types";
+import { difficultyTextClass } from "@/features/problems-page/problems-list/utils/difficulty-text-class";
 
 export function ProblemDescriptionTab({
   problem,
@@ -26,6 +33,7 @@ export function ProblemDescriptionTab({
   showDescription,
   showConstraints,
   showDifficulty,
+  tags = [],
 }: {
   problem: unknown;
   p: ProblemRow;
@@ -36,17 +44,33 @@ export function ProblemDescriptionTab({
   showDescription: boolean;
   showConstraints: boolean;
   showDifficulty: boolean;
+  tags?: ProblemTag[];
 }) {
+  const tagList = tags ?? [];
+  const showMeta = showDifficulty || tagList.length > 0;
+  const difficulty = normalizeDifficultyForDisplay(p.difficulty);
+
   return (
     <div className="space-y-6 pb-10">
       <header className="space-y-1">
         <h1 className="font-semibold text-xl tracking-tight">
           {p.title ?? "Problem"}
         </h1>
-        {showDifficulty ? (
-          <p className="text-muted-foreground text-xs capitalize">
-            {p.difficulty}
-          </p>
+        {showMeta ? (
+          <div className="flex flex-wrap items-center gap-2">
+            {showDifficulty ? (
+              <span
+                className={cn("font-medium text-xs", difficultyTextClass(difficulty))}
+              >
+                {difficulty}
+              </span>
+            ) : null}
+            {tagList.map((tag) => (
+              <Badge key={tag.id} variant="outline">
+                {tag.name}
+              </Badge>
+            ))}
+          </div>
         ) : null}
       </header>
 

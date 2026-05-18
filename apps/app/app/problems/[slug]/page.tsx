@@ -9,6 +9,7 @@ import { fetchProblemBySlug } from "@/lib/problems/fetch-problem-by-slug";
 
 type ProblemDetailBundle = {
   problem: unknown;
+  tags?: unknown;
   examples: unknown;
   hints: unknown;
   starterCode: unknown;
@@ -88,6 +89,7 @@ export default async function ProblemBySlugPage({
                 problem={bundle.problem}
                 solutions={bundle.solutions}
                 starterCode={bundle.starterCode}
+                tags={bundle.tags}
                 testCases={bundle.testCases}
               />
             ) : (

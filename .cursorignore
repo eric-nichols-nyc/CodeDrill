@@ -1,0 +1,83 @@
+# Cursor index exclusions (gitignore syntax)
+# https://cursor.com/docs/context/ignore-files
+
+# Monorepo scope — only apps/app, apps/api, packages/design-system
+apps/ai-chatbots/
+apps/storybook/
+apps/system-design-lab/
+apps/testing-lab/
+apps/with-nest/
+apps/with-solid/
+apps/with-sse/
+
+packages/ai/
+packages/analytics/
+packages/auth/
+packages/collaboration/
+packages/database/
+packages/email/
+packages/feature-flags/
+packages/internationalization/
+packages/next-config/
+packages/notifications/
+packages/observability/
+packages/payments/
+packages/prisma-neon/
+packages/rate-limit/
+packages/schemas/
+packages/security/
+packages/seo/
+packages/storage/
+packages/typescript-config/
+packages/webhooks/
+
+# Dependencies & package manager
+node_modules/
+.pnpm-store/
+.pnp
+.pnp.*
+
+# Lockfiles (large, low signal for codegen)
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Build & framework output
+.next/
+out/
+dist/
+build/
+.turbo/
+.vercel/
+storybook-static/
+.react-email/
+.svelte-kit/
+.nuxt/
+.serverless/
+.webpack/
+.source/
+.contentlayer/
+.content-collections/
+.docusaurus/
+
+# Test & coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Logs, caches, env (secrets)
+*.log
+.env
+.env.*
+!.env.example
+.eslintcache
+.stylelintcache
+.cache/
+.parcel-cache/
+
+# OS & editor noise
+.DS_Store
+Thumbs.db
+
+# Git metadata
+.git/

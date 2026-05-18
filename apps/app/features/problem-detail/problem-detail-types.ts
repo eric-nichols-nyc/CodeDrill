@@ -6,6 +6,12 @@ export type ProblemEditorial = {
   embeds: EditorialYoutubeEmbed[];
 };
 
+export type ProblemTag = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
 export type ProblemRow = {
   title?: string;
   description?: string;

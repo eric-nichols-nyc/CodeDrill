@@ -4,6 +4,7 @@ import type {
   ProblemEditorial,
   ProblemRow,
   ProblemSolutionRow,
+  ProblemTag,
 } from "@/features/problem-detail/problem-detail-types";
 
 function YoutubeEmbed({ videoId }: { videoId: string }) {
@@ -62,6 +63,7 @@ export function ProblemDetailLeftPane({
   showConstraints,
   showDifficulty,
   editorial,
+  tags = [],
 }: {
   p: ProblemRow;
   problem: unknown;
@@ -74,6 +76,7 @@ export function ProblemDetailLeftPane({
   showConstraints: boolean;
   showDifficulty: boolean;
   editorial: ProblemEditorial | null;
+  tags?: ProblemTag[];
 }) {
   const editorialTab = editorial ? (
     <EditorialPanel editorial={editorial} />
@@ -98,6 +101,7 @@ export function ProblemDetailLeftPane({
             showConstraints={showConstraints}
             showDescription={showDescription}
             showDifficulty={showDifficulty}
+            tags={tags}
           />
         }
         editorial={editorialTab}

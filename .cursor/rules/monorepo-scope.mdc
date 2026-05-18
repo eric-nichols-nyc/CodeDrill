@@ -1,0 +1,22 @@
+---
+description: Restrict agent to apps/app, apps/api, and packages/design-system only
+alwaysApply: true
+---
+
+# Monorepo scope constraints
+
+You are strictly confined to these directories unless the user explicitly expands scope:
+
+- `apps/app/`
+- `apps/api/`
+- `packages/design-system/`
+
+- NEVER index, read, grep, search, or edit files under other `apps/*` folders (`storybook`, `with-solid`, `testing-lab`, etc.).
+- NEVER index, read, grep, search, or edit files under other `packages/*` folders unless the user explicitly asks.
+- Treat all other apps and packages as completely out of scope to save token limits.
+- Prefer targeted searches within the allowed paths only (e.g. `apps/app/**`, `apps/api/**`, `packages/design-system/**`).
+- If a task appears to require code outside this scope, stop and ask the user before reading or changing those paths.
+
+Root workspace config (`package.json`, `pnpm-workspace.yaml`, `turbo.json`, `biome.jsonc`) may be read when needed for commands — do not implement product features there.
+
+This aligns with `.cursorignore` at the repo root.

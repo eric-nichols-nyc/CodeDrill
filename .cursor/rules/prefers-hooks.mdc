@@ -1,6 +1,6 @@
 ---
 description: Prefer extracting component logic into custom hooks when refactoring
-globs: apps/app/**/*.{ts,tsx},packages/**/*.{ts,tsx}
+globs: apps/app/**/*.{ts,tsx},packages/design-system/**/*.{ts,tsx}
 alwaysApply: false
 ---
 

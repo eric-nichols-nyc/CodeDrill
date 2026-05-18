@@ -1,4 +1,7 @@
-import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
+import type {
+  ProblemSolutionRow,
+  ProblemTag,
+} from "@/features/problem-detail/problem-detail-types";
 
 export function asRecord(v: unknown): Record<string, unknown> | null {
   if (typeof v !== "object" || v === null) {
@@ -47,4 +50,40 @@ export function isProblemSolutionRowArray(
   value: unknown
 ): value is ProblemSolutionRow[] {
   return Array.isArray(value) && value.every(isProblemSolutionRow);
+}
+
+export function normalizeDifficultyForDisplay(
+  raw?: string
+): "Easy" | "Medium" | "Hard" {
+  const x = (raw ?? "").toLowerCase();
+  if (x === "easy") {
+    return "Easy";
+  }
+  if (x === "hard") {
+    return "Hard";
+  }
+  return "Medium";
+}
+
+export function parseProblemTags(raw: unknown): ProblemTag[] {
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+  const tags: ProblemTag[] = [];
+  for (const item of raw) {
+    const o = asRecord(item);
+    if (!o) {
+      continue;
+    }
+    const name = typeof o.name === "string" ? o.name.trim() : "";
+    if (!name) {
+      continue;
+    }
+    const slug =
+      typeof o.slug === "string" && o.slug.length > 0 ? o.slug : name;
+    const id =
+      typeof o.id === "string" && o.id.length > 0 ? o.id : slug;
+    tags.push({ id, name, slug });
+  }
+  return tags;
 }

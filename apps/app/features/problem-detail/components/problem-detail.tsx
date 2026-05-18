@@ -5,7 +5,10 @@ import {
   isProblemEditorialEmpty,
   parseProblemEditorial,
 } from "@/features/problem-detail/parse-editorial";
-import { asRecord } from "@/features/problem-detail/problem-detail-helpers";
+import {
+  asRecord,
+  parseProblemTags,
+} from "@/features/problem-detail/problem-detail-helpers";
 import type {
   ProblemRow,
   ProblemSolutionRow,
@@ -51,6 +54,7 @@ export function ProblemDetail({
   starterCode,
   solutions,
   testCases,
+  tags: tagsRaw,
 }: {
   problem: unknown;
   examples: unknown;
@@ -58,6 +62,7 @@ export function ProblemDetail({
   starterCode: unknown;
   solutions: ProblemSolutionRow[];
   testCases?: unknown;
+  tags?: unknown;
 }) {
   const p = problemRow(problem);
   const problemId = problemIdFrom(problem);
@@ -71,6 +76,7 @@ export function ProblemDetail({
     p.constraints !== null &&
     p.constraints.length > 0;
   const editorial = p.editorial ?? null;
+  const tags = parseProblemTags(tagsRaw);
 
   const left = (
     <ProblemDetailLeftPane
@@ -85,6 +91,7 @@ export function ProblemDetail({
       showDescription={showDescription}
       showDifficulty={showDifficulty}
       solutions={solutions}
+      tags={tags}
     />
   );
 

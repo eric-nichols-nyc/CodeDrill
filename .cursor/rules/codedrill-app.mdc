@@ -6,6 +6,8 @@ alwaysApply: false
 
 # CodeDrill app context
 
+**Scope:** Follow `.cursor/rules/monorepo-scope.mdc` — only `apps/app/`, `apps/api/`, and `packages/design-system/` unless the user expands scope.
+
 When working on files under `apps/app/`:
 
 ## At task start

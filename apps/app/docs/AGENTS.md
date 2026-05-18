@@ -25,6 +25,15 @@ Always follow **[context/ai-workflow-rules.md](./context/ai-workflow-rules.md)**
 
 Default assumption: UI changes stay in `apps/app`; data and judging logic often belong in `apps/api`. Do not change the API unless the task requires it.
 
+### Monorepo scope constraints
+
+- You are strictly confined to `apps/app/`, `apps/api/`, and `packages/design-system/`.
+- NEVER index, read, or perform codebase searches across any other folders inside `apps/` or `packages/`.
+- Treat all other application and package folders as completely out of scope to save token limits.
+- If a task appears to require code outside this scope, ask the user before reading or changing those paths.
+
+Enforced by repo-root `.cursorignore`, `.cursor/rules/monorepo-scope.mdc`, and [`AGENTS.md`](../../../AGENTS.md).
+
 ## Commands (`apps/app`)
 
 ```sh
