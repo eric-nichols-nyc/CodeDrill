@@ -5,15 +5,16 @@ change.
 
 ## Current Phase
 
-- [e.g. Not started / In progress / Complete]
+- Complete
 
 ## Current Goal
 
-- [What you are building right now]
+- Admin chat layout with static local chatbot (no API yet)
 
 ## Completed
 
-- None yet.
+- `admin-chat-layout` feature: global header with Ask AI toggle, right slide-out panel, static message list/input, hooks for panel and chat state
+- Admin route wraps `AdminPageShell` in `AdminChatLayout`
 
 ## In Progress
 
@@ -21,17 +22,17 @@ change.
 
 ## Next Up
 
-- [First unit to build]
+- Wire admin chat panel to a real admin assistant endpoint when available
 
 ## Open Questions
 
-- [Any unresolved product or technical decisions]
+- Whether `/admin/add` should share the same `AdminChatLayout` wrapper (currently only main `/admin` route)
 
 ## Architecture Decisions
 
-- [Decisions made that affect the system design or
-  data model — include why the decision was made]
+- Chat state stays in client hooks (`useAdminChatLayout`, `useStaticAdminChat`); route remains server-only for auth and data fetch
+- Panel is a fixed right overlay (`max-w-md`) with local static responses until backend exists
 
 ## Session Notes
 
-- [Context needed to resume work in the next session]
+- Feature lives at `apps/app/features/admin-chat-layout/` per `02-admin-chat-layout.md` spec

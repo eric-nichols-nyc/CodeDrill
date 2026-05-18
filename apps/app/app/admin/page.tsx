@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { AdminChatLayout } from "@/features/admin-chat-layout/components/admin-chat-layout";
 import { AdminPageShell } from "@/features/admin/components/admin-page-shell";
 import {
   type AdminProblemListItem,
@@ -29,9 +30,11 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
       : [];
 
   return (
-    <AdminPageShell
-      initialProblems={initialProblems}
-      initialSelectedId={initialSelectedId ?? null}
-    />
+    <AdminChatLayout>
+      <AdminPageShell
+        initialProblems={initialProblems}
+        initialSelectedId={initialSelectedId ?? null}
+      />
+    </AdminChatLayout>
   );
 }
