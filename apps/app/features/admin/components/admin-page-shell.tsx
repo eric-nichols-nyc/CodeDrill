@@ -114,7 +114,7 @@ function AdminPageHeader({
           </Button>
         </div>
         <div className="flex justify-center">
-          <Button aria-label="Create new problem" asChild size="icon">
+          <Button aria-label="Add a problem" asChild size="icon">
             <Link href="/admin/add">
               <Plus />
             </Link>
@@ -162,7 +162,7 @@ function AdminProblemListPane({
           <Button asChild size="sm" variant="outline">
             <Link href="/admin/add">
               <Plus />
-              New
+              Add a
             </Link>
           </Button>
         </div>
@@ -229,7 +229,7 @@ function AdminProblemDetailPane({
       <p className="text-muted-foreground text-sm">
         Select a problem from the list or{" "}
         <Link className="text-foreground underline" href="/admin/add">
-          create a new one
+          add one
         </Link>
         .
       </p>

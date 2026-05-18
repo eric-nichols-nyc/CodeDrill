@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@repo/design-system/components/ui/button";
+import { Toaster } from "@repo/design-system/components/ui/sonner";
 import { cn } from "@repo/design-system/lib/utils";
 import { X } from "lucide-react";
 import { AdminChatInput } from "@/features/admin-chat-layout/components/admin-chat-input";
@@ -13,7 +14,7 @@ export type AdminChatPanelProps = {
 };
 
 export function AdminChatPanel({ isOpen, onClose }: AdminChatPanelProps) {
-  const { messages, submitMessage } = useStaticAdminChat();
+  const chat = useStaticAdminChat();
 
   return (
     <aside
@@ -26,6 +27,7 @@ export function AdminChatPanel({ isOpen, onClose }: AdminChatPanelProps) {
       id="admin-ai-panel"
       role="dialog"
     >
+      <Toaster position="top-center" richColors />
       <header className="flex shrink-0 items-center justify-between gap-2 border-border border-b px-4 py-3">
         <h2 className="font-medium text-sm">Ask AI</h2>
         <Button
@@ -39,9 +41,24 @@ export function AdminChatPanel({ isOpen, onClose }: AdminChatPanelProps) {
         </Button>
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col">
-        <AdminChatMessageList messages={messages} />
-        <AdminChatInput onSubmit={submitMessage} />
+      <div className="relative flex min-h-0 flex-1 flex-col divide-y overflow-hidden">
+        <AdminChatMessageList messages={chat.messages} />
+        <AdminChatInput
+          model={chat.model}
+          modelSelectorOpen={chat.modelSelectorOpen}
+          onModelSelect={chat.handleModelSelect}
+          onModelSelectorOpenChange={chat.setModelSelectorOpen}
+          onSubmit={chat.handleSubmit}
+          onSuggestionClick={chat.handleSuggestionClick}
+          onTextChange={chat.handleTextChange}
+          onTranscriptionChange={chat.handleTranscriptionChange}
+          onToggleWebSearch={chat.toggleWebSearch}
+          selectedModelData={chat.selectedModelData}
+          status={chat.status}
+          submitDisabled={chat.isSubmitDisabled}
+          text={chat.text}
+          useWebSearch={chat.useWebSearch}
+        />
       </div>
     </aside>
   );
