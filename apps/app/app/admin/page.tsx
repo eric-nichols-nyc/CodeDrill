@@ -7,12 +7,18 @@ import {
 import { getNeonAuth } from "@/lib/auth/server";
 import { fetchProblemsList } from "@/lib/problems/fetch-problems-list";
 
-export default async function AdminPage() {
+type AdminPageProps = {
+  searchParams: Promise<{ id?: string }>;
+};
+
+export default async function AdminPage({ searchParams }: AdminPageProps) {
   const { session } = await getNeonAuth();
 
   if (!session) {
     redirect("/auth/sign-in?next=/admin");
   }
+
+  const { id: initialSelectedId } = await searchParams;
 
   const result = await fetchProblemsList();
   const initialProblems: AdminProblemListItem[] =
@@ -22,5 +28,10 @@ export default async function AdminPage() {
           .filter((row): row is AdminProblemListItem => row !== null)
       : [];
 
-  return <AdminPageShell initialProblems={initialProblems} />;
+  return (
+    <AdminPageShell
+      initialProblems={initialProblems}
+      initialSelectedId={initialSelectedId ?? null}
+    />
+  );
 }

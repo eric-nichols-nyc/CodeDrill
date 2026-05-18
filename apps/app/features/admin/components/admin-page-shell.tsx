@@ -96,12 +96,10 @@ function useAdminProblemDetail(id: string | null, enabled: boolean) {
 function AdminPageHeader({
   canEdit,
   isEditing,
-  onCreateClick,
   onToggleEdit,
 }: {
   canEdit: boolean;
   isEditing: boolean;
-  onCreateClick: () => void;
   onToggleEdit: () => void;
 }) {
   return (
@@ -116,13 +114,10 @@ function AdminPageHeader({
           </Button>
         </div>
         <div className="flex justify-center">
-          <Button
-            aria-label="Create new problem"
-            onClick={onCreateClick}
-            size="icon"
-            type="button"
-          >
-            <Plus />
+          <Button aria-label="Create new problem" asChild size="icon">
+            <Link href="/admin/add">
+              <Plus />
+            </Link>
           </Button>
         </div>
         <div className="flex justify-end">
@@ -148,26 +143,34 @@ function AdminPageHeader({
 function AdminProblemListPane({
   problems,
   selectedId,
-  isCreating,
   onSelect,
 }: {
   problems: AdminProblemListItem[];
   selectedId: string | null;
-  isCreating: boolean;
   onSelect: (id: string) => void;
 }) {
   return (
     <div className="flex h-full min-h-0 flex-col border-border border-r bg-muted/10">
       <div className="border-border border-b px-4 py-3">
-        <p className="font-medium text-sm">Problems</p>
-        <p className="text-muted-foreground text-xs">
-          {problems.length} total problem{problems.length === 1 ? "" : "s"}
-        </p>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <p className="font-medium text-sm">Problems</p>
+            <p className="text-muted-foreground text-xs">
+              {problems.length} total problem{problems.length === 1 ? "" : "s"}
+            </p>
+          </div>
+          <Button asChild size="sm" variant="outline">
+            <Link href="/admin/add">
+              <Plus />
+              New
+            </Link>
+          </Button>
+        </div>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto p-2">
         <div className="space-y-2">
           {problems.map((problem) => {
-            const isActive = problem.id === selectedId && !isCreating;
+            const isActive = problem.id === selectedId;
             return (
               <button
                 className={`w-full rounded-lg border px-3 py-3 text-left transition-colors ${
@@ -224,7 +227,11 @@ function AdminProblemDetailPane({
   if (!(detail && selectedProblem)) {
     return (
       <p className="text-muted-foreground text-sm">
-        Select a problem from the list or create a new one.
+        Select a problem from the list or{" "}
+        <Link className="text-foreground underline" href="/admin/add">
+          create a new one
+        </Link>
+        .
       </p>
     );
   }
@@ -244,18 +251,22 @@ function AdminProblemDetailPane({
 
 export function AdminPageShell({
   initialProblems,
+  initialSelectedId,
 }: {
   initialProblems: AdminProblemListItem[];
+  initialSelectedId?: string | null;
 }) {
   const [problems, setProblems] = useState(initialProblems);
-  const [selectedId, setSelectedId] = useState<string | null>(
-    initialProblems[0]?.id ?? null
-  );
+  const [selectedId, setSelectedId] = useState<string | null>(() => {
+    if (
+      initialSelectedId &&
+      initialProblems.some((problem) => problem.id === initialSelectedId)
+    ) {
+      return initialSelectedId;
+    }
+    return initialProblems[0]?.id ?? null;
+  });
   const [mode, setMode] = useState<Mode>("view");
-
-  const [createDialogOpen, setCreateDialogOpen] = useState(
-    initialProblems.length === 0
-  );
 
   const { detail, loading, refresh } = useAdminProblemDetail(
     selectedId,
@@ -264,8 +275,15 @@ export function AdminPageShell({
 
   useEffect(() => {
     setProblems(initialProblems);
+    if (
+      initialSelectedId &&
+      initialProblems.some((problem) => problem.id === initialSelectedId)
+    ) {
+      setSelectedId(initialSelectedId);
+      return;
+    }
     setSelectedId((current) => current ?? initialProblems[0]?.id ?? null);
-  }, [initialProblems]);
+  }, [initialProblems, initialSelectedId]);
 
   const selectedProblem = useMemo(
     () => problems.find((problem) => problem.id === selectedId) ?? null,
@@ -277,23 +295,8 @@ export function AdminPageShell({
     setMode("view");
   }, []);
 
-  const handleCreateClick = useCallback(() => {
-    setCreateDialogOpen(true);
-  }, []);
-
   const handleToggleEdit = useCallback(() => {
     setMode((current) => (current === "edit" ? "view" : "edit"));
-  }, []);
-
-  const handleCreateSubmitted = useCallback((body: unknown) => {
-    const item = parseAdminProblemListItem(body);
-    if (!item) {
-      return;
-    }
-    setProblems((prev) => [item, ...prev.filter((p) => p.id !== item.id)]);
-    setSelectedId(item.id);
-    setMode("view");
-    setCreateDialogOpen(false);
   }, []);
 
   const handleEditSubmitted = useCallback(
@@ -320,7 +323,6 @@ export function AdminPageShell({
         <AdminPageHeader
           canEdit={canEditProblem}
           isEditing={mode === "edit"}
-          onCreateClick={handleCreateClick}
           onToggleEdit={handleToggleEdit}
         />
 
@@ -329,7 +331,6 @@ export function AdminPageShell({
           defaultLeftPercent={28}
           left={
             <AdminProblemListPane
-              isCreating={createDialogOpen}
               onSelect={handleSelect}
               problems={problems}
               selectedId={selectedId}
@@ -349,24 +350,6 @@ export function AdminPageShell({
             </div>
           }
         />
-
-        <Dialog onOpenChange={setCreateDialogOpen} open={createDialogOpen}>
-          <DialogContent
-            className={adminProblemFormDialogContentClass}
-            showCloseButton
-          >
-            <DialogHeader className="shrink-0 border-border border-b px-6 py-4 pr-14 text-left">
-              <DialogTitle>New problem</DialogTitle>
-              <DialogDescription>
-                Fill out the authoring form below. Closing this dialog keeps
-                your current list selection unchanged.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-4 pb-0">
-              <NewProblemForm onSubmitted={handleCreateSubmitted} />
-            </div>
-          </DialogContent>
-        </Dialog>
 
         <Dialog
           onOpenChange={(open) => {
