@@ -14,7 +14,7 @@ export function AppHeaderInner({ children, className }: AppHeaderInnerProps) {
   return (
     <div
       className={cn(
-        "mx-auto flex h-12 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6",
+        "mx-auto flex h-12 w-full items-center justify-between gap-4 px-4 sm:px-6",
         className
       )}
     >
