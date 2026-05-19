@@ -43,20 +43,6 @@ export function ProblemsListHeader({
     >
       <span className="justify-self-start text-foreground">Status</span>
       <button
-        className="-m-2 flex cursor-pointer select-none items-center justify-self-start rounded-md p-2 text-left text-foreground hover:text-primary"
-        onClick={() => onSort("id")}
-        type="button"
-      >
-        <span className="flex items-center whitespace-nowrap">
-          #
-          <SortGlyph
-            field="id"
-            sortDirection={sortDirection}
-            sortField={sortField}
-          />
-        </span>
-      </button>
-      <button
         className="-m-2 flex min-w-0 cursor-pointer select-none items-center rounded-md p-2 text-left text-foreground hover:text-primary"
         onClick={() => onSort("title")}
         type="button"

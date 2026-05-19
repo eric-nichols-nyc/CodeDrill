@@ -17,20 +17,24 @@ export async function fetchProblemsList(): Promise<ProblemsListResult> {
   const h = await headers();
   const cookie = h.get("cookie");
 
-  const res = await fetch(`${base}/problems`, {
-    headers: {
-      ...(cookie ? { Cookie: cookie } : {}),
-      ...(k.INTERNAL_PROBLEMS_SECRET
-        ? { "x-internal-problems-secret": k.INTERNAL_PROBLEMS_SECRET }
-        : {}),
-    },
-    cache: "no-store",
-  });
-
-  const text = await res.text();
   try {
-    return { ok: res.ok, status: res.status, body: JSON.parse(text) as unknown };
+    const res = await fetch(`${base}/problems`, {
+      headers: {
+        ...(cookie ? { Cookie: cookie } : {}),
+        ...(k.INTERNAL_PROBLEMS_SECRET
+          ? { "x-internal-problems-secret": k.INTERNAL_PROBLEMS_SECRET }
+          : {}),
+      },
+      cache: "no-store",
+    });
+
+    const text = await res.text();
+    try {
+      return { ok: res.ok, status: res.status, body: JSON.parse(text) as unknown };
+    } catch {
+      return { ok: res.ok, status: res.status, body: text };
+    }
   } catch {
-    return { ok: res.ok, status: res.status, body: text };
+    return { ok: false, status: 0, body: null };
   }
 }

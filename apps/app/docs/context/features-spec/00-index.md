@@ -34,7 +34,7 @@ Every **product feature** under `apps/app/features/<name>/` should have a spec i
 | `problem-progress` | [03-problem-progress.md](./03-problem-progress.md) | `features/problem-progress/` | `apps/api/src/problem-progress/`, BFF `app/api/problems/[problemId]/progress/` | In progress |
 | `admin` | — | `features/admin/` | `apps/api` problems CRUD via BFF | **Spec TODO** |
 | `problem-detail` | — | `features/problem-detail/` | workspace-code, chat (partial) | **Spec TODO** |
-| `problems-page` | — | `features/problems-page/` | catalog fetch | **Spec TODO** |
+| `problems-page` | [04-problems-page-list-ui.md](./04-problems-page-list-ui.md) (list UI delta) | `features/problems-page/` | catalog fetch + tags on list | Pass A shipped; Pass B planned |
 | `landing` | — | `features/landing/` | — | **Spec TODO** |
 | `docs` | — | `features/docs/` | — | **Spec TODO** |
 

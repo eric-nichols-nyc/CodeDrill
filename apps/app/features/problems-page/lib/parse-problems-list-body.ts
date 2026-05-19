@@ -1,4 +1,23 @@
-import type { ApiProblemRow } from "./map-rows-to-problems";
+import type { ApiProblemRow, ApiProblemTag } from "./map-rows-to-problems";
+
+function parseApiProblemTags(raw: unknown): ApiProblemTag[] {
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+  return raw.flatMap((item) => {
+    if (typeof item !== "object" || item === null) {
+      return [];
+    }
+    const o = item as Record<string, unknown>;
+    const name = typeof o.name === "string" ? o.name.trim() : "";
+    if (!name) {
+      return [];
+    }
+    const slug =
+      typeof o.slug === "string" && o.slug.length > 0 ? o.slug : name;
+    return [{ name, slug }];
+  });
+}
 
 export function parseProblemsListBody(body: unknown): ApiProblemRow[] {
   if (!Array.isArray(body)) {
@@ -18,6 +37,7 @@ export function parseProblemsListBody(body: unknown): ApiProblemRow[] {
         slug: o.slug,
         title: o.title,
         difficulty: typeof o.difficulty === "string" ? o.difficulty : undefined,
+        tags: parseApiProblemTags(o.tags),
       },
     ];
   });

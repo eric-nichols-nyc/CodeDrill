@@ -212,13 +212,33 @@ export function ProblemsPageView({
               <div className="mx-auto max-w-5xl">
                 {fetchOk ? null : (
                   <p className="mb-4 text-destructive text-sm">
-                    Could not load problems (HTTP {fetchStatus}). For
-                    server-side access from this app, set matching{" "}
-                    <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                      INTERNAL_PROBLEMS_SECRET
-                    </code>{" "}
-                    here and on the Nest API, or call the API with a Better Auth
-                    session cookie.
+                    {fetchStatus === 0 ? (
+                      <>
+                        Could not reach the practice API. Start{" "}
+                        <code className="rounded bg-muted px-1 py-0.5 text-xs">
+                          pnpm dev
+                        </code>{" "}
+                        in{" "}
+                        <code className="rounded bg-muted px-1 py-0.5 text-xs">
+                          apps/api
+                        </code>{" "}
+                        (default{" "}
+                        <code className="rounded bg-muted px-1 py-0.5 text-xs">
+                          http://localhost:3030
+                        </code>
+                        ), then refresh.
+                      </>
+                    ) : (
+                      <>
+                        Could not load problems (HTTP {fetchStatus}). For
+                        server-side access from this app, set matching{" "}
+                        <code className="rounded bg-muted px-1 py-0.5 text-xs">
+                          INTERNAL_PROBLEMS_SECRET
+                        </code>{" "}
+                        here and on the Nest API, or call the API with a Better
+                        Auth session cookie.
+                      </>
+                    )}
                   </p>
                 )}
 

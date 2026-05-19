@@ -25,11 +25,17 @@ function stableAcceptance(slug: string): number {
   return Math.round((35 + (h % 4500) / 100) * 10) / 10;
 }
 
+export type ApiProblemTag = {
+  name: string;
+  slug: string;
+};
+
 export type ApiProblemRow = {
   id?: string;
   slug: string;
   title: string;
   difficulty?: string;
+  tags?: ApiProblemTag[];
 };
 
 export function mapRowsToProblems(rows: ApiProblemRow[]): Problem[] {
@@ -41,7 +47,7 @@ export function mapRowsToProblems(rows: ApiProblemRow[]): Problem[] {
     difficulty: normalizeDifficulty(row.difficulty),
     acceptance: stableAcceptance(row.slug),
     status: "unsolved",
-    tags: [],
+    tags: (row.tags ?? []).map((tag) => tag.name),
     isPremium: false,
   }));
 }

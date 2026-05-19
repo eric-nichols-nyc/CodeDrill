@@ -8,6 +8,7 @@ import type { Problem } from "../../lib/types";
 import { problemsListGridClassName } from "../lib/layout";
 import { difficultyTextClass } from "../utils/difficulty-text-class";
 import { problemDetailHref } from "../utils/problem-detail-href";
+import { ProblemListTagPills } from "./problem-list-tag-pills";
 import { ProblemStatusIcon } from "./problem-status-icon";
 
 export type ProblemListRowProps = {
@@ -35,26 +36,26 @@ export function ProblemListRow({ problem, stripeIndex }: ProblemListRowProps) {
         className="contents cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         href={href}
       >
-        <span className="justify-self-start">
+        <span className="justify-self-start pt-0.5">
           <ProblemStatusIcon status={problem.status} />
         </span>
-        <span className="text-foreground tabular-nums">{problem.id}</span>
-        <div className="min-w-0">
+        <div className="min-w-0 py-0.5">
           <div className="flex min-w-0 items-center gap-2">
             <span className="truncate text-foreground transition-colors hover:text-primary">
-              {problem.title}
+              {problem.id}. {problem.title}
             </span>
             {problem.isPremium ? (
               <Lock className="h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
             ) : null}
           </div>
+          <ProblemListTagPills className="mt-1.5" tags={problem.tags} />
         </div>
-        <span className="justify-self-start">
+        <span className="justify-self-start pt-0.5">
           {problem.status === "solved" ? (
             <FileText aria-hidden className="h-4 w-4 text-muted-foreground" />
           ) : null}
         </span>
-        <span className="justify-self-start">
+        <span className="justify-self-start pt-0.5">
           <span
             className={cn(
               "font-semibold",

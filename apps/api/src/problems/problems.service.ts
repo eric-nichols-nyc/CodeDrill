@@ -97,14 +97,47 @@ export class ProblemsService {
     return updatedProblem;
   }
 
-  findAll(query: ListProblemsQueryDto) {
-    if (query.published === undefined) {
-      return this.db.select().from(problems);
+  async findAll(query: ListProblemsQueryDto) {
+    const rows =
+      query.published === undefined
+        ? await this.db.select().from(problems)
+        : await this.db
+            .select()
+            .from(problems)
+            .where(eq(problems.isPublished, query.published));
+
+    if (rows.length === 0) {
+      return [];
     }
-    return this.db
-      .select()
-      .from(problems)
-      .where(eq(problems.isPublished, query.published));
+
+    const problemIds = rows.map((row) => row.id);
+    const tagRows = await this.db
+      .select({
+        problemId: problemTags.problemId,
+        id: tags.id,
+        name: tags.name,
+        slug: tags.slug,
+      })
+      .from(problemTags)
+      .innerJoin(tags, eq(problemTags.tagId, tags.id))
+      .where(inArray(problemTags.problemId, problemIds))
+      .orderBy(asc(tags.name));
+
+    const tagsByProblemId = new Map<
+      string,
+      { id: string; name: string; slug: string }[]
+    >();
+
+    for (const tag of tagRows) {
+      const list = tagsByProblemId.get(tag.problemId) ?? [];
+      list.push({ id: tag.id, name: tag.name, slug: tag.slug });
+      tagsByProblemId.set(tag.problemId, list);
+    }
+
+    return rows.map((problem) => ({
+      ...problem,
+      tags: tagsByProblemId.get(problem.id) ?? [],
+    }));
   }
 
   async findOne(id: string) {
