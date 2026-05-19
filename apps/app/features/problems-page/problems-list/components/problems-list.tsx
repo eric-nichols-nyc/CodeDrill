@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 import type { Problem, SortDirection, SortField } from "../../lib/types";
-import { sortProblems } from "../utils/sort-problems";
-import { ProblemListRow } from "./problem-list-row";
+import { groupProblemsBySection } from "../utils/group-problems-by-section";
+import { ProblemListSection } from "./problem-list-section";
 import { ProblemsListHeader } from "./problems-list-header";
 
 export type ProblemsListProps = {
@@ -19,8 +19,8 @@ export function ProblemsList({
   sortDirection,
   onSort,
 }: ProblemsListProps) {
-  const sorted = useMemo(
-    () => sortProblems(problems, sortField, sortDirection),
+  const sections = useMemo(
+    () => groupProblemsBySection(problems, sortField, sortDirection),
     [problems, sortField, sortDirection]
   );
 
@@ -32,12 +32,8 @@ export function ProblemsList({
         sortField={sortField}
       />
       <div className="divide-y divide-border">
-        {sorted.map((problem, stripeIndex) => (
-          <ProblemListRow
-            key={problem.slug}
-            problem={problem}
-            stripeIndex={stripeIndex}
-          />
+        {sections.map((section) => (
+          <ProblemListSection key={section.sectionId} section={section} />
         ))}
       </div>
     </section>

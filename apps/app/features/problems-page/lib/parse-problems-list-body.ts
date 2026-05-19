@@ -38,7 +38,23 @@ export function parseProblemsListBody(body: unknown): ApiProblemRow[] {
         title: o.title,
         difficulty: typeof o.difficulty === "string" ? o.difficulty : undefined,
         tags: parseApiProblemTags(o.tags),
+        patternSlug: parsePatternSlug(o),
       },
     ];
   });
+}
+
+function parsePatternSlug(o: Record<string, unknown>): string | undefined {
+  if (typeof o.patternSlug === "string") {
+    const trimmed = o.patternSlug.trim();
+    if (trimmed) {
+      return trimmed;
+    }
+  }
+  if (typeof o.pattern_slug === "string") {
+    const trimmed = o.pattern_slug.trim();
+    if (trimmed) {
+      return trimmed;
+    }
+  }
 }

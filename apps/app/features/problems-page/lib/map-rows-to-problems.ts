@@ -16,6 +16,11 @@ function normalizeDifficulty(raw?: string): Difficulty {
 
 const HASH_MOD = 2_147_483_647;
 
+function normalizePatternSlug(raw?: string): string | undefined {
+  const trimmed = raw?.trim();
+  return trimmed ? trimmed : undefined;
+}
+
 /** Deterministic pseudo-acceptance for rows that do not include it from the API. */
 function stableAcceptance(slug: string): number {
   let h = 0;
@@ -36,6 +41,7 @@ export type ApiProblemRow = {
   title: string;
   difficulty?: string;
   tags?: ApiProblemTag[];
+  patternSlug?: string;
 };
 
 export function mapRowsToProblems(rows: ApiProblemRow[]): Problem[] {
@@ -48,6 +54,7 @@ export function mapRowsToProblems(rows: ApiProblemRow[]): Problem[] {
     acceptance: stableAcceptance(row.slug),
     status: "unsolved",
     tags: (row.tags ?? []).map((tag) => tag.name),
+    patternSlug: normalizePatternSlug(row.patternSlug),
     isPremium: false,
   }));
 }

@@ -12,6 +12,8 @@ export type Problem = {
   difficulty: Difficulty;
   status: Status;
   tags: string[];
+  /** Study-plan section key from API `patternSlug` (e.g. two-pointers, sliding-window). */
+  patternSlug?: string;
   isPremium: boolean;
 };
 

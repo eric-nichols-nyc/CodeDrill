@@ -1,171 +1,107 @@
-# Feature update: problems-page — list tags & topic grouping
+# Feature update: problems-page — list tags & study-plan sections
 
 ## Goal
 
-Improve the problems list to match a study-plan style layout: problems grouped under topic section headers (e.g. **Array / String**), topic tags visible on each row, and titles shown as `{id}. {title}`. Wire `Problem.tags` from the catalog API instead of empty placeholders in `mapRowsToProblems`.
+On `/problems`, render a LeetCode 75–style catalog: problems grouped under fixed study-plan **section headers**, each row showing `{id}. {title}`, **tags under the title**, and difficulty on the right. Sections come from each problem’s **`patternSlug`** on the API (not from tags).
 
 ## Reference
 
 - [01-design-system.md](./01-design-system.md) — feature folder layout, SOLID, semantic tokens.
 - [00-index.md](./00-index.md) — parent feature: `problems-page`.
-- Visual reference: LeetCode-style grouped list (category header row + problem rows with status, combined id/title, difficulty on the right).
-
-Existing code to extend (do not duplicate):
-
-- `features/problems-page/problems-list/components/problem-list-row.tsx`
-- `features/problems-page/problems-list/components/problems-list.tsx`
-- `features/problems-page/problems-list/components/problems-list-header.tsx`
-- `features/problems-page/problems-list/lib/layout.ts`
-- `features/problems-page/lib/map-rows-to-problems.ts`
-- `features/problems-page/lib/parse-problems-list-body.ts`
-- `features/problems-page/problems-list/utils/matches-problems-list-query.ts` (topic filter uses `problem.tags`)
+- Visual reference: grouped headers (Array / String, Two Pointers, …) + rows with tags under title.
 
 ## Product decisions (locked)
 
 | Topic | Decision |
 | ----- | -------- |
-| Primary topic for grouping | First tag in `problem.tags` sorted alphabetically on the problem; if none, section **`Uncategorized`**. |
-| Title column | Single cell: **`{id}. {title}`**; remove separate `#` column from grid in grouped list. |
-| Grouping vs sort | **Always group by primary topic.** Column sort applies **within each section** only (not a global flat reorder). |
-| Tags on row | Up to **2** tag pills + **`+N`** if more; **display-only** in v1 (no click-to-filter). |
-| API tag shape | List returns `tags: { name: string; slug: string }[]`; app maps to `Problem.tags` as **display names** (`name`). |
+| **Section (group header)** | `problems.pattern_slug` / API `patternSlug`. **Not** inferred from tags. |
+| **Section catalog** | Fixed ordered list in `problem-list-sections.ts` (see below). |
+| **Unknown / missing slug** | Section **Uncategorized** (always last). |
+| **Title** | `{id}. {title}` in one cell; no separate `#` column. |
+| **Tags under title** | Up to 2 pills + `+N`; display-only; Title Case from slug/name. |
+| **Sort** | Column sort applies **within each section** only. |
+| **Empty sections** | Hidden (no header if no problems in that section). |
+
+### Section catalog (order)
+
+| Order | Header label | `patternSlug` values |
+| ----- | ------------ | -------------------- |
+| 1 | Array / String | `array-string`, `array`, `string` |
+| 2 | Two Pointers | `two-pointers` |
+| 3 | Sliding Window | `sliding-window` |
+| 4 | Hash Map / Set | `hash-map`, `hash-set`, `hash-table` |
+| last | Uncategorized | missing or unrecognized slug |
 
 ## User story
 
-As a learner browsing problems, I want the list grouped by topic with tags on each row, so I can scan a study plan by category and see what each problem covers at a glance.
+As a learner, I want problems grouped by study-plan section with tags under each title, so I can progress through topics the way LeetCode 75 is organized.
 
 ## Requirements
 
-### Pass A — data (catalog tags)
+### Data
 
-- [x] Extend catalog list response (API and BFF if applicable) to include tags per problem via `problem_tags` / `tags` join.
-- [x] Update `ApiProblemRow` in `map-rows-to-problems.ts` with optional `tags?: { name: string; slug: string }[]`.
-- [x] Update `parseProblemsListBody` to parse tag arrays from list JSON.
-- [x] Update `mapRowsToProblems` to set `tags: (row.tags ?? []).map((t) => t.name)` (non-empty when API provides tags).
-- [x] Topic filter in toolbar (`field: "topic"`) continues to match against populated `problem.tags`.
+- [x] `GET /problems` returns `tags[]` per problem (`problem_tags` join).
+- [x] List items include `patternSlug` from the `problems` row (already on entity; parsed in app).
+- [x] `Problem.patternSlug` on the client; `parseProblemsListBody` accepts `patternSlug` or `pattern_slug`.
 
-### Pass B — UI (grouping & row layout)
+### UI
 
-- [ ] Add pure util `groupProblemsByTopic` in `problems-list/utils/`.
-- [ ] Add `ProblemListSection` component: section header + child rows.
-- [ ] Update `ProblemsList` to render sections instead of a flat list.
-- [ ] Section header: topic label only, full width, `bg-muted/30`, `border-b border-border`, not interactive.
-- [ ] Section order: alphabetical by topic label (`Uncategorized` last or first — use **last**).
-- [ ] Zebra striping resets per section (`stripeIndex` starts at 0 in each group).
-- [ ] Update `problemsListGridClassName` and `ProblemsListHeader` for new columns (tags column; drop `#` column).
-- [ ] `ProblemListRow`: show `{id}. {title}`; add tag pills cell; keep difficulty, status, favorite, solution icon as today.
-- [ ] Sort within section: apply existing `sortProblems` to each group's `problems` array before render.
-
-### Styling
-
-- [ ] Semantic tokens only (`bg-muted`, `text-primary`, `difficultyTextClass`, `border-border`).
-- [ ] Tag pills: `text-xs`, `rounded-md`, `bg-muted`, `text-muted-foreground`, truncate long names.
-- [ ] No new primitives under `apps/app/components/ui/`.
+- [x] `groupProblemsBySection` buckets by resolved section id.
+- [x] `ProblemListSection` renders header + rows.
+- [x] `ProblemsList` renders sections (not a flat list).
+- [x] Section header: full width, `bg-muted/30`, `border-b border-border`.
+- [x] Zebra striping resets per section.
+- [x] `ProblemListRow`: `{id}. {title}` + `ProblemListTagPills` under title.
 
 ## System boundaries
 
 | Layer | Path | Notes |
 | ----- | ---- | ----- |
-| Feature UI | `apps/app/features/problems-page/` | List, row, utils, hooks |
-| BFF | `apps/app/app/api/...` (catalog route) | Pass through tags from API |
-| API | `apps/api/src/problems/` | `findAll` or list handler with tags join |
-| Database | `problem_tags`, `tags` | Already exist in schema |
+| Feature UI | `apps/app/features/problems-page/` | List, sections, rows |
+| API | `apps/api/src/problems/` | `findAll` returns problem row + tags |
+| Database | `problems.pattern_slug`, `problem_tags` | |
 
-## API (catalog list)
-
-### Current gap
-
-`ProblemsService.findAll` returns problem rows only. Tags load in `findBySlugWithDetails` via `problem_tags` join. The list endpoint must include tags (batch join or subquery) for all returned problems.
-
-### Target list item shape
+## API list item shape
 
 ```ts
-export type ApiProblemRow = {
-  id?: string;
+{
+  id: string;
   slug: string;
   title: string;
-  difficulty?: string;
-  tags?: { name: string; slug: string }[];
-};
+  difficulty: string;
+  patternSlug: string | null;
+  tags: { id: string; name: string; slug: string }[];
+}
 ```
 
-### App mapping
-
-```ts
-tags: (row.tags ?? []).map((t) => t.name),
-```
-
-## Proposed file structure (additions)
+## File structure
 
 ```txt
 features/problems-page/problems-list/
+  lib/problem-list-sections.ts
+  utils/group-problems-by-section.ts
   components/
     problem-list-section.tsx
-    problem-list-tag-pills.tsx    # optional extract from row
-  utils/
-    group-problems-by-topic.ts
+    problem-list-tag-pills.tsx
+    problem-list-row.tsx
+    problems-list.tsx
 ```
 
-## Component responsibilities
+## Out of scope
 
-### `groupProblemsByTopic` (util)
-
-- **Input:** `Problem[]`, `sortField`, `sortDirection`.
-- **Output:** `{ topic: string; problems: Problem[] }[]`.
-- **Logic:** For each problem, `primaryTopic = sorted(problem.tags)[0] ?? "Uncategorized"`. Group by `primaryTopic`. Sort sections alphabetically; put `Uncategorized` last. Sort each group's problems with `sortProblems`.
-
-### `ProblemListSection`
-
-```ts
-type ProblemListSectionProps = {
-  topic: string;
-  problems: Problem[];
-};
-```
-
-- Renders section header + `ProblemListRow` for each problem.
-- Passes `stripeIndex` 0..n-1 within the section.
-
-### `ProblemListRow` (update)
-
-- Title cell: `{problem.id}. {problem.title}`.
-- New tags cell via `ProblemListTagPills` or inline (max 2 pills + `+N`).
-- Grid aligned with `ProblemsListHeader` via shared `problemsListGridClassName`.
-
-### `ProblemsList` (update)
-
-- After global `sortProblems` is removed from flat list, delegate per-section sort inside `groupProblemsByTopic`.
-- Map sections to `ProblemListSection`.
-
-### `ProblemsListHeader` (update)
-
-- Remove `#` column header and sort button.
-- Add **Tags** column label (non-sortable in v1).
-
-## Out of scope (this pass)
-
-- Clicking a tag to apply toolbar filter.
-- Flat / ungrouped list toggle.
-- Selected-row `text-primary` highlight (unless `selectedSlug` is already passed from parent).
-- Real external problem numbers (list still uses display `id` from catalog order).
-- Pagination changes per section.
-- Drag-and-drop section reorder.
+- Click tag → apply toolbar filter.
+- Flat / ungrouped toggle.
+- Pagination per section.
+- New DB column (use existing `pattern_slug`).
 
 ## Acceptance criteria
 
-- [x] Catalog fetch returns tags; list shows non-empty tags for problems that have `problem_tags` in DB.
-- [ ] List renders topic section headers matching study-plan layout.
-- [ ] Each row shows tag pills and `{id}. {title}` in one title cell.
-- [ ] Difficulty colors unchanged (`difficultyTextClass`).
-- [ ] Topic filter in toolbar works with real tag data.
-- [ ] `pnpm typecheck` passes for `apps/app` and `apps/api` if API touched.
+- [x] Section headers appear in catalog order when problems exist in each section.
+- [x] Each problem appears in exactly one section (from `patternSlug`).
+- [x] Tags render under title; difficulty unchanged.
+- [x] Topic filter still matches `problem.tags`.
+- [ ] Admin: set `patternSlug` on problems meant for Array / String (`array-string` etc.).
 
 ## Implementation prompt for agents
 
-Implement the problems-page list update per this spec and `01-design-system.md`.
-
-**Pass A:** Extend API list (and BFF if needed) to return `tags` per problem. Update `parseProblemsListBody` and `mapRowsToProblems` so `Problem.tags` is populated.
-
-**Pass B:** Add `groupProblemsByTopic` and `ProblemListSection`. Update `ProblemsList`, `problem-list-row.tsx`, `problems-list-header.tsx`, and `layout.ts` for grouped sections, a tags column, and `{id}. {title}` format. Sort within sections only. Keep routes thin. Use `@repo/design-system` tokens only; no new app-level UI primitives.
-
-Do not implement out-of-scope items in this pass.
+Implement per this spec. Grouping uses `patternSlug` and `problem-list-sections.ts`. Do not group by first tag. Sort within sections only. Use semantic design-system tokens.
