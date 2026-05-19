@@ -42,7 +42,7 @@ export function ProblemListRow({ problem, stripeIndex }: ProblemListRowProps) {
         <div className="min-w-0 py-0.5">
           <div className="flex min-w-0 items-center gap-2">
             <span className="truncate text-foreground transition-colors hover:text-primary">
-              {problem.id}. {problem.title}
+              {problem.title}
             </span>
             {problem.isPremium ? (
               <Lock className="h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
