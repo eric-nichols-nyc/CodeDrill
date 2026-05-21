@@ -207,6 +207,14 @@ export function useProblemWorkspace({
     });
   }, [appendConsole, drafts, rows]);
 
+  const handleReset = useCallback(() => {
+    console.log("[problem-workspace] Reset clicked", {
+      activeStarterKey: activeStarterKey || "(default first row)",
+      language: activeRow?.language ?? "(none)",
+      starterKey: activeRow?.key ?? "(none)",
+    });
+  }, [activeRow, activeStarterKey]);
+
   return {
     rows,
     drafts,
@@ -227,6 +235,7 @@ export function useProblemWorkspace({
     workspaceCodeSaveError: saveWorkspaceCode.error ?? null,
     clearWorkspaceCodeSaveError: () => saveWorkspaceCode.reset(),
     handleRun,
+    handleReset,
     handleSubmit,
   };
 }

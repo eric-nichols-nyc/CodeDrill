@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/design-system/components/ui/select";
-import { Play, Send } from "lucide-react";
+import { Play, RotateCcw, Send } from "lucide-react";
 import { SplitLayout } from "@/components/split-layout";
 import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
 import { useProblemWorkspace } from "./hooks/use-problem-workspace";
@@ -44,6 +44,7 @@ export function ProblemWorkspace({
     lastRunOutcome,
     isPending,
     handleRun,
+    handleReset,
     handleSubmit,
     isSavingCode,
     workspaceCodeLoadError,
@@ -108,6 +109,16 @@ export function ProblemWorkspace({
       </div>
       <div className="mt-3 flex shrink-0 flex-wrap items-center justify-end gap-3 rounded-md border border-border bg-muted/20 px-3 py-2">
         <div className="flex items-center gap-2">
+          <Button
+            aria-label="Reset to starter code"
+            disabled={isPending || isSavingCode || rows.length === 0}
+            onClick={handleReset}
+            size="icon"
+            type="button"
+            variant="outline"
+          >
+            <RotateCcw className="h-4 w-4" />
+          </Button>
           <Button
             disabled={isPending || isSavingCode}
             onClick={handleRun}
