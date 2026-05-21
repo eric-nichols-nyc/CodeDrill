@@ -107,6 +107,13 @@ export function useProblemWorkspace({
     [rows, activeStarterKey]
   );
 
+  const canReset = useMemo(() => {
+    if (!activeRow) {
+      return false;
+    }
+    return (drafts[activeRow.key] ?? "") !== (activeRow.code ?? "");
+  }, [activeRow, drafts]);
+
   const totalChars = totalDraftChars(rows, drafts);
 
   const appendConsole = useCallback(
@@ -208,12 +215,19 @@ export function useProblemWorkspace({
   }, [appendConsole, drafts, rows]);
 
   const handleReset = useCallback(() => {
-    console.log("[problem-workspace] Reset clicked", {
-      activeStarterKey: activeStarterKey || "(default first row)",
-      language: activeRow?.language ?? "(none)",
-      starterKey: activeRow?.key ?? "(none)",
-    });
-  }, [activeRow, activeStarterKey]);
+    if (!activeRow) {
+      return;
+    }
+    if (!canReset) {
+      return;
+    }
+
+    const starterText = activeRow.code ?? "";
+    setDrafts((prev) => ({ ...prev, [activeRow.key]: starterText }));
+    setLastRunOutcome(null);
+    setLastAction(null);
+    setActiveTab("testcase");
+  }, [activeRow, canReset]);
 
   return {
     rows,
@@ -234,6 +248,7 @@ export function useProblemWorkspace({
     workspaceCodeLoadError: workspaceCodeLoadError ?? null,
     workspaceCodeSaveError: saveWorkspaceCode.error ?? null,
     clearWorkspaceCodeSaveError: () => saveWorkspaceCode.reset(),
+    canReset,
     handleRun,
     handleReset,
     handleSubmit,

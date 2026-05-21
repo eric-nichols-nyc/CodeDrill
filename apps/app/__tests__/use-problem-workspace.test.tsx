@@ -172,4 +172,38 @@ describe("useProblemWorkspace", () => {
 
     expect(result.current.lastRunOutcome?.compileError).not.toBeNull();
   });
+
+  it("resets the active starter draft and clears run state", () => {
+    const { result } = renderHook(
+      () =>
+        useProblemWorkspace({
+          starterCode: singleJsStarter,
+          testCases: addTestCases,
+        }),
+      { wrapper: createWrapper() }
+    );
+
+    const key = result.current.rows[0]?.key;
+    expect(key).toBeDefined();
+
+    act(() => {
+      result.current.setDraftForKey(key as string, "function sum(a, b) { return 0; }");
+    });
+    expect(result.current.canReset).toBe(true);
+
+    act(() => {
+      result.current.handleRun();
+    });
+    expect(result.current.lastRunOutcome).not.toBeNull();
+
+    act(() => {
+      result.current.handleReset();
+    });
+
+    expect(result.current.drafts[key as string]).toBe(singleJsStarter[0].code);
+    expect(result.current.canReset).toBe(false);
+    expect(result.current.lastRunOutcome).toBeNull();
+    expect(result.current.lastAction).toBeNull();
+    expect(result.current.activeTab).toBe("testcase");
+  });
 });

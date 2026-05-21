@@ -46,6 +46,7 @@ export function ProblemWorkspace({
     handleRun,
     handleReset,
     handleSubmit,
+    canReset,
     isSavingCode,
     workspaceCodeLoadError,
     workspaceCodeSaveError,
@@ -111,7 +112,7 @@ export function ProblemWorkspace({
         <div className="flex items-center gap-2">
           <Button
             aria-label="Reset to starter code"
-            disabled={isPending || isSavingCode || rows.length === 0}
+            disabled={isPending || isSavingCode || !canReset}
             onClick={handleReset}
             size="icon"
             type="button"
