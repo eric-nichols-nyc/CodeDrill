@@ -2,7 +2,6 @@
 
 import { cn } from "@repo/design-system/lib/utils";
 import {
-  AlignLeft,
   ChevronLeft,
   ChevronRight,
   Flame,
@@ -11,10 +10,11 @@ import {
   Shuffle,
   UserPlus,
 } from "lucide-react";
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { AppBrandLink } from "@/components/app-brand-link";
 import { AppHeaderInner } from "@/components/app-header-inner";
+import { NavDrawer } from "@/features/nav-drawer";
+import type { Problem } from "@/features/problems-page/lib/types";
 import { NavUserMenu } from "@/components/nav-user-menu";
 import { TimerMenuButton } from "@/components/timer";
 
@@ -119,13 +119,23 @@ function NavIconButton({
 export type ProblemSlugNavHeaderProps = {
   /** Problem title from API (fallback: slug). */
   title: string;
+  problems: Problem[];
+  currentSlug: string;
+  fetchOk: boolean;
+  fetchStatus: number;
 };
 
 /**
- * Sticky LeetCode-style nav for `/problems/[slug]`. Home + Problem list are real
- * routes; other controls are visual placeholders until wired.
+ * Sticky LeetCode-style nav for `/problems/[slug]`. Problem List opens nav drawer;
+ * logo links home; other controls are placeholders until wired.
  */
-export function ProblemSlugNavHeader({ title }: ProblemSlugNavHeaderProps) {
+export function ProblemSlugNavHeader({
+  title,
+  problems,
+  currentSlug,
+  fetchOk,
+  fetchStatus,
+}: ProblemSlugNavHeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full shrink-0 select-none border-[var(--nav-border)] border-b bg-[var(--nav-bg)]">
       <AppHeaderInner className="gap-0">
@@ -137,16 +147,12 @@ export function ProblemSlugNavHeader({ title }: ProblemSlugNavHeaderProps) {
             className="mx-1 h-4 w-px shrink-0 bg-[var(--nav-border)]"
           />
 
-          <Link
-            aria-label="Problem List"
-            className="group flex h-8 shrink-0 items-center gap-1.5 rounded px-1.5 transition-colors hover:bg-white/5"
-            href="/problems"
-          >
-            <AlignLeft className="h-4 w-4 text-[var(--nav-icon)] group-hover:text-[var(--nav-icon-hover)]" />
-            <span className="whitespace-nowrap font-medium text-[var(--nav-icon-hover)] text-sm">
-              Problem List
-            </span>
-          </Link>
+          <NavDrawer
+            currentSlug={currentSlug}
+            fetchOk={fetchOk}
+            fetchStatus={fetchStatus}
+            problems={problems}
+          />
 
           <NavIconButton label="Previous problem">
             <ChevronLeft className="h-4 w-4" />

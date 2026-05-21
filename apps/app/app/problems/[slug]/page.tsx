@@ -5,7 +5,14 @@ import { ProblemExpandableSidebar } from "@/features/problem-detail/components/p
 import { ProblemSlugNavHeader } from "@/features/problem-detail/components/problem-slug-nav-header";
 import { isProblemSolutionRowArray } from "@/features/problem-detail/problem-detail-helpers";
 import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
+import { mapRowsToProblems } from "@/features/problems-page/lib/map-rows-to-problems";
+import { parseProblemsListBody } from "@/features/problems-page/lib/parse-problems-list-body";
+import type { Problem } from "@/features/problems-page/lib/types";
 import { fetchProblemBySlug } from "@/lib/problems/fetch-problem-by-slug";
+import {
+  fetchProblemsList,
+  type ProblemsListResult,
+} from "@/lib/problems/fetch-problems-list";
 
 type ProblemDetailBundle = {
   problem: unknown;
@@ -17,6 +24,25 @@ type ProblemDetailBundle = {
   solutions: ProblemSolutionRow[];
   testCases?: unknown;
 };
+
+function parseCatalogProblems(listResult: ProblemsListResult): Problem[] {
+  const rows = listResult.ok ? parseProblemsListBody(listResult.body) : [];
+  return mapRowsToProblems(rows);
+}
+
+function resolveTitle(slug: string, bundle: ProblemDetailBundle | null): string {
+  if (!bundle) {
+    return slug;
+  }
+  const p = bundle.problem;
+  if (typeof p === "object" && p !== null && "title" in p) {
+    const t = (p as { title: unknown }).title;
+    if (typeof t === "string" && t.length > 0) {
+      return t;
+    }
+  }
+  return slug;
+}
 
 function isProblemDetailBundle(value: unknown): value is ProblemDetailBundle {
   if (typeof value !== "object" || value === null) {
@@ -40,33 +66,32 @@ export default async function ProblemBySlugPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const result = await fetchProblemBySlug(slug);
-  console.log("[problems/[slug]]", { slug, body: result.body });
+  const [result, listResult] = await Promise.all([
+    fetchProblemBySlug(slug),
+    fetchProblemsList(),
+  ]);
+  const problems = parseCatalogProblems(listResult);
 
   if (result.status === 404) {
     notFound();
   }
 
-  let title = slug;
   const bundle =
     result.ok === true && isProblemDetailBundle(result.body)
       ? result.body
       : null;
-
-  if (bundle) {
-    const p = bundle.problem;
-    if (typeof p === "object" && p !== null && "title" in p) {
-      const t = (p as { title: unknown }).title;
-      if (typeof t === "string" && t.length > 0) {
-        title = t;
-      }
-    }
-  }
+  const title = resolveTitle(slug, bundle);
 
   return (
     <TimerProvider>
       <div className="problem-by-slug-page flex h-dvh min-h-0 flex-col overflow-hidden bg-background">
-        <ProblemSlugNavHeader title={title} />
+        <ProblemSlugNavHeader
+          currentSlug={slug}
+          fetchOk={listResult.ok}
+          fetchStatus={listResult.status}
+          problems={problems}
+          title={title}
+        />
 
         <main className="flex min-h-0 flex-1 flex-row overflow-hidden">
           <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
