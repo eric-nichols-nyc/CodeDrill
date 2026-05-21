@@ -1,7 +1,5 @@
 "use client";
 
-import { Badge } from "@repo/design-system/components/ui/badge";
-import { Button } from "@repo/design-system/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,11 +7,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/design-system/components/ui/dialog";
-import { Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { SplitLayout } from "@/components/split-layout";
+import { AdminPageHeader } from "@/features/admin/components/admin-page-header";
 import { AdminProblemDetail } from "@/features/admin/components/admin-problem-detail";
+import { AdminProblemListSidebar } from "@/features/admin/components/admin-problem-list-sidebar";
+import { AdminSplitShell } from "@/features/admin/components/admin-split-shell";
 import { NewProblemForm } from "@/features/admin/components/new-problem-form";
 import {
   type AdminProblemDetail as AdminProblemDetailData,
@@ -91,120 +90,6 @@ function useAdminProblemDetail(id: string | null, enabled: boolean) {
   }, [id]);
 
   return { detail, loading, refresh };
-}
-
-function AdminPageHeader({
-  canEdit,
-  isEditing,
-  onToggleEdit,
-}: {
-  canEdit: boolean;
-  isEditing: boolean;
-  onToggleEdit: () => void;
-}) {
-  return (
-    <header className="sticky top-0 z-20 border-border border-b bg-background/95 px-6 py-4 backdrop-blur">
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-        <div className="flex items-center gap-2">
-          <Button asChild size="sm" variant="outline">
-            <Link href="/">Home</Link>
-          </Button>
-          <Button asChild size="sm" variant="outline">
-            <Link href="/problems">Problems</Link>
-          </Button>
-        </div>
-        <div className="flex justify-center">
-          <Button aria-label="Add a problem" asChild size="icon">
-            <Link href="/admin/add">
-              <Plus />
-            </Link>
-          </Button>
-        </div>
-        <div className="flex justify-end">
-          {canEdit ? (
-            <Button
-              onClick={onToggleEdit}
-              size="sm"
-              type="button"
-              variant="outline"
-            >
-              {isEditing ? null : <Pencil />}
-              {isEditing ? "Cancel" : "Edit"}
-            </Button>
-          ) : (
-            <div />
-          )}
-        </div>
-      </div>
-    </header>
-  );
-}
-
-function AdminProblemListPane({
-  problems,
-  selectedId,
-  onSelect,
-}: {
-  problems: AdminProblemListItem[];
-  selectedId: string | null;
-  onSelect: (id: string) => void;
-}) {
-  return (
-    <div className="flex h-full min-h-0 flex-col border-border border-r bg-muted/10">
-      <div className="border-border border-b px-4 py-3">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="font-medium text-sm">Problems</p>
-            <p className="text-muted-foreground text-xs">
-              {problems.length} total problem{problems.length === 1 ? "" : "s"}
-            </p>
-          </div>
-          <Button asChild size="sm" variant="outline">
-            <Link href="/admin/add">
-              <Plus />
-              Add a
-            </Link>
-          </Button>
-        </div>
-      </div>
-      <div className="min-h-0 flex-1 overflow-y-auto p-2">
-        <div className="space-y-2">
-          {problems.map((problem) => {
-            const isActive = problem.id === selectedId;
-            return (
-              <button
-                className={`w-full rounded-lg border px-3 py-3 text-left transition-colors ${
-                  isActive
-                    ? "border-primary bg-primary/5"
-                    : "border-border bg-background hover:bg-muted/40"
-                }`}
-                key={problem.id}
-                onClick={() => onSelect(problem.id)}
-                type="button"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-sm">
-                      {problem.title}
-                    </p>
-                    <p className="truncate text-muted-foreground text-xs">
-                      {problem.slug}
-                    </p>
-                  </div>
-                  <Badge variant="outline">{problem.difficulty}</Badge>
-                </div>
-                <div className="mt-2">
-                  <Badge variant="outline">
-                    {problem.isPublished ? "published" : "draft"}
-                  </Badge>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
 }
 
 function AdminProblemDetailPane({
@@ -318,39 +203,16 @@ export function AdminPageShell({
   const editDialogOpen = mode === "edit" && canEditProblem;
 
   return (
-    <div className="h-[calc(100dvh-1rem)] p-4">
-      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-background">
+    <AdminSplitShell
+      header={
         <AdminPageHeader
           canEdit={canEditProblem}
           isEditing={mode === "edit"}
           onToggleEdit={handleToggleEdit}
+          variant="browse"
         />
-
-        <SplitLayout
-          className="min-h-0 flex-1"
-          defaultLeftPercent={28}
-          left={
-            <AdminProblemListPane
-              onSelect={handleSelect}
-              problems={problems}
-              selectedId={selectedId}
-            />
-          }
-          minLeftPx={220}
-          minRightPx={420}
-          right={
-            <div className="flex h-full min-h-0 flex-col">
-              <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-6 pb-0">
-                <AdminProblemDetailPane
-                  detail={detail}
-                  loading={loading}
-                  selectedProblem={selectedProblem}
-                />
-              </div>
-            </div>
-          }
-        />
-
+      }
+      modals={
         <Dialog
           onOpenChange={(open) => {
             if (!open) {
@@ -387,7 +249,20 @@ export function AdminPageShell({
             ) : null}
           </DialogContent>
         </Dialog>
-      </div>
-    </div>
+      }
+      sidebar={
+        <AdminProblemListSidebar
+          dbProblems={problems}
+          onSelectProblem={handleSelect}
+          selectedId={selectedId}
+        />
+      }
+    >
+      <AdminProblemDetailPane
+        detail={detail}
+        loading={loading}
+        selectedProblem={selectedProblem}
+      />
+    </AdminSplitShell>
   );
 }

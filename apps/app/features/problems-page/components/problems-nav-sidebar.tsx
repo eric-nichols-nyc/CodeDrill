@@ -32,8 +32,8 @@ function NavRow({ active, icon, label, onClick, trailing }: NavItemProps) {
       className={cn(
         "h-10 w-full justify-start gap-3 rounded-lg px-3 font-normal",
         active
-          ? "bg-secondary text-foreground shadow-none"
-          : "text-muted-foreground hover:bg-accent/80 hover:text-foreground"
+          ? "bg-accent text-accent-foreground shadow-none"
+          : "text-muted-foreground hover:bg-accent/80 hover:text-accent-foreground"
       )}
       onClick={onClick}
       type="button"

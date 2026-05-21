@@ -1,15 +1,43 @@
 "use client";
 
-import { Button } from "@repo/design-system/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useMemo } from "react";
+import { AdminPageHeader } from "@/features/admin/components/admin-page-header";
+import { AdminProblemListSidebar } from "@/features/admin/components/admin-problem-list-sidebar";
+import { AdminSplitShell } from "@/features/admin/components/admin-split-shell";
 import { NewProblemForm } from "@/features/admin/components/new-problem-form";
-import { parseAdminProblemListItem } from "@/features/admin/lib/problem-form-values";
+import { findCatalogEntry } from "@/features/admin/lib/admin-problem-catalog";
+import { getCatalogProblemPayload } from "@/features/admin/lib/get-catalog-problem-payload";
+import {
+  type AdminProblemListItem,
+  parseAdminProblemListItem,
+} from "@/features/admin/lib/problem-form-values";
 
-export function AdminAddProblemPage() {
+export function AdminAddProblemPage({
+  initialProblems,
+}: {
+  initialProblems: AdminProblemListItem[];
+}) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const catalogKey = searchParams.get("catalogKey");
+
+  const initialValues = useMemo(() => {
+    if (!catalogKey) {
+      return;
+    }
+    const entry = findCatalogEntry(catalogKey);
+    if (!entry) {
+      return;
+    }
+    return getCatalogProblemPayload(entry);
+  }, [catalogKey]);
+
+  const description =
+    catalogKey && initialValues
+      ? `Prefilled from catalog template "${initialValues.title}". Review and submit to create it in the database.`
+      : "Fill out the authoring form below. After you create a problem, you will return to the admin list with it selected.";
+  const unknownCatalogKey = Boolean(catalogKey && !initialValues);
 
   const handleSubmitted = useCallback(
     (body: unknown) => {
@@ -24,40 +52,26 @@ export function AdminAddProblemPage() {
   );
 
   return (
-    <div className="h-[calc(100dvh-1rem)] p-4">
-      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-background">
-        <header className="sticky top-0 z-20 shrink-0 border-border border-b bg-background/95 px-6 py-4 backdrop-blur">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <Button asChild size="sm" variant="outline">
-                <Link href="/admin">
-                  <ArrowLeft />
-                  Admin
-                </Link>
-              </Button>
-              <Button asChild size="sm" variant="outline">
-                <Link href="/">Home</Link>
-              </Button>
-              <Button asChild size="sm" variant="outline">
-                <Link href="/problems">Problems</Link>
-              </Button>
-            </div>
-          </div>
-        </header>
-
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6">
-          <div className="mx-auto max-w-5xl space-y-6">
-            <div>
-              <h1 className="font-semibold text-2xl">Add a problem</h1>
-              <p className="text-muted-foreground text-sm">
-                Fill out the authoring form below. After you create a problem,
-                you will return to the admin list with it selected.
-              </p>
-            </div>
-            <NewProblemForm onSubmitted={handleSubmitted} />
-          </div>
+    <AdminSplitShell
+      header={<AdminPageHeader variant="add" />}
+      sidebar={<AdminProblemListSidebar dbProblems={initialProblems} />}
+    >
+      <div className="mx-auto max-w-5xl space-y-6 pb-6">
+        <div>
+          <h1 className="font-semibold text-2xl">Add a problem</h1>
+          <p className="text-muted-foreground text-sm">{description}</p>
+          {unknownCatalogKey ? (
+            <p className="mt-2 text-destructive text-sm">
+              Unknown catalog key &quot;{catalogKey}&quot;. Choose a template
+              from the admin catalog tab.
+            </p>
+          ) : null}
         </div>
+        <NewProblemForm
+          initialValues={initialValues}
+          onSubmitted={handleSubmitted}
+        />
       </div>
-    </div>
+    </AdminSplitShell>
   );
 }
