@@ -13,6 +13,7 @@ change.
 
 ## Completed
 
+- `problem-slug-nav` — prev/next/random on `/problems/[slug]` nav header (wrap-around catalog order)
 - `admin-chat-layout` feature: global header with Ask AI toggle, right slide-out panel, static message list/input, hooks for panel and chat state
 - Admin route wraps `AdminPageShell` in `AdminChatLayout`
 - Feature spec `05-admin-problem-filter.md` (catalog registry, added status, filters)

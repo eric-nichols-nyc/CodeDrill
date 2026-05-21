@@ -35,6 +35,7 @@ Every **product feature** under `apps/app/features/<name>/` should have a spec i
 | `admin` | [05-admin-problem-filter.md](./05-admin-problem-filter.md) (catalog + added status) | `features/admin/` | `apps/api` problems CRUD via BFF | Shipped |
 | `problem-detail` | — | `features/problem-detail/` | workspace-code, chat (partial) | **Spec TODO** |
 | `problems-page` | [04-problems-page-list-ui.md](./04-problems-page-list-ui.md) (list UI delta) | `features/problems-page/` | catalog + tags + `patternSlug` sections | Shipped |
+| `problem-slug-nav` | [06-problem-slug-nav.md](./06-problem-slug-nav.md) | `features/problem-slug-nav/` | `fetchProblemsList` on slug page | Shipped |
 | `landing` | — | `features/landing/` | — | **Spec TODO** |
 | `docs` | — | `features/docs/` | — | **Spec TODO** |
 
