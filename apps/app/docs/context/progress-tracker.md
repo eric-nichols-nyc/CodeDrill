@@ -13,7 +13,7 @@ change.
 
 ## Completed
 
-- `nav-drawer` — problem workspace logo opens left drawer with catalog list; drawer header Home → `/`; wired on `/problems/[slug]` via parallel `fetchProblemsList`
+- `nav-drawer` — Problem List on workspace header opens left Sheet with catalog; sheet header Home → `/`; logo stays home link; `/problems/[slug]` parallel `fetchProblemsList`
 - `admin-chat-layout` feature: global header with Ask AI toggle, right slide-out panel, static message list/input, hooks for panel and chat state
 - Admin route wraps `AdminPageShell` in `AdminChatLayout`
 - Feature spec `05-admin-problem-filter.md` (catalog registry, added status, filters)

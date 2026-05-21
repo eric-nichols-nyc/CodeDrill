@@ -20,6 +20,7 @@ export type NavDrawerProps = {
   trigger?: ReactElement;
 };
 
+/** Left catalog panel (shadcn Sheet, `side="left"`). Feature id: nav-drawer. */
 export function NavDrawer({
   problems,
   currentSlug,
