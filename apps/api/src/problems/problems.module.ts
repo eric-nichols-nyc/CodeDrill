@@ -6,5 +6,6 @@ import { ProblemsService } from "./problems.service";
 @Module({
   controllers: [ProblemsController],
   providers: [ProblemsService, ProblemsAccessGuard],
+  exports: [ProblemsService],
 })
 export class ProblemsModule {}

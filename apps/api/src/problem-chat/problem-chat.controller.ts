@@ -39,7 +39,7 @@ export class ProblemChatController {
     @Body() body: PostProblemChatMessageDto,
     @Session() session: UserSession
   ) {
-    return this.problemChatService.appendUserMessage(
+    return this.problemChatService.postTutorMessage(
       session.user.id,
       problemId,
       body
