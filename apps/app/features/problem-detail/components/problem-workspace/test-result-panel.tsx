@@ -150,7 +150,6 @@ export function TestResultPanel({
           <CaseResultContent
             caseResult={caseResult}
             key={caseResult.index}
-            stdoutLines={outcome.userConsole}
             testCaseRows={testCaseRows}
           />
         ))}
@@ -162,11 +161,9 @@ export function TestResultPanel({
 function CaseResultContent({
   caseResult,
   testCaseRows,
-  stdoutLines,
 }: {
   caseResult: ClientTestCaseResult;
   testCaseRows: ProblemTestCaseView[];
-  stdoutLines: RunClientTestsOutcome["userConsole"];
 }) {
   const input = testCaseRows[caseResult.index]?.input ?? "";
 
@@ -182,7 +179,7 @@ function CaseResultContent({
           output={caseResult.actualDisplay}
           passed={caseResult.passed}
           runtimeError={caseResult.error}
-          stdoutLines={stdoutLines}
+          stdoutLines={caseResult.userConsole}
         />
       </ScrollArea>
     </TabsContent>

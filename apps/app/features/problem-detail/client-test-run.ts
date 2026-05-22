@@ -8,6 +8,8 @@ export type ClientTestCaseResult = {
   /** String form of actual return value or empty if no run */
   actualDisplay: string;
   error?: string;
+  /** `console.log` / `warn` / `error` emitted while this case was executed */
+  userConsole: CapturedConsoleLine[];
 };
 
 /** Lines emitted by user code via `console.log` / `warn` / `error` during a client Run. */
@@ -26,7 +28,7 @@ export type RunClientTestsOutcome = {
   userConsole: CapturedConsoleLine[];
 };
 
-/** Merges identical consecutive captures (usual when logs run inside solution code invoked per testcase). */
+/** Merges identical consecutive captures (e.g. repeated lines in the global run log). */
 export function collapseAdjacentCapturedConsoleLines(
   lines: CapturedConsoleLine[]
 ): CapturedConsoleLine[] {
@@ -246,6 +248,9 @@ export function runClientTests(
 
     const callee = fn as (...args: unknown[]) => unknown;
     const caseResults: ClientTestCaseResult[] = rows.map((row, index) => {
+      const consoleStart = userConsole.length;
+      const caseConsole = () => userConsole.slice(consoleStart);
+
       let expected: unknown;
       try {
         expected = JSON.parse(row.expectedOutput);
@@ -261,6 +266,7 @@ export function runClientTests(
           expectedDisplay: row.expectedOutput,
           actualDisplay: "",
           error: err,
+          userConsole: caseConsole(),
         };
       }
 
@@ -279,6 +285,7 @@ export function runClientTests(
           passed,
           expectedDisplay: stringifyUnknown(expected),
           actualDisplay: stringifyUnknown(actual),
+          userConsole: caseConsole(),
         };
       } catch (error) {
         const errMsg = error instanceof Error ? error.message : "Runtime error";
@@ -289,6 +296,7 @@ export function runClientTests(
           expectedDisplay: stringifyUnknown(expected),
           actualDisplay: "",
           error: errMsg,
+          userConsole: caseConsole(),
         };
       }
     });
