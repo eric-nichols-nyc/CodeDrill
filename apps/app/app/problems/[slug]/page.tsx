@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import { TimerProvider } from "@/components/timer";
 import { ProblemDetail } from "@/features/problem-detail/components/problem-detail";
 import { ProblemExpandableSidebar } from "@/features/problem-detail/components/problem-expandable-sidebar";
-import { ProblemSlugNavHeader } from "@/features/problem-detail/components/problem-slug-nav-header";
+import { ProblemSlugNavHeaderConnected } from "@/features/problem-slug-nav/components/problem-slug-nav-header-connected";
+import { buildCatalogSlugs } from "@/features/problem-slug-nav/utils/build-catalog-slugs";
 import { isProblemSolutionRowArray } from "@/features/problem-detail/problem-detail-helpers";
 import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
 import { mapRowsToProblems } from "@/features/problems-page/lib/map-rows-to-problems";
@@ -25,9 +26,15 @@ type ProblemDetailBundle = {
   testCases?: unknown;
 };
 
-function parseCatalogProblems(listResult: ProblemsListResult): Problem[] {
+function parseCatalogFromList(listResult: ProblemsListResult): {
+  problems: Problem[];
+  catalogSlugs: string[];
+} {
   const rows = listResult.ok ? parseProblemsListBody(listResult.body) : [];
-  return mapRowsToProblems(rows);
+  return {
+    problems: mapRowsToProblems(rows),
+    catalogSlugs: buildCatalogSlugs(rows),
+  };
 }
 
 function resolveTitle(slug: string, bundle: ProblemDetailBundle | null): string {
@@ -70,7 +77,7 @@ export default async function ProblemBySlugPage({
     fetchProblemBySlug(slug),
     fetchProblemsList(),
   ]);
-  const problems = parseCatalogProblems(listResult);
+  const { problems, catalogSlugs } = parseCatalogFromList(listResult);
 
   if (result.status === 404) {
     notFound();
@@ -85,7 +92,8 @@ export default async function ProblemBySlugPage({
   return (
     <TimerProvider>
       <div className="problem-by-slug-page flex h-dvh min-h-0 flex-col overflow-hidden bg-background">
-        <ProblemSlugNavHeader
+        <ProblemSlugNavHeaderConnected
+          catalogSlugs={catalogSlugs}
           currentSlug={slug}
           fetchOk={listResult.ok}
           fetchStatus={listResult.status}

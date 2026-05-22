@@ -123,11 +123,16 @@ export type ProblemSlugNavHeaderProps = {
   currentSlug: string;
   fetchOk: boolean;
   fetchStatus: number;
+  /** When false, prev/next/random controls are disabled (0–1 problems in catalog). */
+  canNavigate?: boolean;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  onRandom?: () => void;
 };
 
 /**
- * Sticky LeetCode-style nav for `/problems/[slug]`. Problem List opens nav drawer;
- * logo links home; other controls are placeholders until wired.
+ * Sticky LeetCode-style nav for `/problems/[slug]`. Problem List opens nav sheet;
+ * logo links home; prev/next/random rotate through catalog order (id asc).
  */
 export function ProblemSlugNavHeader({
   title,
@@ -135,6 +140,10 @@ export function ProblemSlugNavHeader({
   currentSlug,
   fetchOk,
   fetchStatus,
+  canNavigate = false,
+  onPrevious,
+  onNext,
+  onRandom,
 }: ProblemSlugNavHeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full shrink-0 select-none border-[var(--nav-border)] border-b bg-[var(--nav-bg)]">
@@ -154,14 +163,38 @@ export function ProblemSlugNavHeader({
             problems={problems}
           />
 
-          <NavIconButton label="Previous problem">
+          <NavIconButton
+            className={canNavigate ? undefined : "pointer-events-none opacity-40"}
+            label="Previous problem"
+            onClick={() => {
+              if (canNavigate) {
+                onPrevious?.();
+              }
+            }}
+          >
             <ChevronLeft className="h-4 w-4" />
           </NavIconButton>
-          <NavIconButton label="Next problem">
+          <NavIconButton
+            className={canNavigate ? undefined : "pointer-events-none opacity-40"}
+            label="Next problem"
+            onClick={() => {
+              if (canNavigate) {
+                onNext?.();
+              }
+            }}
+          >
             <ChevronRight className="h-4 w-4" />
           </NavIconButton>
 
-          <NavIconButton label="Random problem">
+          <NavIconButton
+            className={canNavigate ? undefined : "pointer-events-none opacity-40"}
+            label="Random problem"
+            onClick={() => {
+              if (canNavigate) {
+                onRandom?.();
+              }
+            }}
+          >
             <Shuffle className="h-3.5 w-3.5" />
           </NavIconButton>
 
