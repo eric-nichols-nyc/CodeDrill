@@ -37,7 +37,7 @@ export default async function AuthPage({
     typeof testPassword === "string" &&
     testPassword.length > 0;
 
-  const nextPath = typeof next === "string" && next.startsWith("/") ? next : "/dashboard";
+  const nextPath = typeof next === "string" && next.startsWith("/") ? next : "/problems";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">

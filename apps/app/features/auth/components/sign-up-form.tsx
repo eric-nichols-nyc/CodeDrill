@@ -17,7 +17,7 @@ type SignUpFormProps = {
 };
 
 export function SignUpForm({
-  nextPath = "/dashboard",
+  nextPath = "/problems",
   defaultEmail = "",
   defaultPassword = "",
   defaultName = "",

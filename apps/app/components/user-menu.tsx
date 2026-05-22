@@ -65,7 +65,7 @@ export function UserMenu({ variant = "default" }: UserMenuProps) {
         <div className="px-2 py-1.5 text-muted-foreground text-xs">{email}</div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/problems">Problems</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/account">Account</Link>

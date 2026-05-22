@@ -28,7 +28,7 @@ export default async function AccountPage() {
         </div>
       </dl>
       <Button asChild variant="outline">
-        <Link href="/dashboard">Back to dashboard</Link>
+        <Link href="/problems">Back to problems</Link>
       </Button>
     </main>
   );

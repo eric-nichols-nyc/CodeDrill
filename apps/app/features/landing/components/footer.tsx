@@ -11,9 +11,6 @@ export function Footer() {
           <Link className="hover:text-foreground" href="/problems">
             Problems
           </Link>
-          <Link className="hover:text-foreground" href="/dashboard">
-            Dashboard
-          </Link>
           <Link className="hover:text-foreground" href="/auth/sign-in">
             Sign in
           </Link>

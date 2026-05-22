@@ -32,9 +32,6 @@ export function LandingHeader({ className }: LandingHeaderProps) {
           <Button asChild className="hidden sm:inline-flex" variant="ghost">
             <Link href="/problems">Problems</Link>
           </Button>
-          <Button asChild className="hidden sm:inline-flex" variant="ghost">
-            <Link href="/dashboard">Dashboard</Link>
-          </Button>
           <ModeToggle />
           <UserMenu />
         </nav>

@@ -43,14 +43,6 @@ export function ProblemsHeader({ className }: ProblemsHeaderProps) {
             >
               Problems
             </Button>
-            <Button
-              asChild
-              className="text-muted-foreground hover:text-foreground"
-              size="sm"
-              variant="ghost"
-            >
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
           </nav>
         </div>
 

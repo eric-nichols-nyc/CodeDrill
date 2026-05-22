@@ -16,7 +16,7 @@ type SignInFormProps = {
 };
 
 export function SignInForm({
-  nextPath = "/dashboard",
+  nextPath = "/problems",
   defaultEmail = "",
   defaultPassword = "",
 }: SignInFormProps) {
