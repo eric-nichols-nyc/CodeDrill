@@ -230,13 +230,12 @@ export function ProblemsPageView({
                       </>
                     ) : (
                       <>
-                        Could not load problems (HTTP {fetchStatus}). For
-                        server-side access from this app, set matching{" "}
+                        Could not load problems (HTTP {fetchStatus}). Ensure the
+                        Nest API is running and set optional{" "}
                         <code className="rounded bg-muted px-1 py-0.5 text-xs">
                           INTERNAL_PROBLEMS_SECRET
                         </code>{" "}
-                        here and on the Nest API, or call the API with a Better
-                        Auth session cookie.
+                        for server-side catalog access, or sign in for Bearer auth.
                       </>
                     )}
                   </p>

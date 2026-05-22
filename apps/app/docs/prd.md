@@ -143,7 +143,7 @@ Tables include (non-exhaustive): **`problems`**, **`tags`** / **`problem_tags`**
 | **F3** | **Editor** | Syntax highlighting; monospaced font; font size preference if required by parity. | **Partial** — Monaco wired; preferences as needed. |
 | **F4** | **Run** | Executes against **visible** sample cases; structured per-case results; timeout UX. | **Partial** — client-side Run on samples; document limits; consider server path later. |
 | **F5** | **Submit** | Full suite **server-side or sandbox**; friendly status codes; no raw stacks to users. | **Not done** — UI placeholder; schema supports submissions. |
-| **F6** | **Auth** | Sign up, sign in, sign out, session for protected APIs. | **Partial** — Neon Auth in app; Better Auth on API; unify for user-scoped features. |
+| **F6** | **Auth** | Sign up, sign in, sign out, session for protected APIs. | **Partial** — Better Auth on Nest API; app sign-in/up via `/auth/*` + Bearer token; users re-register after Neon Auth removal. |
 | **F7** | **Progress** | `solved` / `attempted` per user per problem; catalog reflects status. | **Not done** — `problem_progress` exists; end-to-end wiring TBD. |
 | **F8** | **Rate limiting** | Run/submit endpoints limited per user/IP. | **Partial** — use `@repo/rate-limit` when exposing public judge/submit routes. |
 

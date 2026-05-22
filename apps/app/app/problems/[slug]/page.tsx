@@ -115,11 +115,12 @@ export default async function ProblemBySlugPage({
             {result.ok ? null : (
               <div className="p-6">
                 <p className="text-destructive text-sm">
-                  Could not load problem (HTTP {result.status}). Set matching{" "}
+                  Could not load problem (HTTP {result.status}). Ensure the Nest
+                  API is running, sign in, or set optional{" "}
                   <code className="rounded bg-muted px-1 py-0.5 text-xs">
                     INTERNAL_PROBLEMS_SECRET
                   </code>{" "}
-                  or use a Better Auth session cookie when calling the API.
+                  for server-side catalog access.
                 </p>
               </div>
             )}

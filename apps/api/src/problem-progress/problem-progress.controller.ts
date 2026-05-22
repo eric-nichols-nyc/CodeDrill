@@ -22,7 +22,7 @@ import { ProblemProgressService } from "./problem-progress.service";
 /**
  * Per-user progress for a problem (status, favorite, …).
  *
- * Same auth model as workspace-code: session cookie OR BFF secret + x-user-id.
+ * Access: Better Auth session via Bearer token or session cookie.
  * Lives under `/problems/:problemId/progress`, not `PUT /problems/:id` (admin catalog).
  */
 @AllowAnonymous()

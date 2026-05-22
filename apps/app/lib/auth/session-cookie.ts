@@ -1,10 +1,8 @@
 import type { NextRequest } from "next/server";
+import { AUTH_TOKEN_COOKIE } from "./token";
 
-/** Neon Auth (Next handler) uses cookies prefixed with `__Secure-neon-auth` on HTTPS. */
-export function hasNeonAuthSessionCookie(request: NextRequest): boolean {
-  return request.cookies.getAll().some(
-    (c) =>
-      c.name.includes("neon-auth") &&
-      (c.name.includes("session_token") || c.name.includes("session"))
-  );
+/** True when the request carries an API auth Bearer token cookie. */
+export function hasApiAuthTokenCookie(request: NextRequest): boolean {
+  const token = request.cookies.get(AUTH_TOKEN_COOKIE)?.value;
+  return typeof token === "string" && token.length > 0;
 }

@@ -1,10 +1,8 @@
-import { NeonAuthUIProvider } from "@neondatabase/neon-js/auth/react/ui";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { QueryProvider } from "@/components/providers/query-provider";
-import { authClient } from "@/lib/auth/client";
 import "./styles.css";
 
 const geistSans = Geist({
@@ -70,47 +68,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NeonAuthUIProvider
-          authClient={authClient}
-          emailOTP
-          redirectTo="/dashboard"
-        >
-          <QueryProvider>
-            {process.env.NODE_ENV === "development" ? (
-              <Link
-                className="fixed bottom-3 left-3 z-50 rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 font-mono text-amber-950 text-xs shadow-sm hover:bg-amber-500/20 dark:text-amber-100"
-                href="/admin"
-              >
-                Admin (dev)
-              </Link>
-            ) : null}
-            {children}
-          </QueryProvider>
-        </NeonAuthUIProvider>
+        <QueryProvider>
+          {process.env.NODE_ENV === "development" ? (
+            <Link
+              className="fixed bottom-3 left-3 z-50 rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 font-mono text-amber-950 text-xs shadow-sm hover:bg-amber-500/20 dark:text-amber-100"
+              href="/admin"
+            >
+              Admin (dev)
+            </Link>
+          ) : null}
+          {children}
+        </QueryProvider>
         {process.env.NODE_ENV === "development" ? <TanStackDevtools /> : null}
       </body>
     </html>
   );
 }
-
-// import "./styles.css";
-// import { fonts } from "@repo/design-system/lib/fonts";
-// import { ThemeProvider } from "@repo/design-system/providers/theme";
-// import type { ReactNode } from "react";
-// import { AuthProvider } from "./provider";
-
-// type RootLayoutProperties = {
-//   readonly children: ReactNode;
-// };
-
-// const RootLayout = ({ children }: RootLayoutProperties) => (
-//   <html className={fonts} lang="en" suppressHydrationWarning>
-//     <body>
-//       <ThemeProvider>
-//         <AuthProvider> {children} </AuthProvider>
-//       </ThemeProvider>
-//     </body>
-//   </html>
-// );
-
-// export default RootLayout;

@@ -1,42 +1,21 @@
 import { NextResponse } from "next/server";
-import { keys } from "@/lib/auth/keys";
-import { getNeonAuth } from "@/lib/auth/server";
-import { neonUserId } from "@/lib/auth/neon-user-id";
-import {
-  problemsApiBaseUrl,
-  upstreamUserHeaders,
-} from "@/lib/problems/upstream-user-headers";
+import { apiAuthHeaders } from "@/lib/auth/api-auth-headers";
+import { apiBaseUrl } from "@/lib/auth/api-url";
 
 type RouteContext = { params: Promise<{ problemId: string }> };
 
-function unauthorized(
-  error: string,
-  code: string,
-  hint?: string
-): NextResponse {
-  return NextResponse.json({ error, code, ...(hint ? { hint } : {}) }, {
-    status: 401,
-  });
+function unauthorized(error: string, code: string): NextResponse {
+  return NextResponse.json({ error, code }, { status: 401 });
 }
 
 function progressUpstreamUrl(problemId: string): string {
-  return `${problemsApiBaseUrl()}/problems/${encodeURIComponent(problemId)}/progress`;
+  return `${apiBaseUrl()}/problems/${encodeURIComponent(problemId)}/progress`;
 }
 
 export async function GET(_request: Request, context: RouteContext) {
-  const auth = await upstreamUserHeaders();
+  const auth = await apiAuthHeaders();
   if (!auth) {
-    const { session, user } = await getNeonAuth();
-    if (session && !neonUserId(user)) {
-      return unauthorized(
-        "Could not resolve your user id.",
-        "INVALID_SESSION"
-      );
-    }
-    return unauthorized(
-      "Sign in to view your progress.",
-      "NOT_SIGNED_IN"
-    );
+    return unauthorized("Sign in to view your progress.", "NOT_SIGNED_IN");
   }
 
   const { problemId } = await context.params;
@@ -48,18 +27,9 @@ export async function GET(_request: Request, context: RouteContext) {
   const text = await upstream.text();
 
   if (upstream.status === 401) {
-    const internalSecret = keys().INTERNAL_PROBLEMS_SECRET;
-    if (!internalSecret) {
-      return unauthorized(
-        "Progress API rejected the request.",
-        "MISSING_INTERNAL_SECRET",
-        "Set INTERNAL_PROBLEMS_SECRET in apps/app/.env.local and apps/api/.env (same value)."
-      );
-    }
     return unauthorized(
       text || "Progress API rejected the request.",
-      "UPSTREAM_UNAUTHORIZED",
-      "Ensure INTERNAL_PROBLEMS_SECRET matches on the Nest API and restart both servers."
+      "UPSTREAM_UNAUTHORIZED"
     );
   }
 
@@ -73,19 +43,9 @@ export async function GET(_request: Request, context: RouteContext) {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
-  const auth = await upstreamUserHeaders();
+  const auth = await apiAuthHeaders();
   if (!auth) {
-    const { session, user } = await getNeonAuth();
-    if (session && !neonUserId(user)) {
-      return unauthorized(
-        "Could not resolve your user id.",
-        "INVALID_SESSION"
-      );
-    }
-    return unauthorized(
-      "Sign in to update your progress.",
-      "NOT_SIGNED_IN"
-    );
+    return unauthorized("Sign in to update your progress.", "NOT_SIGNED_IN");
   }
 
   const { problemId } = await context.params;
@@ -111,18 +71,9 @@ export async function PATCH(request: Request, context: RouteContext) {
   const text = await upstream.text();
 
   if (upstream.status === 401) {
-    const internalSecret = keys().INTERNAL_PROBLEMS_SECRET;
-    if (!internalSecret) {
-      return unauthorized(
-        "Could not save progress — API authorization failed.",
-        "MISSING_INTERNAL_SECRET",
-        "Set INTERNAL_PROBLEMS_SECRET in apps/app/.env.local and apps/api/.env (same value)."
-      );
-    }
     return unauthorized(
       text || "Could not save progress — API authorization failed.",
-      "UPSTREAM_UNAUTHORIZED",
-      "Ensure INTERNAL_PROBLEMS_SECRET matches on the Nest API and restart both servers."
+      "UPSTREAM_UNAUTHORIZED"
     );
   }
 

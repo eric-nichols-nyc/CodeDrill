@@ -9,10 +9,12 @@ change.
 
 ## Current Goal
 
-- None — problem chat V1 UI shipped
+- None — API auth consolidation shipped (`08-api-auth-consolidation.md`)
 
 ## Completed
 
+- API auth consolidation — Nest bearer plugin + app Better Auth client; sign-in/up at `/auth/*`; Bearer on BFF/actions; Neon Auth removed
+- API auth consolidation (API slice) — bearer plugin, `getSessionFromHeaders`, removed `x-user-id` guard path
 - Problem chat V1 UI — Server Actions + TanStack Query in `features/problem-detail/chatbot/`; history load, send message, markdown assistant replies; `problemId` wired through sidebar
 
 ## Completed
@@ -43,7 +45,7 @@ change.
 
 - Chat state stays in client hooks (`useAdminChatLayout`, `useStaticAdminChat`); route remains server-only for auth and data fetch
 - Panel is a fixed right overlay (`max-w-md`) with local static responses until backend exists
-- **Problem tutor chat:** Nest API shipped in `apps/api/src/problem-chat/`; app UI uses Server Actions in `features/problem-detail/chatbot/` (no BFF route) + TanStack Query — see `07-problem-chat-ui.md`
+- **Auth:** Nest API is the sole auth authority — Better Auth bearer plugin; app uses `better-auth/react` client via `/api/auth/*` proxy; Bearer cookie for server BFF/actions
 
 ## Session Notes
 

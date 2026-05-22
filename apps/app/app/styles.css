@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "@neondatabase/neon-auth-ui/tailwind";
 @import "react-quill-new/dist/quill.snow.css";
 @import "@repo/design-system/styles/globals.css";
 

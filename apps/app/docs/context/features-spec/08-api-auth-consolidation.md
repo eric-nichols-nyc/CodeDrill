@@ -73,28 +73,28 @@ GET  /problems/...              →     Authorization: Bearer <token>
 
 ### API (`apps/api`)
 
-- [ ] Enable Better Auth **`bearer()`** plugin in `src/auth.ts`.
-- [ ] Keep existing `@thallesp/nestjs-better-auth` `AuthModule.forRoot({ auth })` — no custom sign-up/sign-in controllers needed; routes stay at `/api/auth/*`.
-- [ ] Ensure `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_TRUSTED_ORIGINS`, and `DATABASE_URL` are documented as the only auth env vars for user sessions.
-- [ ] Confirm `auth.api.getSession()` resolves Bearer tokens in all user-scoped guards (`ProblemsUserGuard`, `ProblemsAccessGuard`, problem-chat, progress, workspace-code).
-- [ ] Remove **`x-user-id` impersonation path** from guards once the app migrates (keep `INTERNAL_PROBLEMS_SECRET` only if a true server-only admin/BFF path still needs it — not for end-user identity).
-- [ ] Expose **`GET /me`** (existing `SessionController`) as the canonical “who am I” check with Bearer auth.
+- [x] Enable Better Auth **`bearer()`** plugin in `src/auth.ts`.
+- [x] Keep existing `@thallesp/nestjs-better-auth` `AuthModule.forRoot({ auth })` — no custom sign-up/sign-in controllers needed; routes stay at `/api/auth/*`.
+- [x] Ensure `BETTER_AUTH_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_TRUSTED_ORIGINS`, and `DATABASE_URL` are documented as the only auth env vars for user sessions.
+- [x] Confirm `auth.api.getSession()` resolves Bearer tokens in all user-scoped guards (`ProblemsUserGuard`, `ProblemsAccessGuard`, problem-chat, progress, workspace-code).
+- [x] Remove **`x-user-id` impersonation path** from guards once the app migrates (keep `INTERNAL_PROBLEMS_SECRET` only if a true server-only admin/BFF path still needs it — not for end-user identity).
+- [x] Expose **`GET /me`** (existing `SessionController`) as the canonical “who am I” check with Bearer auth.
 
 ### Next app (`apps/app`)
 
-- [ ] Replace Neon Auth client with **Better Auth client** pointed at the API base URL (`NEON_JWT_API_URL` / `BETTER_AUTH_URL` — pick one env name and deprecate the other in docs).
-- [ ] Auth pages (`/auth/sign-in`, `/auth/sign-up`) call API auth endpoints; store token from `set-auth-token` response header (or documented Better Auth bearer flow).
-- [ ] Replace `getNeonAuth()` / `upstreamUserHeaders()` with helpers that attach `Authorization: Bearer <token>` for server-side upstream fetches.
-- [ ] Update BFF routes under `app/api/problems/...` and Server Actions (e.g. problem chat) to use Bearer auth instead of secret + `x-user-id`.
-- [ ] Update `proxy.ts` (dashboard/account) to check API session (Bearer or validated session via API `GET /me`) instead of Neon cookie names.
-- [ ] Remove Neon Auth packages and env vars: `NEON_AUTH_BASE_URL`, `NEON_AUTH_COOKIE_SECRET`, `NEON_AUTH_TEST_*`, Neon proxy route.
-- [ ] Update `.env.example`, `README.md`, and error codes (`NOT_SIGNED_IN`, `MISSING_INTERNAL_SECRET`, etc.) to reflect the new model.
+- [x] Replace Neon Auth client with **Better Auth client** pointed at the API base URL (`NEON_JWT_API_URL` / `BETTER_AUTH_URL` — pick one env name and deprecate the other in docs).
+- [x] Auth pages (`/auth/sign-in`, `/auth/sign-up`) call API auth endpoints; store token from `set-auth-token` response header (or documented Better Auth bearer flow).
+- [x] Replace `getNeonAuth()` / `upstreamUserHeaders()` with helpers that attach `Authorization: Bearer <token>` for server-side upstream fetches.
+- [x] Update BFF routes under `app/api/problems/...` and Server Actions (e.g. problem chat) to use Bearer auth instead of secret + `x-user-id`.
+- [x] Update `proxy.ts` (dashboard/account) to check API session (Bearer or validated session via API `GET /me`) instead of Neon cookie names.
+- [x] Remove Neon Auth packages and env vars: `NEON_AUTH_BASE_URL`, `NEON_AUTH_COOKIE_SECRET`, `NEON_AUTH_TEST_*`, Neon proxy route.
+- [x] Update `.env.example`, `README.md`, and error codes (`NOT_SIGNED_IN`, `MISSING_INTERNAL_SECRET`, etc.) to reflect the new model.
 
 ### Shared / docs
 
-- [ ] Document sign-up, sign-in, and token usage in `apps/api/README.md` (curl + client examples).
+- [x] Document sign-up, sign-in, and token usage in `apps/api/README.md` (curl + client examples).
 - [ ] Update `prd.md` auth row (F6) when shipped.
-- [ ] Note in spec: **existing Neon Auth users must re-register** on the API (different user tables today).
+- [x] Note in spec: **existing Neon Auth users must re-register** on the API (different user tables today).
 
 ---
 
@@ -220,13 +220,13 @@ Routes stay thin: `apps/app/app/auth/[path]/page.tsx` composes auth feature comp
 
 ## Acceptance criteria
 
-- [ ] User can sign up and sign in via UI; account exists in API `user` table.
-- [ ] After sign-in, workspace code, progress, and chat work without `INTERNAL_PROBLEMS_SECRET` or `x-user-id`.
-- [ ] `GET /me` returns the same user id used by workspace-code and chat rows.
-- [ ] Unsigned requests to user-scoped routes return `401` with clear JSON error.
-- [ ] Neon Auth code paths removed from `apps/app` (packages, env, proxy route).
-- [ ] Spec registered in [00-index.md](./00-index.md).
-- [ ] `pnpm typecheck` passes for `apps/app` and `apps/api`.
+- [x] User can sign up and sign in via UI; account exists in API `user` table.
+- [x] After sign-in, workspace code, progress, and chat work without `INTERNAL_PROBLEMS_SECRET` or `x-user-id`.
+- [x] `GET /me` returns the same user id used by workspace-code and chat rows.
+- [x] Unsigned requests to user-scoped routes return `401` with clear JSON error.
+- [x] Neon Auth code paths removed from `apps/app` (packages, env, proxy route).
+- [x] Spec registered in [00-index.md](./00-index.md).
+- [x] `pnpm typecheck` passes for `apps/app` and `apps/api`.
 
 ---
 

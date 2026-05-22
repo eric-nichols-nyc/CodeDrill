@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createProblemBodySchema } from "@/features/admin/lib/create-problem-schema";
 import { keys } from "@/lib/auth/keys";
-import { getNeonAuth } from "@/lib/auth/server";
+import { getApiAuth } from "@/lib/auth/server";
 import {
   parseModelJsonObject,
   readOpenAiAssistantContent,
@@ -48,7 +48,7 @@ function parseRequestPrompt(body: unknown): string | null {
 }
 
 export async function POST(request: Request) {
-  const { session } = await getNeonAuth();
+  const { session } = await getApiAuth();
   if (!session) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });
   }

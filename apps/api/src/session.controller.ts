@@ -2,8 +2,8 @@ import { Controller, Get } from "@nestjs/common";
 import { Session, type UserSession } from "@thallesp/nestjs-better-auth";
 
 /**
- * Example protected route (global AuthGuard from nestjs-better-auth).
- * Send session cookie from sign-in, or call from a same-origin client with credentials.
+ * Protected route (global AuthGuard from nestjs-better-auth).
+ * Accepts session cookie or `Authorization: Bearer` (bearer plugin).
  */
 @Controller()
 export class SessionController {

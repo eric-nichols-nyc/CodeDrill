@@ -1,6 +1,6 @@
 "use client";
 
-import { UserButton } from "@neondatabase/neon-js/auth/react/ui";
+import { UserMenu } from "@/components/user-menu";
 import { ModeToggle } from "@repo/design-system/components/mode-toggle";
 import { Button } from "@repo/design-system/components/ui/button";
 import { cn } from "@repo/design-system/lib/utils";
@@ -35,11 +35,8 @@ export function LandingHeader({ className }: LandingHeaderProps) {
           <Button asChild className="hidden sm:inline-flex" variant="ghost">
             <Link href="/dashboard">Dashboard</Link>
           </Button>
-          <Button asChild size="sm" variant="outline">
-            <Link href="/auth/sign-in">Sign in</Link>
-          </Button>
           <ModeToggle />
-          <UserButton size="icon" />
+          <UserMenu />
         </nav>
       </AppHeaderInner>
     </header>

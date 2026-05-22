@@ -22,9 +22,8 @@ import { ProblemWorkspaceCodeService } from "./problem-workspace-code.service";
 /**
  * Per-user saved editor code (e.g. persisted when the user clicks Run).
  *
- * Access: Better Auth session **or** `x-internal-problems-secret` + `x-user-id`
- * (Next BFF after Neon Auth). `@AllowAnonymous()` skips the global guard so
- * `ProblemsUserGuard` can enforce that policy.
+ * Access: Better Auth session via Bearer token or session cookie.
+ * `@AllowAnonymous()` skips the global guard so `ProblemsUserGuard` enforces auth.
  */
 @AllowAnonymous()
 @Controller("problems")

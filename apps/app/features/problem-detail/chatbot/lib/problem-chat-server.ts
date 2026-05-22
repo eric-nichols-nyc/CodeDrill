@@ -1,12 +1,7 @@
 import "server-only";
 
-import { keys } from "@/lib/auth/keys";
-import {
-  problemsApiBaseUrl,
-  upstreamUserHeaders,
-} from "@/lib/problems/upstream-user-headers";
-import { getNeonAuth } from "@/lib/auth/server";
-import { neonUserId } from "@/lib/auth/neon-user-id";
+import { apiAuthHeaders } from "@/lib/auth/api-auth-headers";
+import { apiBaseUrl } from "@/lib/auth/api-url";
 import { ProblemChatApiError } from "./problem-chat-errors";
 import { problemChatErrorFromResponse } from "./parse-problem-chat-error";
 import type {
@@ -16,32 +11,6 @@ import type {
   ProblemChatMessageDto,
   ProblemChatThreadDto,
 } from "./problem-chat-types";
-
-/**
- * Dev-only: set PROBLEM_CHAT_DEV_USER_ID + INTERNAL_PROBLEMS_SECRET to test chat
- * without Neon Auth / Better Auth wired up. Any non-empty user id string works.
- */
-async function resolveChatUpstreamHeaders(): Promise<
-  Record<string, string> | null
-> {
-  const fromSession = await upstreamUserHeaders();
-  if (fromSession) {
-    return fromSession;
-  }
-
-  const devUserId =
-    process.env.PROBLEM_CHAT_DEV_USER_ID?.trim() ??
-    (process.env.NODE_ENV === "development" ? "dev-local-user" : undefined);
-  const internalSecret = keys().INTERNAL_PROBLEMS_SECRET;
-  if (devUserId && internalSecret) {
-    return {
-      "x-user-id": devUserId,
-      "x-internal-problems-secret": internalSecret,
-    };
-  }
-
-  return null;
-}
 
 function emptyChatHistory(problemId: string): GetProblemChatMessagesResponse {
   const now = new Date().toISOString();
@@ -66,17 +35,9 @@ async function readResponse(res: Response): Promise<string> {
 }
 
 async function requireAuthHeaders(): Promise<Record<string, string>> {
-  const auth = await resolveChatUpstreamHeaders();
+  const auth = await apiAuthHeaders();
   if (auth) {
     return auth;
-  }
-
-  const { session, user } = await getNeonAuth();
-  if (session && !neonUserId(user)) {
-    throw new ProblemChatApiError("Could not resolve your user id.", {
-      status: 401,
-      code: "INVALID_SESSION",
-    });
   }
 
   throw new ProblemChatApiError("Sign in to use the tutor.", {
@@ -86,7 +47,7 @@ async function requireAuthHeaders(): Promise<Record<string, string>> {
 }
 
 function chatMessagesPath(problemId: string): string {
-  return `${problemsApiBaseUrl()}/problems/${encodeURIComponent(problemId)}/chat/messages`;
+  return `${apiBaseUrl()}/problems/${encodeURIComponent(problemId)}/chat/messages`;
 }
 
 function isProblemChatThreadDto(value: unknown): value is ProblemChatThreadDto {
@@ -172,7 +133,7 @@ async function upstreamFetch(
 export async function getProblemChatMessages(
   problemId: string
 ): Promise<GetProblemChatMessagesResponse> {
-  const auth = await resolveChatUpstreamHeaders();
+  const auth = await apiAuthHeaders();
   if (!auth) {
     return emptyChatHistory(problemId);
   }

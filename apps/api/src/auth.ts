@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import { betterAuth } from "better-auth";
+import { bearer } from "better-auth/plugins";
 import { Pool } from "pg";
 
 config({
@@ -38,4 +39,5 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  plugins: [bearer()],
 });

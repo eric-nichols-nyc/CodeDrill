@@ -19,8 +19,8 @@ import { ProblemsAccessGuard } from "./guards/problems-access.guard";
 import { ProblemsService } from "./problems.service";
 
 /**
- * Access: Better Auth session **or** `x-internal-problems-secret` matching `INTERNAL_PROBLEMS_SECRET`
- * (used by the Next.js admin BFF when Neon Auth does not share cookies with this API).
+ * Access: Better Auth session (Bearer or cookie) **or** `x-internal-problems-secret`
+ * matching `INTERNAL_PROBLEMS_SECRET` for server-to-server catalog/admin BFF calls.
  */
 @AllowAnonymous()
 @UseGuards(ProblemsAccessGuard)

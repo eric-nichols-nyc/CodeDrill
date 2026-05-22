@@ -1,23 +1,54 @@
 import "server-only";
-import { neonAuth } from "@neondatabase/neon-js/auth/next";
-import { keys } from "./keys";
 
-/**
- * Validates `NEON_AUTH_BASE_URL` (via `keys()`) before calling `neonAuth()`.
- * Without a valid absolute URL, `neonAuth()` throws `TypeError: Invalid URL`.
- */
-export async function getSession(): Promise<unknown> {
-  keys();
-  return await neonAuth();
-}
+import { apiBaseUrl } from "./api-url";
+import { apiAuthHeaders } from "./api-auth-headers";
 
-export type NeonAuthState = {
-  session: unknown;
-  user: unknown;
+export type ApiAuthUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  image?: string | null;
 };
 
-/** Session + user for RSC; return type kept loose to avoid non-portable inferred types. */
-export async function getNeonAuth(): Promise<NeonAuthState> {
-  keys();
-  return neonAuth() as Promise<NeonAuthState>;
+export type ApiAuthSession = {
+  id: string;
+  expiresAt: string;
+};
+
+export type ApiAuthState = {
+  session: ApiAuthSession | null;
+  user: ApiAuthUser | null;
+};
+
+const emptyState: ApiAuthState = { session: null, user: null };
+
+/** Session + user from the Nest API (`GET /api/auth/get-session`). */
+export async function getApiAuth(): Promise<ApiAuthState> {
+  const headers = await apiAuthHeaders();
+  if (!headers) {
+    return emptyState;
+  }
+
+  try {
+    const res = await fetch(`${apiBaseUrl()}/api/auth/get-session`, {
+      headers,
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      return emptyState;
+    }
+
+    const body = (await res.json()) as {
+      session?: ApiAuthSession | null;
+      user?: ApiAuthUser | null;
+    };
+
+    return {
+      session: body.session ?? null,
+      user: body.user ?? null,
+    };
+  } catch {
+    return emptyState;
+  }
 }

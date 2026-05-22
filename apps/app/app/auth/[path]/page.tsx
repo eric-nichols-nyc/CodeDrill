@@ -1,27 +1,43 @@
 import { DevAuthFormFill } from "@/components/dev-auth-form-fill";
-import { AuthView } from "@neondatabase/neon-js/auth/react/ui";
+import { SignInForm } from "@/features/auth/components/sign-in-form";
+import { SignUpForm } from "@/features/auth/components/sign-up-form";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export const dynamicParams = false;
 
+const AUTH_PATHS = ["sign-in", "sign-up"] as const;
+
+export function generateStaticParams() {
+  return AUTH_PATHS.map((path) => ({ path }));
+}
+
 export default async function AuthPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ path: string }>;
+  searchParams: Promise<{ next?: string }>;
 }) {
   const { path } = await params;
+  const { next } = await searchParams;
+
+  if (!AUTH_PATHS.includes(path as (typeof AUTH_PATHS)[number])) {
+    notFound();
+  }
 
   const isDev = process.env.NODE_ENV === "development";
-  const testEmail = process.env.NEON_AUTH_TEST_EMAIL;
-  const testPassword = process.env.NEON_AUTH_TEST_PASSWORD;
-  const testName = process.env.NEON_AUTH_TEST_NAME;
+  const testEmail = process.env.AUTH_TEST_EMAIL;
+  const testPassword = process.env.AUTH_TEST_PASSWORD;
+  const testName = process.env.AUTH_TEST_NAME;
   const showDevFill =
     isDev &&
     typeof testEmail === "string" &&
     testEmail.length > 0 &&
     typeof testPassword === "string" &&
-    testPassword.length > 0 &&
-    (path === "sign-in" || path === "sign-up");
+    testPassword.length > 0;
+
+  const nextPath = typeof next === "string" && next.startsWith("/") ? next : "/dashboard";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -36,7 +52,23 @@ export default async function AuthPage({
         </div>
       </header>
       <main className="container mx-auto flex grow flex-col items-center justify-center gap-3 self-center p-4 md:p-6">
-        <AuthView path={path} />
+        <h1 className="font-semibold text-xl">
+          {path === "sign-up" ? "Create account" : "Sign in"}
+        </h1>
+        {path === "sign-up" ? (
+          <SignUpForm
+            defaultEmail={testEmail ?? ""}
+            defaultName={testName ?? "Test User"}
+            defaultPassword={testPassword ?? ""}
+            nextPath={nextPath}
+          />
+        ) : (
+          <SignInForm
+            defaultEmail={testEmail ?? ""}
+            defaultPassword={testPassword ?? ""}
+            nextPath={nextPath}
+          />
+        )}
         {showDevFill ? (
           <DevAuthFormFill
             authPath={path}

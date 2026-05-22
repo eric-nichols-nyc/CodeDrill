@@ -1,38 +1,22 @@
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { createProblemBodySchema } from "@/features/admin/lib/create-problem-schema";
-import { keys } from "@/lib/auth/keys";
-import { getNeonAuth } from "@/lib/auth/server";
+import { apiBaseUrl } from "@/lib/auth/api-url";
+import { catalogUpstreamHeaders } from "@/lib/auth/catalog-upstream-headers";
+import { getApiAuth } from "@/lib/auth/server";
 
-const TRAILING_SLASH = /\/$/;
-
-function apiBaseUrl(): string {
-  const fromEnv = keys().NEON_JWT_API_URL;
-  const base = (fromEnv ?? "http://localhost:3030").replace(TRAILING_SLASH, "");
-  return base;
-}
-
-async function authHeaders() {
-  const { session } = await getNeonAuth();
+async function requireCatalogHeaders() {
+  const { session } = await getApiAuth();
   if (!session) {
     return null;
   }
-
-  const h = await headers();
-  const cookie = h.get("cookie");
-  const internalSecret = keys().INTERNAL_PROBLEMS_SECRET;
-
-  return {
-    ...(cookie ? { Cookie: cookie } : {}),
-    ...(internalSecret ? { "x-internal-problems-secret": internalSecret } : {}),
-  };
+  return catalogUpstreamHeaders();
 }
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await authHeaders();
+  const auth = await requireCatalogHeaders();
   if (!auth) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });
   }
@@ -60,7 +44,7 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await authHeaders();
+  const auth = await requireCatalogHeaders();
   if (!auth) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { UserButton } from "@neondatabase/neon-js/auth/react/ui";
+import { UserMenu } from "@/components/user-menu";
 import { ModeToggle } from "@repo/design-system/components/mode-toggle";
 import { Button } from "@repo/design-system/components/ui/button";
 import { cn } from "@repo/design-system/lib/utils";
@@ -56,7 +56,7 @@ export function ProblemsHeader({ className }: ProblemsHeaderProps) {
 
         <div className="flex items-center gap-2">
           <ModeToggle />
-          <UserButton size="icon" />
+          <UserMenu />
         </div>
       </AppHeaderInner>
     </header>

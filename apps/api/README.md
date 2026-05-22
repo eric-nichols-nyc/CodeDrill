@@ -2,7 +2,7 @@
 
 NestJS service on **Neon Postgres** with **[Better Auth](https://www.better-auth.com/)** (email/password), **[@thallesp/nestjs-better-auth](https://github.com/ThallesP/nestjs-better-auth)**, and **Drizzle ORM** for the practice catalog (problems, submissions, chat threads, etc.).
 
-Auth routes are mounted under `/api/auth/*`. Session cookies protect routes unless they use `@AllowAnonymous()` (see `ProblemsController` + `ProblemsAccessGuard` for the problems API).
+Auth routes are mounted under `/api/auth/*`. Protected routes accept a **Bearer token** (bearer plugin) or Better Auth session cookie unless they use `@AllowAnonymous()` with a custom guard (see `ProblemsController` + `ProblemsAccessGuard`).
 
 The pnpm workspace package name is **`neon-jwt-api`**; the app lives in **`apps/api`**.
 
@@ -32,8 +32,10 @@ Create **`apps/api/.env`** (see comments in `src/database/database.module.ts` an
 | `BETTER_AUTH_SECRET` | At least 32 characters ([Better Auth installation](https://www.better-auth.com/docs/installation)) |
 | `BETTER_AUTH_URL` | Public base URL of **this API** (e.g. `http://localhost:3030`). Must match what browsers and `curl` use. |
 | `BETTER_AUTH_TRUSTED_ORIGINS` | Comma-separated origins for CORS/cookies (e.g. Next app `http://localhost:3010`) |
-| `INTERNAL_PROBLEMS_SECRET` | Optional shared secret; when set, `x-internal-problems-secret` can authorize `/problems` routes for server-to-server calls (Next admin BFF). |
+| `INTERNAL_PROBLEMS_SECRET` | Optional; when set, `x-internal-problems-secret` authorizes **catalog** `/problems` routes for server-to-server BFF (admin). Not used for end-user identity. |
 | `PORT` | Optional; defaults to **3030** |
+
+User session auth uses only the `BETTER_AUTH_*` and `DATABASE_URL` variables above. Clients send `Authorization: Bearer <token>` after sign-in (see [Bearer plugin](https://www.better-auth.com/docs/plugins/bearer)).
 
 Generate a secret:
 
@@ -87,21 +89,21 @@ Default URL: `http://localhost:3030` (or your `PORT`).
 
 ### Better Auth
 
-- `POST /api/auth/sign-up/email`, `POST /api/auth/sign-in/email`, session cookies, etc. ([basic usage](https://www.better-auth.com/docs/basic-usage))
+- `POST /api/auth/sign-up/email`, `POST /api/auth/sign-in/email`, session cookies, Bearer tokens ([basic usage](https://www.better-auth.com/docs/basic-usage), [bearer plugin](https://www.better-auth.com/docs/plugins/bearer))
 
 ### Session example
 
-- **`GET /me`** — requires a valid Better Auth session cookie (`SessionController`).
+- **`GET /me`** — requires Bearer token or session cookie (`SessionController`).
 
 ### Problems catalog (`ProblemsController`)
 
-Base path: **`/problems`**. Access: **Better Auth session** or **`x-internal-problems-secret`** when `INTERNAL_PROBLEMS_SECRET` is set (see `ProblemsAccessGuard`).
+Base path: **`/problems`**. Access: **Bearer token / session cookie** or **`x-internal-problems-secret`** when `INTERNAL_PROBLEMS_SECRET` is set for server-to-server catalog calls (see `ProblemsAccessGuard`).
 
 Examples: `GET /problems`, `GET /problems/by-slug/:slug`, `GET /problems/:id/details`, `POST /problems`, `PUT /problems/:id`.
 
 ### Problem chat (`ProblemChatController`)
 
-Per-user tutor message history. **Session only** — no internal-secret bypass. `:problemId` is a **UUID** matching `problems.id`.
+Per-user tutor message history. **Bearer token or session cookie** — no internal-secret bypass. `:problemId` is a **UUID** matching `problems.id`.
 
 | Method | Path | Description |
 |--------|------|-------------|
@@ -132,19 +134,46 @@ curl -X POST "$BASE/api/auth/sign-up/email" \
 curl -X POST "$BASE/api/auth/sign-in/email" \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"password123"}' \
-  -c cookies.txt
+  -c cookies.txt -D sign-in-headers.txt
 ```
 
-### Protected route
+### Sign in (Bearer token)
+
+After sign-in, Better Auth returns a token in the **`set-auth-token`** response header (bearer plugin):
+
+```bash
+TOKEN=$(grep -i '^set-auth-token:' sign-in-headers.txt | cut -d' ' -f2- | tr -d '\r')
+echo "$TOKEN"
+```
+
+Or capture in one step:
+
+```bash
+TOKEN=$(
+  curl -s -D - -o /dev/null -X POST "$BASE/api/auth/sign-in/email" \
+    -H "Content-Type: application/json" \
+    -d '{"email":"test@example.com","password":"password123"}' \
+  | grep -i '^set-auth-token:' | cut -d' ' -f2- | tr -d '\r'
+)
+```
+
+### Protected route (cookie)
 
 ```bash
 curl "$BASE/me" -b cookies.txt
 ```
 
+### Protected route (Bearer)
+
+```bash
+curl "$BASE/me" -H "Authorization: Bearer $TOKEN"
+```
+
 ### List chat messages for a problem (after sign-in)
 
 ```bash
-curl "$BASE/problems/00000000-0000-0000-0000-000000000001/chat/messages" -b cookies.txt
+curl "$BASE/problems/00000000-0000-0000-0000-000000000001/chat/messages" \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
 Replace the UUID with a real `problems.id` from your database.
@@ -166,6 +195,7 @@ Replace the UUID with a real `problems.id` from your database.
 
 ## References
 
+- [Better Auth — Bearer plugin](https://www.better-auth.com/docs/plugins/bearer)
 - [Better Auth — Installation](https://www.better-auth.com/docs/installation)
 - [Better Auth — NestJS](https://www.better-auth.com/docs/integrations/nestjs)
 - [Drizzle ORM](https://orm.drizzle.team/)

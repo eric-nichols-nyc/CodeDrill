@@ -36,7 +36,7 @@ function queryInput(
 
 /**
  * Dev-only helper: fills visible email/password (and optional name) inputs
- * inside `<main>` for Neon Auth `AuthView`. Not rendered in production builds.
+ * inside `<main>` for auth forms. Not rendered in production builds.
  */
 export function DevAuthFormFill({
   email,

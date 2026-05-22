@@ -35,12 +35,11 @@ sequenceDiagram
   API->>DB: problem_workspace_code
 ```
 
-## Auth (BFF → API)
+## Auth transport (BFF → API)
 
-The Next route checks **Neon Auth**, then calls the Nest API with:
+The Next route checks **API auth** (`getApiAuth`), then calls the Nest API with:
 
-- `x-user-id` — Neon user id
-- `x-internal-problems-secret` — when `INTERNAL_PROBLEMS_SECRET` is set (same pattern as admin problem routes)
+- `Authorization: Bearer <token>` — from the `codedrill.auth_token` cookie set at sign-in
 
 Requires sign-in; unsigned users get an empty load and no save.
 
@@ -50,10 +49,8 @@ The BFF returns JSON `{ error, code, hint? }`. The workspace shows a red alert a
 
 | `code` | Meaning |
 |--------|---------|
-| `NOT_SIGNED_IN` | No Neon Auth session — use **Sign in** in the banner |
-| `MISSING_INTERNAL_SECRET` | Set `INTERNAL_PROBLEMS_SECRET` on **both** `apps/app` and `apps/api` |
-| `UPSTREAM_UNAUTHORIZED` | Secret mismatch or API not restarted |
-| `INVALID_SESSION` | Signed in but user id missing from session |
+| `NOT_SIGNED_IN` | No API auth session — use **Sign in** at `/auth/sign-in` |
+| `UPSTREAM_UNAUTHORIZED` | Token expired or invalid — sign in again |
 
 ## Export diagram as image
 

@@ -1,19 +1,11 @@
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { createProblemBodySchema } from "@/features/admin/lib/create-problem-schema";
-import { keys } from "@/lib/auth/keys";
-import { getNeonAuth } from "@/lib/auth/server";
-
-const TRAILING_SLASH = /\/$/;
-
-function apiBaseUrl(): string {
-  const fromEnv = keys().NEON_JWT_API_URL;
-  const base = (fromEnv ?? "http://localhost:3030").replace(TRAILING_SLASH, "");
-  return base;
-}
+import { apiBaseUrl } from "@/lib/auth/api-url";
+import { catalogUpstreamHeaders } from "@/lib/auth/catalog-upstream-headers";
+import { getApiAuth } from "@/lib/auth/server";
 
 export async function POST(request: Request) {
-  const { session } = await getNeonAuth();
+  const { session } = await getApiAuth();
   if (!session) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });
   }
@@ -33,18 +25,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const h = await headers();
-  const cookie = h.get("cookie");
-  const internalSecret = keys().INTERNAL_PROBLEMS_SECRET;
+  const upstreamHeaders = await catalogUpstreamHeaders();
 
   const upstream = await fetch(`${apiBaseUrl()}/problems`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(cookie ? { Cookie: cookie } : {}),
-      ...(internalSecret
-        ? { "x-internal-problems-secret": internalSecret }
-        : {}),
+      ...upstreamHeaders,
     },
     body: JSON.stringify(parsed.data),
   });

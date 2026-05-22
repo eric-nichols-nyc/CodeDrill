@@ -104,67 +104,42 @@ pnpm clean
 
 ## Authentication
 
-### Auth pages (`/auth/[path]`)
+Auth is owned by the **Nest API** (`apps/api`, Better Auth). The Next app proxies `/api/auth/*` to the API and stores a Bearer token in the `codedrill.auth_token` cookie after sign-in.
 
-Sign-in, sign-up, email OTP, and related flows use Neon’s **`AuthView`** (`app/auth/[path]/page.tsx`). Use **`/auth/sign-in`** and **`/auth/sign-up`** (and other paths your Neon project exposes). Sign out is available from the header **`UserButton`**.
+- **`/auth/sign-in`**, **`/auth/sign-up`** — email/password forms (`features/auth/`)
+- **`/account`** — signed-in profile summary
+- **`proxy.ts`** — redirects unsigned users from `/dashboard` and `/account`
 
-`proxy.ts` sends unauthenticated visitors to **`/auth/sign-in`** when they hit **`/dashboard`** or **`/account/*`**.
-
-### Server-Side Auth
-
-Get the current session and user on the server:
+### Server-side session
 
 ```typescript
-import { getNeonAuth } from "@/lib/auth/server";
-import { redirect } from "next/navigation";
+import { getApiAuth } from "@/lib/auth/server";
+import { apiAuthHeaders } from "@/lib/auth/api-auth-headers";
 
-export default async function ProtectedPage() {
-  const { session, user } = await getNeonAuth();
-
-  if (!session) {
-    redirect("/auth/sign-in");
-  }
-
-  return <div>Welcome</div>;
-}
+const { session, user } = await getApiAuth();
+const headers = await apiAuthHeaders(); // Authorization: Bearer … for Nest upstream
 ```
 
-### Client-Side Auth
+See **`apps/api/README.md`** for curl sign-up/sign-in examples and **`docs/context/features-spec/08-api-auth-consolidation.md`** for the full auth model.
 
-The auth client is available for client components:
+### Client-side
 
 ```typescript
-import { authClient } from "@/lib/auth/client";
-
-// Use authClient methods in client components
+import { authClient, signOutAndClearToken } from "@/lib/auth/client";
 ```
-
-### Auth Routes
-
-- `/auth/sign-in` - Sign in page
-- `/auth/sign-up` - Sign up page
-- `/auth/[path]` - Other auth flows (handled by Neon Auth UI)
-- `/account/[path]` - Account management pages
-- `/dashboard` - Protected dashboard page
-
-### API Routes
-
-The app includes a catch-all auth API route at `/api/auth/[...path]` that handles all Neon Auth API requests.
 
 ## Related Packages
 
-- `@neondatabase/neon-js` - Neon database and auth client
-- `@neondatabase/neon-auth-next` - Neon Auth Next.js integration
-- `@neondatabase/neon-auth-ui` - Neon Auth UI components
-- `@repo/design-system` - Shared UI components
-- `@repo/database` - Prisma database client
-- `@repo/prisma-neon` - Neon database adapter
-- `@repo/typescript-config` - TypeScript configuration
+- `better-auth` — auth client (sign-in/up against proxied API routes)
+- `@repo/design-system` — Shared UI components
+- `@repo/database` — Prisma database client
+- `@repo/prisma-neon` — Neon database adapter
+- `@repo/typescript-config` — TypeScript configuration
 
 ## Resources
 
 - [Next.js Documentation](https://nextjs.org/docs)
-- [Neon Documentation](https://neon.tech/docs)
-- [Neon Auth Documentation](https://neon.tech/docs/auth)
+- [Better Auth Documentation](https://www.better-auth.com/docs)
+- [Nest API README](../api/README.md)
 - [Prisma Documentation](https://www.prisma.io/docs)
 

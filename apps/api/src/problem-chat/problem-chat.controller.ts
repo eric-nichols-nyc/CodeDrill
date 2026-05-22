@@ -22,8 +22,7 @@ import {
 /**
  * Per-user problem tutor chat history.
  *
- * Same auth as workspace-code / progress: Better Auth session **or**
- * `x-internal-problems-secret` + `x-user-id` from the Next.js BFF.
+ * Access: Better Auth session via Bearer token or session cookie.
  */
 @AllowAnonymous()
 @Controller("problems")
