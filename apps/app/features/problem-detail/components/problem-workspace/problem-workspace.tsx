@@ -149,7 +149,6 @@ export function ProblemWorkspace({
       right={
         <ProblemOutputPanel
           activeTab={activeTab}
-          isBusy={isPending}
           lastAction={lastAction}
           lastRunOutcome={lastRunOutcome}
           onTabChange={setActiveTab}

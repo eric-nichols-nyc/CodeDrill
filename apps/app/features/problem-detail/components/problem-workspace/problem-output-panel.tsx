@@ -5,7 +5,6 @@
  * (per-case Input / Stdout / Output / Expected after Run).
  */
 
-import { Badge } from "@repo/design-system/components/ui/badge";
 import {
   Tabs,
   TabsContent,
@@ -14,7 +13,6 @@ import {
 } from "@repo/design-system/components/ui/tabs";
 import { CheckSquare, Terminal } from "lucide-react";
 import { useMemo } from "react";
-import { TimerPanelBar } from "@/components/timer";
 import type { RunClientTestsOutcome } from "@/features/problem-detail/client-test-run";
 import { normalizeProblemTestCases } from "@/features/problem-detail/client-test-run";
 
@@ -40,17 +38,15 @@ function ResultsPlaceholder({
   );
 }
 
-/** Right-hand Output column: header → timer → Testcase / Test Result tabs. */
+/** Right-hand Output column: Testcase / Test Result tabs. */
 export function ProblemOutputPanel({
   activeTab,
-  isBusy,
   lastAction,
   lastRunOutcome = null,
   onTabChange,
   testCases,
 }: {
   activeTab: string;
-  isBusy: boolean;
   lastAction: "run" | "submit" | null;
   lastRunOutcome?: RunClientTestsOutcome | null;
   onTabChange: (value: string) => void;
@@ -62,19 +58,7 @@ export function ProblemOutputPanel({
   );
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3 p-4 pl-3">
-      <div className="flex shrink-0 items-center justify-between gap-3">
-        <h2 className="font-medium text-muted-foreground text-sm">Output</h2>
-        <div className="flex items-center gap-2">
-          {lastAction ? (
-            <Badge variant="outline">Last action: {lastAction}</Badge>
-          ) : null}
-          {isBusy ? <Badge>Working</Badge> : null}
-        </div>
-      </div>
-
-      <TimerPanelBar />
-
+    <div className="flex h-full min-h-0 flex-col p-4 pl-3">
       <Tabs
         className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-border bg-muted/20"
         onValueChange={onTabChange}
@@ -100,14 +84,14 @@ export function ProblemOutputPanel({
         </div>
 
         <TabsContent
-          className="mt-0 flex min-h-0 flex-1 flex-col overflow-hidden"
+          className="mt-0 min-h-0 flex-1 overflow-y-auto"
           value="testcase"
         >
           <TestcasePanel testCaseRows={testCaseRows} />
         </TabsContent>
 
         <TabsContent
-          className="mt-0 flex min-h-0 flex-1 flex-col overflow-hidden"
+          className="mt-0 min-h-0 flex-1 overflow-y-auto"
           value="test-result"
         >
           {lastRunOutcome !== null && lastAction === "run" ? (
