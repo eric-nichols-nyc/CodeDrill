@@ -20,6 +20,7 @@
     "@codemirror/view": "^6.42.1",
     "@fsegurai/codemirror-theme-android-studio": "^6.2.5",
     "@monaco-editor/react": "4.8.0-rc.3",
+    "@nanostores/react": "github:ai/react",
     "@neondatabase/neon-auth-next": "0.1.0-alpha.24",
     "@neondatabase/neon-auth-ui": "0.1.0-alpha.2",
     "@neondatabase/neon-js": "0.1.0-beta.21",

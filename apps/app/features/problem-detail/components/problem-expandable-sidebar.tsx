@@ -4,6 +4,7 @@ import { Button } from "@repo/design-system/components/ui/button";
 import { ChevronLeft, ChevronRight, GripVertical } from "lucide-react";
 import { type PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from "react";
 import { ProblemSideTabs } from "@/features/problem-detail/components/problem-side-tabs";
+import type { GetProblemChatMessagesResponse } from "@/features/problem-detail/chatbot/lib/problem-chat-types";
 
 const DEFAULT_WIDTH_PX = 310;
 const MIN_WIDTH_PX = 240;
@@ -23,8 +24,12 @@ const clampWidth = (raw: number) => {
 
 export function ProblemExpandableSidebar({
   learningNotes,
+  problemId,
+  initialChatData,
 }: {
   learningNotes?: unknown;
+  problemId?: string;
+  initialChatData?: GetProblemChatMessagesResponse;
 }) {
   const [open, setOpen] = useState(true);
   const [widthPx, setWidthPx] = useState(DEFAULT_WIDTH_PX);
@@ -101,7 +106,11 @@ export function ProblemExpandableSidebar({
               <ChevronRight className="size-4" />
             </Button>
           </div>
-          <ProblemSideTabs learningNotes={learningNotes} />
+          <ProblemSideTabs
+            initialChatData={initialChatData}
+            learningNotes={learningNotes}
+            problemId={problemId}
+          />
         </div>
       ) : (
         <button

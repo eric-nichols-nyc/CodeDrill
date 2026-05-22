@@ -1,9 +1,7 @@
 import {
   Inject,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
-  ServiceUnavailableException,
 } from "@nestjs/common";
 import { and, asc, eq } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
@@ -185,6 +183,20 @@ export class ProblemChatService {
     );
   }
 
+  private tutorErrorReply(
+    summary: string,
+    metadata?: Record<string, unknown>
+  ) {
+    return {
+      content: summary,
+      metadata: {
+        model: CHAT_MODEL,
+        tutorError: true,
+        ...metadata,
+      },
+    };
+  }
+
   private async generateTutorReply(input: {
     systemPrompt: string;
     problemContext: ReturnType<typeof buildProblemContext>;
@@ -193,66 +205,87 @@ export class ProblemChatService {
     code?: string;
     language?: string;
   }) {
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY?.trim();
     if (!apiKey) {
-      throw new ServiceUnavailableException("OPENAI_API_KEY is not set");
+      return {
+        content:
+          "The tutor is not configured yet (`OPENAI_API_KEY` is missing on the API). Your message was saved — add the key to **apps/api/.env** and restart the API.",
+        metadata: {
+          model: "stub-no-openai-key",
+        },
+      };
     }
 
-    const upstream = await fetch(OPENAI_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: CHAT_MODEL,
-        temperature: 0.3,
-        messages: [
-          { role: "system", content: input.systemPrompt },
-          {
-            role: "system",
-            content: this.buildContextMessage({
-              problemContext: input.problemContext,
-              code: input.code,
-              language: input.language,
-            }),
-          },
-          ...input.history,
-          { role: "user", content: input.userMessage },
-        ],
-      }),
-    });
+    const history = input.history.filter(
+      (message): message is { role: "user" | "assistant"; content: string } =>
+        message.role === "user" || message.role === "assistant"
+    );
 
-    const rawText = await upstream.text();
-
-    let completion: OpenAiCompletion;
     try {
-      completion = JSON.parse(rawText) as OpenAiCompletion;
-    } catch {
-      throw new InternalServerErrorException(
-        "OpenAI returned a non-JSON response"
+      const upstream = await fetch(OPENAI_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: CHAT_MODEL,
+          temperature: 0.3,
+          messages: [
+            { role: "system", content: input.systemPrompt },
+            {
+              role: "system",
+              content: this.buildContextMessage({
+                problemContext: input.problemContext,
+                code: input.code,
+                language: input.language,
+              }),
+            },
+            ...history,
+            { role: "user", content: input.userMessage },
+          ],
+        }),
+      });
+
+      const rawText = await upstream.text();
+
+      let completion: OpenAiCompletion;
+      try {
+        completion = JSON.parse(rawText) as OpenAiCompletion;
+      } catch {
+        return this.tutorErrorReply(
+          "OpenAI returned a response the tutor could not parse. Check the API key and try again."
+        );
+      }
+
+      if (!upstream.ok) {
+        return this.tutorErrorReply(
+          `OpenAI error (${upstream.status}): ${this.readOpenAiErrorMessage(completion, upstream.status)}`
+        );
+      }
+
+      const content = this.readOpenAiAssistantContent(completion);
+      if (!content) {
+        return this.tutorErrorReply(
+          "OpenAI returned an empty reply. Try sending your message again."
+        );
+      }
+
+      return {
+        content,
+        metadata: {
+          model: CHAT_MODEL,
+        },
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message.length > 0
+          ? error.message
+          : "Unknown network error";
+      return this.tutorErrorReply(
+        `The tutor could not reach OpenAI: ${message}`
       );
     }
-
-    if (!upstream.ok) {
-      throw new InternalServerErrorException(
-        this.readOpenAiErrorMessage(completion, upstream.status)
-      );
-    }
-
-    const content = this.readOpenAiAssistantContent(completion);
-    if (!content) {
-      throw new InternalServerErrorException(
-        "OpenAI returned an empty assistant message"
-      );
-    }
-
-    return {
-      content,
-      metadata: {
-        model: CHAT_MODEL,
-      },
-    };
   }
 
   async getThreadMessages(userId: string, problemId: string) {

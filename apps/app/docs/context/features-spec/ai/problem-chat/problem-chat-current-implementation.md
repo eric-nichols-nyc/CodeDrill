@@ -1,5 +1,7 @@
 # Current Problem Chat Implementation
 
+> **App UI:** Implementation spec for wiring the chat panel is [07-problem-chat-ui.md](../07-problem-chat-ui.md). Tutor behavior and context docs remain in this folder.
+
 ## DB Tables Already Exist
 
 The existing database shape is already close to what v1 needs.

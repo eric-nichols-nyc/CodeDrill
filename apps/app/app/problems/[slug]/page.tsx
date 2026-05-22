@@ -4,7 +4,10 @@ import { ProblemDetail } from "@/features/problem-detail/components/problem-deta
 import { ProblemExpandableSidebar } from "@/features/problem-detail/components/problem-expandable-sidebar";
 import { ProblemSlugNavHeaderConnected } from "@/features/problem-slug-nav/components/problem-slug-nav-header-connected";
 import { buildCatalogSlugs } from "@/features/problem-slug-nav/utils/build-catalog-slugs";
-import { isProblemSolutionRowArray } from "@/features/problem-detail/problem-detail-helpers";
+import {
+  asRecord,
+  isProblemSolutionRowArray,
+} from "@/features/problem-detail/problem-detail-helpers";
 import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
 import { mapRowsToProblems } from "@/features/problems-page/lib/map-rows-to-problems";
 import { parseProblemsListBody } from "@/features/problems-page/lib/parse-problems-list-body";
@@ -25,6 +28,11 @@ type ProblemDetailBundle = {
   solutions: ProblemSolutionRow[];
   testCases?: unknown;
 };
+
+function problemIdFrom(problem: unknown): string | undefined {
+  const id = asRecord(problem)?.id;
+  return typeof id === "string" && id.length > 0 ? id : undefined;
+}
 
 function parseCatalogFromList(listResult: ProblemsListResult): {
   problems: Problem[];
@@ -88,6 +96,7 @@ export default async function ProblemBySlugPage({
       ? result.body
       : null;
   const title = resolveTitle(slug, bundle);
+  const problemId = bundle ? problemIdFrom(bundle.problem) : undefined;
 
   return (
     <TimerProvider>
@@ -135,7 +144,10 @@ export default async function ProblemBySlugPage({
               </div>
             )}
           </div>
-          <ProblemExpandableSidebar learningNotes={bundle?.learningNotes} />
+          <ProblemExpandableSidebar
+            learningNotes={bundle?.learningNotes}
+            problemId={problemId}
+          />
         </main>
       </div>
     </TimerProvider>

@@ -8,6 +8,7 @@ import {
 } from "@repo/design-system/components/ui/tabs";
 import { cn } from "@repo/design-system/lib/utils";
 import { Chat } from "@/features/problem-detail/chatbot/components/chat";
+import type { GetProblemChatMessagesResponse } from "@/features/problem-detail/chatbot/lib/problem-chat-types";
 import { ProblemNotes } from "@/features/problem-detail/components/problem-notes";
 
 const panelClass =
@@ -15,8 +16,12 @@ const panelClass =
 
 export function ProblemSideTabs({
   learningNotes,
+  problemId,
+  initialChatData,
 }: {
   learningNotes?: unknown;
+  problemId?: string;
+  initialChatData?: GetProblemChatMessagesResponse;
 }) {
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
@@ -36,7 +41,7 @@ export function ProblemSideTabs({
           className={cn(panelClass, "flex min-h-0 flex-col")}
           value="chat"
         >
-          <Chat />
+          <Chat initialChatData={initialChatData} problemId={problemId} />
         </TabsContent>
         <TabsContent className={panelClass} value="notes">
           <ProblemNotes learningNotes={learningNotes} />

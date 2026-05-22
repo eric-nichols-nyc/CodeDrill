@@ -9,7 +9,11 @@ change.
 
 ## Current Goal
 
-- None — pick next admin slice or wire admin chat to API
+- None — problem chat V1 UI shipped
+
+## Completed
+
+- Problem chat V1 UI — Server Actions + TanStack Query in `features/problem-detail/chatbot/`; history load, send message, markdown assistant replies; `problemId` wired through sidebar
 
 ## Completed
 
@@ -39,7 +43,9 @@ change.
 
 - Chat state stays in client hooks (`useAdminChatLayout`, `useStaticAdminChat`); route remains server-only for auth and data fetch
 - Panel is a fixed right overlay (`max-w-md`) with local static responses until backend exists
+- **Problem tutor chat:** Nest API shipped in `apps/api/src/problem-chat/`; app UI uses Server Actions in `features/problem-detail/chatbot/` (no BFF route) + TanStack Query — see `07-problem-chat-ui.md`
 
 ## Session Notes
 
 - Feature lives at `apps/app/features/admin-chat-layout/` per `02-admin-chat-layout.md` spec
+- Problem chat UI spec: `docs/context/features-spec/07-problem-chat-ui.md`; backend reference in `docs/context/features-spec/ai/problem-chat/`

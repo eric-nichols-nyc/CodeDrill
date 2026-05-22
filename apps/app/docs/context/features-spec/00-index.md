@@ -34,7 +34,7 @@ Every **product feature** under `apps/app/features/<name>/` should have a spec i
 | `problem-progress` | [03-problem-progress.md](./03-problem-progress.md) | `features/problem-progress/` | `apps/api/src/problem-progress/`, BFF `app/api/problems/[problemId]/progress/` | In progress |
 | `admin` | [05-admin-problem-filter.md](./05-admin-problem-filter.md) (catalog + added status) | `features/admin/` | `apps/api` problems CRUD via BFF | Shipped |
 | `nav-drawer` | [06-nav-drawer.md](./06-nav-drawer.md) | `features/nav-drawer/` | Reuse `GET /problems` via `fetchProblemsList` | Shipped |
-| `problem-detail` | — | `features/problem-detail/` | workspace-code, chat (partial); consumes `nav-drawer` on header | **Spec TODO** |
+| `problem-detail` | [07-problem-chat-ui.md](./07-problem-chat-ui.md) (chatbot V1 UI) | `features/problem-detail/` | Nest `problem-chat/` + chat Server Actions + TanStack | **Chat UI shipped (V1)** |
 | `problems-page` | [04-problems-page-list-ui.md](./04-problems-page-list-ui.md) (list UI delta) | `features/problems-page/` | catalog + tags + `patternSlug` sections | Shipped |
 | `landing` | — | `features/landing/` | — | **Spec TODO** |
 | `docs` | — | `features/docs/` | — | **Spec TODO** |
