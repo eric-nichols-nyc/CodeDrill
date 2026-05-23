@@ -26,3 +26,14 @@ export type PostProblemChatMessageResponse = {
   userMessage: ProblemChatMessageDto;
   assistantMessage: ProblemChatMessageDto;
 };
+
+/** SSE events from POST /problems/:problemId/chat/messages/stream */
+export type ProblemChatStreamEvent =
+  | { type: "text-delta"; delta: string }
+  | {
+      type: "finish";
+      userMessage: ProblemChatMessageDto;
+      assistantMessage: ProblemChatMessageDto;
+      thread: ProblemChatThreadDto;
+    }
+  | { type: "error"; message: string };

@@ -1,29 +1,41 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo } from "react";
-import {
-  getProblemChatMessages,
-  postProblemChatMessage,
-} from "../lib/problem-chat-api";
+import { useChat } from "@ai-sdk/react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { DefaultChatTransport } from "ai";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { getProblemChatMessages } from "../lib/problem-chat-api";
 import { isProblemChatApiError } from "../lib/problem-chat-errors";
 import { problemChatKeys } from "../lib/problem-chat-keys";
-import type {
-  GetProblemChatMessagesResponse,
-  ProblemChatUiMessage,
-} from "../lib/problem-chat-types";
+import {
+  historyDtoToUiMessages,
+  problemChatStreamApiPath,
+} from "../lib/problem-chat-ui-messages";
+import type { GetProblemChatMessagesResponse } from "../lib/problem-chat-types";
 
-function toUiMessages(
-  messages: GetProblemChatMessagesResponse["messages"]
-): ProblemChatUiMessage[] {
-  return messages.flatMap((message) => {
-    if (message.role !== "user" && message.role !== "assistant") {
-      return [];
-    }
-    return [
-      { id: message.id, role: message.role, content: message.content },
-    ];
-  });
+function mapSubmitStatus(
+  status: "submitted" | "streaming" | "ready" | "error"
+): "submitted" | "streaming" | "error" | undefined {
+  if (status === "submitted") {
+    return "submitted";
+  }
+  if (status === "streaming") {
+    return "streaming";
+  }
+  if (status === "error") {
+    return "error";
+  }
+  return;
+}
+
+function canSendMessage(
+  problemId: string | undefined,
+  status: "submitted" | "streaming" | "ready" | "error"
+): boolean {
+  if (!problemId) {
+    return false;
+  }
+  return status !== "submitted" && status !== "streaming";
 }
 
 function errorMessage(error: unknown): string {
@@ -43,70 +55,120 @@ export function useProblemChat(
   }
 ) {
   const queryClient = useQueryClient();
+  const hydratedProblemIdRef = useRef<string | null>(null);
 
   const historyQuery = useQuery({
     queryKey: problemChatKeys.messages(problemId ?? ""),
-    queryFn: () => getProblemChatMessages(problemId!),
+    queryFn: () => {
+      if (!problemId) {
+        throw new Error("Missing problem id");
+      }
+      return getProblemChatMessages(problemId);
+    },
     enabled: Boolean(problemId),
     initialData: options?.initialData,
     retry: (failureCount) => failureCount < 1,
   });
 
-  const sendMutation = useMutation({
-    mutationFn: (content: string) =>
-      postProblemChatMessage(problemId!, { content }),
-    onSuccess: (response) => {
+  const transport = useMemo(() => {
+    if (!problemId) {
+      return new DefaultChatTransport({
+        api: "/api/problems/__missing__/chat/stream",
+      });
+    }
+
+    return new DefaultChatTransport({
+      api: problemChatStreamApiPath(problemId),
+    });
+  }, [problemId]);
+
+  const syncHistoryToCache = useCallback(
+    (data: GetProblemChatMessagesResponse) => {
       if (!problemId) {
         return;
       }
-      queryClient.setQueryData<GetProblemChatMessagesResponse>(
-        problemChatKeys.messages(problemId),
-        (prev) => ({
-          thread: response.thread,
-          messages: [
-            ...(prev?.messages ?? []),
-            response.userMessage,
-            response.assistantMessage,
-          ],
-        })
-      );
+
+      queryClient.setQueryData(problemChatKeys.messages(problemId), data);
+    },
+    [problemId, queryClient]
+  );
+
+  const {
+    messages,
+    sendMessage: sendChatMessage,
+    setMessages,
+    status,
+    error: chatError,
+  } = useChat({
+    id: problemId ?? "problem-chat-no-id",
+    // @ts-expect-error duplicate ai@5 type tree in monorepo lockfile; runtime uses ai@6
+    transport,
+    onFinish: async () => {
+      if (!problemId) {
+        return;
+      }
+
+      try {
+        const fresh = await getProblemChatMessages(problemId);
+        syncHistoryToCache(fresh);
+        setMessages(historyDtoToUiMessages(fresh.messages));
+      } catch {
+        // Keep streamed messages visible if refresh fails.
+      }
     },
   });
 
-  const messages = useMemo(
-    () => toUiMessages(historyQuery.data?.messages ?? []),
-    [historyQuery.data?.messages]
-  );
+  useEffect(() => {
+    if (!problemId) {
+      hydratedProblemIdRef.current = null;
+      setMessages([]);
+      return;
+    }
+
+    if (historyQuery.isPending) {
+      return;
+    }
+
+    if (hydratedProblemIdRef.current === problemId) {
+      return;
+    }
+
+    setMessages(historyDtoToUiMessages(historyQuery.data?.messages ?? []));
+    hydratedProblemIdRef.current = problemId;
+  }, [
+    problemId,
+    historyQuery.isPending,
+    historyQuery.data?.messages,
+    setMessages,
+  ]);
 
   const sendMessage = useCallback(
     async (content: string) => {
       const text = content.trim();
-      if (!text || !problemId || sendMutation.isPending) {
+      if (!text) {
         return;
       }
-      await sendMutation.mutateAsync(text);
+      if (!canSendMessage(problemId, status)) {
+        return;
+      }
+
+      await sendChatMessage({ text });
     },
-    [problemId, sendMutation]
+    [problemId, sendChatMessage, status]
   );
 
-  const activeError = sendMutation.error ?? historyQuery.error;
-
-  const submitStatus = sendMutation.isPending
-    ? ("submitted" as const)
-    : sendMutation.isError
-      ? ("error" as const)
-      : undefined;
-
-  const canSend = Boolean(problemId) && !sendMutation.isPending;
+  const activeError = chatError ?? historyQuery.error;
+  const isSending = status === "submitted" || status === "streaming";
+  const submitStatus = mapSubmitStatus(status);
 
   return {
     messages,
     isLoadingHistory: historyQuery.isPending && !historyQuery.data,
-    isSending: sendMutation.isPending,
+    isSending,
     error: activeError ? errorMessage(activeError) : null,
     sendMessage,
     submitStatus,
-    canSend,
+    canSend: canSendMessage(problemId, status),
     hasProblemId: Boolean(problemId),
   };
 }

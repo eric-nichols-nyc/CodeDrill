@@ -106,3 +106,32 @@ Runs the tutor pipeline (non-streaming). Requires session and `OPENAI_API_KEY`.
 ```
 
 Message objects use the same shape as items in `GET …/chat/messages` `messages[]`. Frontend can append `userMessage` and `assistantMessage` to local state and update `thread` from the POST body.
+
+### `POST /problems/:problemId/chat/messages/stream`
+
+Streaming tutor pipeline (SSE). Same auth and request body as blocking POST. Blocking POST remains available as fallback.
+
+**Response:** `text/event-stream` with JSON events:
+
+```ts
+type ProblemChatStreamEvent =
+  | { type: "text-delta"; delta: string }
+  | {
+      type: "finish";
+      userMessage: ProblemChatMessageDto;
+      assistantMessage: ProblemChatMessageDto;
+      thread: ProblemChatThreadDto;
+    }
+  | { type: "error"; message: string };
+```
+
+**Flow:** persist user message → stream OpenAI tokens as `text-delta` → persist assistant on completion → emit `finish`. Errors before/during stream persist a tutor-error assistant message (same metadata pattern as blocking POST).
+
+**Manual test:**
+
+```sh
+curl -N -X POST "http://localhost:3030/problems/<problemId>/chat/messages/stream" \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"content":"What pattern fits this problem?"}'
+```

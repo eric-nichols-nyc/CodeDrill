@@ -9,10 +9,13 @@ change.
 
 ## Current Goal
 
-- None — API auth consolidation shipped (`08-api-auth-consolidation.md`)
+- None — problem chat streaming V2 round 1 shipped (`09-problem-chat-streaming.md`)
 
 ## Completed
 
+- Problem chat streaming Stage 1 — Nest `POST /problems/:problemId/chat/messages/stream` (SSE text-delta + finish); blocking POST unchanged
+- Problem chat streaming Stage 2 — Next BFF `/api/problems/[problemId]/chat/stream` wraps Nest SSE as AI SDK UI message stream
+- Problem chat streaming Stage 3 — `useChat` send path + streaming `chat.tsx` (history via TanStack, send via BFF stream)
 - API auth consolidation — Nest bearer plugin + app Better Auth client; sign-in/up at `/auth/*`; Bearer on BFF/actions; Neon Auth removed
 - API auth consolidation (API slice) — bearer plugin, `getSessionFromHeaders`, removed `x-user-id` guard path
 - Problem chat V1 UI — Server Actions + TanStack Query in `features/problem-detail/chatbot/`; history load, send message, markdown assistant replies; `problemId` wired through sidebar
@@ -51,3 +54,4 @@ change.
 
 - Feature lives at `apps/app/features/admin-chat-layout/` per `02-admin-chat-layout.md` spec
 - Problem chat UI spec: `docs/context/features-spec/07-problem-chat-ui.md`; backend reference in `docs/context/features-spec/ai/problem-chat/`
+- Problem chat streaming V2 spec: `docs/context/features-spec/09-problem-chat-streaming.md` — refactor existing chatbot in 3 stages (API → BFF → client); round 1 skips UI restructure and Framer Motion

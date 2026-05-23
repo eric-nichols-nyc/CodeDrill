@@ -20,6 +20,7 @@ import {
   PromptInputSubmit,
   PromptInputTextarea,
 } from "@repo/design-system/components/ai-elements/prompt-input";
+import type { ReactNode } from "react";
 import { useProblemChat } from "@/features/problem-detail/chatbot/hooks/use-problem-chat";
 import type { GetProblemChatMessagesResponse } from "@/features/problem-detail/chatbot/lib/problem-chat-types";
 
@@ -42,7 +43,7 @@ export function Chat({
 
   const handleSubmit = async (message: PromptInputMessage) => {
     const text = message.text.trim();
-    if (!text || !hasProblemId || isSending) {
+    if (!text || isSending || !hasProblemId) {
       return;
     }
     try {
@@ -52,38 +53,47 @@ export function Chat({
     }
   };
 
-  const emptyDescription = !hasProblemId
-    ? "This problem could not be loaded for chat."
-    : "Ask for a hint, pattern nudge, or explanation.";
+  const emptyDescription = hasProblemId
+    ? "Ask for a hint, pattern nudge, or explanation."
+    : "This problem could not be loaded for chat.";
+
+  let conversationBody: ReactNode;
+  if (isLoadingHistory) {
+    conversationBody = (
+      <ConversationEmptyState
+        description="Loading your conversation…"
+        title="Chat"
+      />
+    );
+  } else if (messages.length === 0) {
+    conversationBody = (
+      <ConversationEmptyState
+        description={emptyDescription}
+        title="Start a conversation"
+      />
+    );
+  } else {
+    conversationBody = messages.map((message) => (
+      <Message from={message.role} key={message.id}>
+        {message.parts
+          .filter((part) => part.type === "text")
+          .map((part, index) => (
+            <MessageContent key={`${message.id}-${index}`}>
+              {message.role === "assistant" ? (
+                <MessageResponse>{part.text}</MessageResponse>
+              ) : (
+                part.text
+              )}
+            </MessageContent>
+          ))}
+      </Message>
+    ));
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <Conversation className="min-h-0 flex-1">
-        <ConversationContent>
-          {isLoadingHistory ? (
-            <ConversationEmptyState
-              description="Loading your conversation…"
-              title="Chat"
-            />
-          ) : messages.length === 0 ? (
-            <ConversationEmptyState
-              description={emptyDescription}
-              title="Start a conversation"
-            />
-          ) : (
-            messages.map((message) => (
-              <Message from={message.role} key={message.id}>
-                <MessageContent>
-                  {message.role === "assistant" ? (
-                    <MessageResponse>{message.content}</MessageResponse>
-                  ) : (
-                    message.content
-                  )}
-                </MessageContent>
-              </Message>
-            ))
-          )}
-        </ConversationContent>
+        <ConversationContent>{conversationBody}</ConversationContent>
         <ConversationScrollButton />
       </Conversation>
 
@@ -111,10 +121,6 @@ export function Chat({
           </PromptInputFooter>
         </PromptInput>
       </PromptInputProvider>
-
-      {isSending ? (
-        <p className="mx-2 mb-2 text-muted-foreground text-xs">Thinking…</p>
-      ) : null}
     </div>
   );
 }

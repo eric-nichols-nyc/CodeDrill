@@ -46,3 +46,14 @@ export type ProblemChatUiMessage = {
 export type ProblemChatActionResult<T> =
   | { ok: true; data: T }
   | { ok: false; error: string };
+
+/** SSE events from Nest `POST …/chat/messages/stream` (mirrors API). */
+export type ProblemChatStreamEvent =
+  | { type: "text-delta"; delta: string }
+  | {
+      type: "finish";
+      userMessage: ProblemChatMessageDto;
+      assistantMessage: ProblemChatMessageDto;
+      thread: ProblemChatThreadDto;
+    }
+  | { type: "error"; message: string };

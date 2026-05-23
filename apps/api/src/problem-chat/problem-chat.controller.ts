@@ -7,9 +7,11 @@ import {
   ParseUUIDPipe,
   Post,
   Req,
+  Res,
   UseGuards,
 } from "@nestjs/common";
 import { AllowAnonymous } from "@thallesp/nestjs-better-auth";
+import type { Response } from "express";
 // biome-ignore lint/style/useImportType: Nest uses emitted constructor param metadata
 import { PostProblemChatMessageDto } from "./dto/post-problem-chat-message.dto";
 // biome-ignore lint/style/useImportType: Nest uses emitted constructor param metadata
@@ -56,6 +58,21 @@ export class ProblemChatController {
       request.userId!,
       problemId,
       body
+    );
+  }
+
+  @Post(":problemId/chat/messages/stream")
+  postMessageStream(
+    @Param("problemId", ParseUUIDPipe) problemId: string,
+    @Body() body: PostProblemChatMessageDto,
+    @Req() request: RequestWithUserId,
+    @Res() response: Response
+  ) {
+    return this.problemChatService.postTutorMessageStream(
+      request.userId!,
+      problemId,
+      body,
+      response
     );
   }
 }
