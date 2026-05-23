@@ -292,3 +292,29 @@
   --tw-prose-invert-th-borders: var(--color-border);
   --tw-prose-invert-td-borders: var(--color-border);
 }
+
+/* Streamdown: Shiki dual-theme bg/color strings are invalid React style values, so
+   code blocks can render with a transparent background and light-theme token colors
+   in dark mode (punctuation disappears against the editor-like panel). */
+[data-streamdown="code-block-body"] {
+  background-color: #fafafa !important;
+  color: #383a42;
+}
+
+.dark [data-streamdown="code-block-body"] {
+  --shiki-dark-bg: #282c34;
+  background-color: var(--shiki-dark-bg) !important;
+  color: #abb2bf;
+}
+
+.dark [data-streamdown="code-block-body"] code span span {
+  color: var(--shiki-dark) !important;
+}
+
+[data-streamdown="inline-code"] {
+  border-radius: calc(var(--radius) - 2px);
+  background-color: var(--muted);
+  padding: 0.125rem 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}

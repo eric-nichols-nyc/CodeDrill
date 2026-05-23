@@ -814,6 +814,9 @@ importers:
       '@repo/observability':
         specifier: workspace:*
         version: link:../observability
+      '@streamdown/code':
+        specifier: ^1.0.2
+        version: 1.1.1(react@19.2.1)
       '@xyflow/react':
         specifier: ^12.10.0
         version: 12.10.0(@types/react@19.2.7)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -5966,6 +5969,11 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  '@streamdown/code@1.1.1':
+    resolution: {integrity: sha512-i7HTNuDgZWb+VdrNVOam9gQhIc5MSSDXKWXgbUrn/4vSRaSMM+Rtl10MQj4wLWPNpF7p80waJsAqFP8HZfb0Jg==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
 
   '@stripe/agent-toolkit@0.7.12':
     resolution: {integrity: sha512-fbtpJAg63INJ2zLlefXuigbWMnMZ33e6J5m/2mep6s8FSsl1pQZtLBZsk2gSp4Ix4199hkS3AG3FSz5diUHXXg==}
@@ -18686,6 +18694,11 @@ snapshots:
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
+
+  '@streamdown/code@1.1.1(react@19.2.1)':
+    dependencies:
+      react: 19.2.1
+      shiki: 3.20.0
 
   '@stripe/agent-toolkit@0.7.12(@langchain/core@0.3.42(openai@4.86.1(ws@8.18.3(bufferutil@4.0.9))(zod@4.1.13)))(@modelcontextprotocol/sdk@1.12.0)(agents@0.0.84(@cloudflare/workers-types@4.20250525.0)(react@19.2.1))(ai@6.0.191(zod@4.1.13))(openai@4.86.1(ws@8.18.3(bufferutil@4.0.9))(zod@4.1.13))':
     dependencies:

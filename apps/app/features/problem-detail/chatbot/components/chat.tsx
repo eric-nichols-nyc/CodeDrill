@@ -73,6 +73,9 @@ export function Chat({
       />
     );
   } else {
+    const isStreaming = submitStatus === "streaming";
+    const lastMessageId = messages.at(-1)?.id;
+
     conversationBody = messages.map((message) => (
       <Message from={message.role} key={message.id}>
         {message.parts
@@ -80,7 +83,13 @@ export function Chat({
           .map((part, index) => (
             <MessageContent key={`${message.id}-${index}`}>
               {message.role === "assistant" ? (
-                <MessageResponse>{part.text}</MessageResponse>
+                <MessageResponse
+                  isAnimating={
+                    isStreaming ? message.id === lastMessageId : false
+                  }
+                >
+                  {part.text}
+                </MessageResponse>
               ) : (
                 part.text
               )}

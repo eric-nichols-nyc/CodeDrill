@@ -18,7 +18,13 @@ import {
 } from "lucide-react";
 import type { ComponentProps, HTMLAttributes, ReactElement } from "react";
 import { createContext, memo, useContext, useEffect, useState } from "react";
+import type { BundledTheme } from "shiki";
 import { Streamdown } from "streamdown";
+
+const messageResponseShikiTheme: [BundledTheme, BundledTheme] = [
+  "one-light",
+  "one-dark-pro",
+];
 
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
   from: UIMessage["role"];
@@ -304,12 +310,13 @@ export const MessageBranchPage = ({
 export type MessageResponseProps = ComponentProps<typeof Streamdown>;
 
 export const MessageResponse = memo(
-  ({ className, ...props }: MessageResponseProps) => (
+  ({ className, shikiTheme = messageResponseShikiTheme, ...props }: MessageResponseProps) => (
     <Streamdown
       className={cn(
         "size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
         className
       )}
+      shikiTheme={shikiTheme}
       {...props}
     />
   ),
