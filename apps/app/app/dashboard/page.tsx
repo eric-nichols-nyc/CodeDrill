@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { DashboardResizableDemo } from "@/features/dashboard/components/dashboard-resizable-demo";
 
 export default function DashboardPage() {
-  redirect("/problems");
+  return <DashboardResizableDemo />;
 }
