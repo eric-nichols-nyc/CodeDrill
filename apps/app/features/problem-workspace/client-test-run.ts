@@ -1,4 +1,4 @@
-import { asRecord, strField } from "@/features/problem-detail/problem-detail-helpers";
+import { asRecord, strField } from "@/features/problem-workspace/problem-detail-helpers";
 
 export type ClientTestCaseResult = {
   index: number;

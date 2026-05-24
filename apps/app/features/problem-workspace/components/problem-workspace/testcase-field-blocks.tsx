@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, type ReactNode } from "react";
-import type { CapturedConsoleLine } from "@/features/problem-detail/client-test-run";
+import type { CapturedConsoleLine } from "@/features/problem-workspace/client-test-run";
 
 import { formatTestcaseInputFields } from "./utils/format-testcase-input-fields";
 

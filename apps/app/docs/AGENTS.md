@@ -85,7 +85,7 @@ Read `context/progress-tracker.md` at the start of a task to align with current 
 ```
 apps/app/
   app/              # App Router routes
-  features/         # Domain UI (problem-detail, problems-page, admin, docs, …)
+  features/         # Domain UI (problem-workspace, problems-page, admin, docs, …)
   components/       # Shared app components (e.g. split-layout)
   lib/              # Auth, API clients, problem fetchers
   docs/

@@ -21,8 +21,8 @@ import {
   PromptInputTextarea,
 } from "@repo/design-system/components/ai-elements/prompt-input";
 import type { ReactNode } from "react";
-import { useProblemChat } from "@/features/problem-detail/chatbot/hooks/use-problem-chat";
-import type { GetProblemChatMessagesResponse } from "@/features/problem-detail/chatbot/lib/problem-chat-types";
+import { useProblemChat } from "@/features/problem-workspace/chatbot/hooks/use-problem-chat";
+import type { GetProblemChatMessagesResponse } from "@/features/problem-workspace/chatbot/lib/problem-chat-types";
 
 export function Chat({
   problemId,

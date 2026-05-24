@@ -34,11 +34,11 @@ Every **product feature** under `apps/app/features/<name>/` should have a spec i
 | `problem-progress` | [03-problem-progress.md](./03-problem-progress.md) | `features/problem-progress/` | `apps/api/src/problem-progress/`, BFF `app/api/problems/[problemId]/progress/` | In progress |
 | `admin` | [05-admin-problem-filter.md](./05-admin-problem-filter.md) (catalog + added status) | `features/admin/` | `apps/api` problems CRUD via BFF | Shipped |
 | `nav-drawer` | [06-nav-drawer.md](./06-nav-drawer.md) | `features/nav-drawer/` | Reuse `GET /problems` via `fetchProblemsList` | Shipped |
-| `problem-detail` | [07-problem-chat-ui.md](./07-problem-chat-ui.md) (chatbot V1 UI) | `features/problem-detail/` | Nest `problem-chat/` + chat Server Actions + TanStack | **Chat UI shipped (V1)** |
-| `problem-detail` (chat streaming) | [09-problem-chat-streaming.md](./09-problem-chat-streaming.md) | `features/problem-detail/chatbot/` | Nest stream + BFF + `useChat` | **Round 1 shipped** |
+| `problem-workspace` | [07-problem-chat-ui.md](./07-problem-chat-ui.md) (chatbot V1 UI) | `features/problem-workspace/` | Nest `problem-chat/` + chat Server Actions + TanStack | **Chat UI shipped (V1)** |
+| `problem-workspace` (chat streaming) | [09-problem-chat-streaming.md](./09-problem-chat-streaming.md) | `features/problem-workspace/chatbot/` | Nest stream + BFF + `useChat` | **Round 1 shipped** |
 | `api-auth` | [08-api-auth-consolidation.md](./08-api-auth-consolidation.md) | `lib/auth/`, `features/auth/`, `app/auth/` | `apps/api/src/auth.ts` + guards; Bearer token | **Shipped** |
 | `problems-page` | [04-problems-page-list-ui.md](./04-problems-page-list-ui.md) (list UI delta) | `features/problems-page/` | catalog + tags + `patternSlug` sections | Shipped |
 | `landing` | — | `features/landing/` | — | **Spec TODO** |
 | `docs` | — | `features/docs/` | — | **Spec TODO** |
 
-Nested areas (e.g. `problem-detail/.../workspace-code`) are documented inside the parent feature spec when that spec is written, or in a child section — not as separate top-level features unless they ship independently.
+Nested areas (e.g. `problem-workspace/.../workspace-code`) are documented inside the parent feature spec when that spec is written, or in a child section — not as separate top-level features unless they ship independently.

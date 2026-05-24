@@ -26,7 +26,7 @@ features/<feature-name>/
   lib/            # Optional: schemas, types, API helpers for this feature
 ```
 
-Nested UI can mirror the same shape (see `problem-detail/components/problem-workspace/`):
+Nested UI can mirror the same shape (see `problem-workspace/components/problem-workspace/`):
 
 ```
 components/<area>/

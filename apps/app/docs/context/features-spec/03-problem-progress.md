@@ -8,7 +8,7 @@ Persist **per-user, per-problem** state: solve status (`not_started` | `attempte
 
 - [01-design-system.md](./01-design-system.md) — feature UI layout.
 - [00-index.md](./00-index.md) — feature registry.
-- Workspace-code pattern (same auth, BFF shape): `apps/app/docs/workspace-code-save-flow.md`, `features/problem-detail/.../workspace-code/`.
+- Workspace-code pattern (same auth, BFF shape): `apps/app/docs/workspace-code-save-flow.md`, `features/problem-workspace/.../workspace-code/`.
 
 ## User story
 

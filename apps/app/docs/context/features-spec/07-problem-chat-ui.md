@@ -1,10 +1,10 @@
-# Feature: problem-chat UI (problem-detail chatbot)
+# Feature: problem-chat UI (problem-workspace chatbot)
 
 ## Goal
 
 Wire the **problem page chat panel** to the existing Nest tutor API so signed-in users can load persisted thread history, send messages, and receive markdown assistant replies grounded in the current problem.
 
-Backend persistence, tutor prompt, and OpenAI orchestration are **already implemented** in `apps/api/src/problem-chat/`. This spec covers the **V1 app UI slice** — colocated under `features/problem-detail/chatbot/`.
+Backend persistence, tutor prompt, and OpenAI orchestration are **already implemented** in `apps/api/src/problem-chat/`. This spec covers the **V1 app UI slice** — colocated under `features/problem-workspace/chatbot/`.
 
 ## Reference
 
@@ -119,7 +119,7 @@ Types mirror `apps/api/src/problem-chat/problem-chat.types.ts`.
 ## File structure (V1)
 
 ```txt
-apps/app/features/problem-detail/chatbot/
+apps/app/features/problem-workspace/chatbot/
   actions/
     problem-chat.actions.ts     # "use server" — client-callable entrypoints
   lib/
@@ -238,7 +238,7 @@ Presentational only:
 Implement V1 per this spec and [01-design-system.md](./01-design-system.md).
 
 1. Read [problem-chat-current-implementation.md](./ai/problem-chat/problem-chat-current-implementation.md).
-2. Add files under `features/problem-detail/chatbot/` per structure above.
+2. Add files under `features/problem-workspace/chatbot/` per structure above.
 3. Thread `problemId` from problem page → sidebar → `Chat`.
 4. TanStack in `use-problem-chat.ts` only; thin helpers in `problem-chat-api.ts`.
 5. Server Actions for Nest transport — **no** `app/api/.../chat/messages` routes.

@@ -9,18 +9,18 @@ import {
 import { Badge } from "@repo/design-system/components/ui/badge";
 import { cn } from "@repo/design-system/lib/utils";
 import { Lightbulb } from "lucide-react";
-import { ExampleItem } from "@/features/problem-detail/components/example-item";
-import { HintItem } from "@/features/problem-detail/components/hint-item";
-import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
+import { ExampleItem } from "@/features/problem-workspace/components/example-item";
+import { HintItem } from "@/features/problem-workspace/components/hint-item";
+import { JsonFallback } from "@/features/problem-workspace/components/json-fallback";
 import {
   asRecord,
   normalizeDifficultyForDisplay,
   rowKey,
-} from "@/features/problem-detail/problem-detail-helpers";
+} from "@/features/problem-workspace/problem-detail-helpers";
 import type {
   ProblemRow,
   ProblemTag,
-} from "@/features/problem-detail/problem-detail-types";
+} from "@/features/problem-workspace/problem-detail-types";
 import { difficultyTextClass } from "@/features/problems-page/problems-list/utils/difficulty-text-class";
 
 export function ProblemDescriptionTab({

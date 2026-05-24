@@ -18,7 +18,7 @@ change.
 - Problem chat streaming Stage 3 — `useChat` send path + streaming `chat.tsx` (history via TanStack, send via BFF stream)
 - API auth consolidation — Nest bearer plugin + app Better Auth client; sign-in/up at `/auth/*`; Bearer on BFF/actions; Neon Auth removed
 - API auth consolidation (API slice) — bearer plugin, `getSessionFromHeaders`, removed `x-user-id` guard path
-- Problem chat V1 UI — Server Actions + TanStack Query in `features/problem-detail/chatbot/`; history load, send message, markdown assistant replies; `problemId` wired through sidebar
+- Problem chat V1 UI — Server Actions + TanStack Query in `features/problem-workspace/chatbot/`; history load, send message, markdown assistant replies; `problemId` wired through sidebar
 
 ## Completed
 

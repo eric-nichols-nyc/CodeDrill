@@ -3,7 +3,7 @@ import {
   historyDtoToUiMessages,
   problemChatStreamApiPath,
   textFromUiMessage,
-} from "@/features/problem-detail/chatbot/lib/problem-chat-ui-messages";
+} from "@/features/problem-workspace/chatbot/lib/problem-chat-ui-messages";
 
 describe("problem-chat-ui-messages", () => {
   it("maps persisted messages to UIMessage parts", () => {

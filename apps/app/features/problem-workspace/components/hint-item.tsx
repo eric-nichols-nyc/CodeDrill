@@ -1,8 +1,8 @@
-import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
+import { JsonFallback } from "@/features/problem-workspace/components/json-fallback";
 import {
   asRecord,
   strField,
-} from "@/features/problem-detail/problem-detail-helpers";
+} from "@/features/problem-workspace/problem-detail-helpers";
 
 type HintItemProps = {
   hint: unknown;

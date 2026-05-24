@@ -13,8 +13,8 @@ import {
 } from "@repo/design-system/components/ui/tabs";
 import { CheckSquare, Terminal } from "lucide-react";
 import { useMemo } from "react";
-import type { RunClientTestsOutcome } from "@/features/problem-detail/client-test-run";
-import { normalizeProblemTestCases } from "@/features/problem-detail/client-test-run";
+import type { RunClientTestsOutcome } from "@/features/problem-workspace/client-test-run";
+import { normalizeProblemTestCases } from "@/features/problem-workspace/client-test-run";
 
 import { TestcasePanel } from "./testcase-panel";
 import { TestResultPanel } from "./test-result-panel";

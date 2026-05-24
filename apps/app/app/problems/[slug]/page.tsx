@@ -1,14 +1,14 @@
 import { notFound } from "next/navigation";
 import { TimerProvider } from "@/components/timer";
-import { ProblemDetail } from "@/features/problem-detail/components/problem-detail";
-import { ProblemExpandableSidebar } from "@/features/problem-detail/components/problem-expandable-sidebar";
+import { ProblemDetail } from "@/features/problem-workspace/components/problem-detail";
+import { ProblemExpandableSidebar } from "@/features/problem-workspace/components/problem-expandable-sidebar";
 import { ProblemSlugNavHeaderConnected } from "@/features/problem-slug-nav/components/problem-slug-nav-header-connected";
 import { buildCatalogSlugs } from "@/features/problem-slug-nav/utils/build-catalog-slugs";
 import {
   asRecord,
   isProblemSolutionRowArray,
-} from "@/features/problem-detail/problem-detail-helpers";
-import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
+} from "@/features/problem-workspace/problem-detail-helpers";
+import type { ProblemSolutionRow } from "@/features/problem-workspace/problem-detail-types";
 import { mapRowsToProblems } from "@/features/problems-page/lib/map-rows-to-problems";
 import { parseProblemsListBody } from "@/features/problems-page/lib/parse-problems-list-body";
 import type { Problem } from "@/features/problems-page/lib/types";

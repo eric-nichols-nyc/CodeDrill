@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createProblemChatBffStreamResponse } from "@/features/problem-detail/chatbot/lib/problem-chat-stream-server";
-import { parseChatStreamRequestBody } from "@/features/problem-detail/chatbot/lib/parse-problem-chat-stream-request";
+import { createProblemChatBffStreamResponse } from "@/features/problem-workspace/chatbot/lib/problem-chat-stream-server";
+import { parseChatStreamRequestBody } from "@/features/problem-workspace/chatbot/lib/parse-problem-chat-stream-request";
 import { apiAuthHeaders } from "@/lib/auth/api-auth-headers";
 
 export const maxDuration = 120;

@@ -1,18 +1,18 @@
 import { SplitLayout } from "@/components/split-layout";
-import { ProblemDetailLeftPane } from "@/features/problem-detail/components/problem-detail-left-pane";
-import { ProblemWorkspace } from "@/features/problem-detail/components/problem-workspace/problem-workspace";
+import { ProblemDetailLeftPane } from "@/features/problem-workspace/components/problem-detail-left-pane";
+import { ProblemWorkspace } from "@/features/problem-workspace/components/problem-workspace/problem-workspace";
 import {
   isProblemEditorialEmpty,
   parseProblemEditorial,
-} from "@/features/problem-detail/parse-editorial";
+} from "@/features/problem-workspace/parse-editorial";
 import {
   asRecord,
   parseProblemTags,
-} from "@/features/problem-detail/problem-detail-helpers";
+} from "@/features/problem-workspace/problem-detail-helpers";
 import type {
   ProblemRow,
   ProblemSolutionRow,
-} from "@/features/problem-detail/problem-detail-types";
+} from "@/features/problem-workspace/problem-detail-types";
 
 function pickConstraints(raw: unknown): string | null | undefined {
   if (typeof raw === "string") {

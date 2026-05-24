@@ -1,6 +1,6 @@
 "use client";
 
-import { ProblemSlugNavHeader } from "@/features/problem-detail/components/problem-slug-nav-header";
+import { ProblemSlugNavHeader } from "@/features/problem-workspace/components/problem-slug-nav-header";
 import { useProblemSlugNavigation } from "@/features/problem-slug-nav/hooks/use-problem-slug-navigation";
 import type { Problem } from "@/features/problems-page/lib/types";
 

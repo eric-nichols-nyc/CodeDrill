@@ -122,7 +122,7 @@ Tables include (non-exhaustive): **`problems`**, **`tags`** / **`problem_tags`**
 | **Workspace** | **Run:** `client-test-run.ts` + `use-problem-workspace` evaluate the active starter snippet against **sample** cases in the browser. **Submit:** **not implemented** (placeholder messages only). |
 | **Editor** | **Monaco** (`@monaco-editor/react`) primary; CodeMirror packages also present in dependencies. |
 | **Timer** | `TimerProvider` wraps the problem-by-slug page (cosmetic / UX continuity with baseline). |
-| **Problem chat UI** | Client chat components under `features/problem-detail/chatbot/` intended to use the API thread/message routes. |
+| **Problem chat UI** | Client chat components under `features/problem-workspace/chatbot/` intended to use the API thread/message routes. |
 
 ### Implications
 

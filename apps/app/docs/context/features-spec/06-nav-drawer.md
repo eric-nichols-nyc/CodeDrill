@@ -11,7 +11,7 @@ On the problem workspace (`/problems/[slug]`), clicking **Problem List** in the 
 - [01-design-system.md](./01-design-system.md) — feature folder layout, SOLID, semantic tokens.
 - [04-problems-page-list-ui.md](./04-problems-page-list-ui.md) — catalog shape, row display conventions.
 - [00-index.md](./00-index.md) — registry entry for this feature.
-- Integration: `apps/app/features/problem-detail/components/problem-slug-nav-header.tsx`
+- Integration: `apps/app/features/problem-workspace/components/problem-slug-nav-header.tsx`
 - Primitive: `@repo/design-system/components/ui/sheet` (`Sheet`, `SheetContent`, `SheetTrigger`, `SheetClose`, `side="left"`).
 
 ## User story
@@ -65,7 +65,7 @@ As a learner on a problem page, I want to open a problem list from the header wi
 | Layer | Path | Notes |
 | ----- | ---- | ----- |
 | Feature UI | `apps/app/features/nav-drawer/` | Sheet shell, list, Problem List trigger |
-| Consumer | `features/problem-detail/.../problem-slug-nav-header.tsx` | Logo + `NavDrawer` |
+| Consumer | `features/problem-workspace/.../problem-slug-nav-header.tsx` | Logo + `NavDrawer` |
 | Route | `app/problems/[slug]/page.tsx` | Parallel catalog fetch |
 | List parsing | `features/problems-page/lib/` | Reuse parsers + `Problem` type |
 | API | `GET /problems` via `lib/problems/fetch-problems-list.ts` | Existing |

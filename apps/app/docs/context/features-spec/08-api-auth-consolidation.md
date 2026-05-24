@@ -109,7 +109,7 @@ GET  /problems/...              →     Authorization: Bearer <token>
 | Auth UI | `apps/app/app/auth/[path]/page.tsx` | Replace Neon `AuthView` with Better Auth–backed forms or client |
 | Auth lib | `apps/app/lib/auth/` | Client, server session helpers, token storage |
 | BFF | `apps/app/app/api/problems/**` | Forward Bearer, not `x-user-id` |
-| Server Actions | e.g. `features/problem-detail/chatbot/lib/` | Same Bearer transport |
+| Server Actions | e.g. `features/problem-workspace/chatbot/lib/` | Same Bearer transport |
 | Database | `apps/api` Better Auth migrations | Existing `user` / `session` tables — no new schema unless bearer plugin requires it |
 
 ---

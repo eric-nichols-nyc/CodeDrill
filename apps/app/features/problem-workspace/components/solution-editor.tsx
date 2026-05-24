@@ -13,11 +13,11 @@ import {
 import { cn } from "@repo/design-system/lib/utils";
 import CodeMirror from "@uiw/react-codemirror";
 import { useMemo, useState } from "react";
-import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
+import { JsonFallback } from "@/features/problem-workspace/components/json-fallback";
 import {
   asRecord,
   strField,
-} from "@/features/problem-detail/problem-detail-helpers";
+} from "@/features/problem-workspace/problem-detail-helpers";
 
 type SyntaxMode = "javascript" | "typescript";
 

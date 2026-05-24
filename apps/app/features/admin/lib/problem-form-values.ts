@@ -1,5 +1,5 @@
 import type { CreateProblemBody } from "./create-problem-schema";
-import { parseProblemEditorial } from "@/features/problem-detail/parse-editorial";
+import { parseProblemEditorial } from "@/features/problem-workspace/parse-editorial";
 
 type ProblemRecord = Record<string, unknown>;
 

@@ -4,7 +4,7 @@ import {
 } from "@repo/design-system/components/ai-elements/code-block";
 import { Badge } from "@repo/design-system/components/ui/badge";
 import type { ComponentProps } from "react";
-import type { ProblemSolutionRow } from "@/features/problem-detail/problem-detail-types";
+import type { ProblemSolutionRow } from "@/features/problem-workspace/problem-detail-types";
 
 type ShikiLanguage = ComponentProps<typeof CodeBlock>["language"];
 

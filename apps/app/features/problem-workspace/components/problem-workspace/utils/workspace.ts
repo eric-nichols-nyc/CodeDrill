@@ -2,7 +2,7 @@ import {
   asRecord,
   rowKey,
   strField,
-} from "@/features/problem-detail/problem-detail-helpers";
+} from "@/features/problem-workspace/problem-detail-helpers";
 import type { StarterCodeRow } from "../types";
 
 /**

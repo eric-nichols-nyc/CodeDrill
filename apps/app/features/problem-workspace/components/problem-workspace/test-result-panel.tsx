@@ -13,7 +13,7 @@ import type {
   ClientTestCaseResult,
   ProblemTestCaseView,
   RunClientTestsOutcome,
-} from "@/features/problem-detail/client-test-run";
+} from "@/features/problem-workspace/client-test-run";
 
 import { TestResultCaseColumn } from "./testcase-field-blocks";
 

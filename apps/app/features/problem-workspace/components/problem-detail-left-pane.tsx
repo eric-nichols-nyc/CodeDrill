@@ -1,11 +1,11 @@
-import { ProblemDescriptionTab } from "@/features/problem-detail/components/problem-description-tab";
-import { ProblemTabs } from "@/features/problem-detail/components/problem-tabs";
+import { ProblemDescriptionTab } from "@/features/problem-workspace/components/problem-description-tab";
+import { ProblemTabs } from "@/features/problem-workspace/components/problem-tabs";
 import type {
   ProblemEditorial,
   ProblemRow,
   ProblemSolutionRow,
   ProblemTag,
-} from "@/features/problem-detail/problem-detail-types";
+} from "@/features/problem-workspace/problem-detail-types";
 
 function YoutubeEmbed({ videoId }: { videoId: string }) {
   const src = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`;

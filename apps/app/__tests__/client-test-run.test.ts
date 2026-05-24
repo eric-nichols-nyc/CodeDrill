@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { runClientTests } from "@/features/problem-detail/client-test-run";
+import { runClientTests } from "@/features/problem-workspace/client-test-run";
 
 describe("runClientTests", () => {
   it("scopes userConsole to each case, not the full run", () => {

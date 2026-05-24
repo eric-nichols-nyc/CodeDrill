@@ -4,7 +4,7 @@ Editor text is stored in **`problem_workspace_code`** (one row per user + proble
 
 **Related code**
 
-- Queries: `features/problem-detail/components/problem-workspace/queries/`
+- Queries: `features/problem-workspace/components/problem-workspace/queries/`
 - BFF: `app/api/problems/[problemId]/workspace-code/route.ts`
 - API: `apps/api/src/problem-workspace-code/`
 - Schema: `problem_workspace_code` in `apps/api/src/database/schema.ts`

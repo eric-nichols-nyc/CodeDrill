@@ -16,7 +16,7 @@ import {
 } from "@repo/design-system/components/ui/select";
 import { Play, RotateCcw, Send } from "lucide-react";
 import { SplitLayout } from "@/components/split-layout";
-import { JsonFallback } from "@/features/problem-detail/components/json-fallback";
+import { JsonFallback } from "@/features/problem-workspace/components/json-fallback";
 import { useProblemWorkspace } from "./hooks/use-problem-workspace";
 import { MonacoSolutionEdtor } from "./monaco-solution-edtor";
 import { ProblemOutputPanel } from "./problem-output-panel";

@@ -29,7 +29,7 @@ As a signed-in learner on a problem page, I want tutor replies to appear token-b
 
 ## Approach
 
-**Refactor in place** under `features/problem-detail/chatbot/`. Do not add `chatbot-v2/` or a second sidebar integration.
+**Refactor in place** under `features/problem-workspace/chatbot/`. Do not add `chatbot-v2/` or a second sidebar integration.
 
 | Concern | V1 (keep) | V2 (add / change) |
 | ------- | --------- | ----------------- |
@@ -132,7 +132,7 @@ apps/app/app/api/problems/[problemId]/chat/stream/route.ts
 **Files touched (expected):**
 
 ```txt
-apps/app/features/problem-detail/chatbot/
+apps/app/features/problem-workspace/chatbot/
   hooks/use-problem-chat.ts
   components/chat.tsx
   lib/problem-chat-types.ts          # UIMessage mapping helpers if needed
@@ -172,8 +172,8 @@ apps/app/features/problem-detail/chatbot/
 | ----- | ---- | ----- |
 | Nest API | `apps/api/src/problem-chat/` | New stream endpoint; existing GET + blocking POST unchanged in round 1 |
 | BFF | `apps/app/app/api/problems/[problemId]/chat/stream/` | **New** — required for streaming |
-| Server Actions | `features/problem-detail/chatbot/actions/` | GET only in round 1 |
-| Feature UI | `features/problem-detail/chatbot/` | Refactor hook + `chat.tsx` |
+| Server Actions | `features/problem-workspace/chatbot/actions/` | GET only in round 1 |
+| Feature UI | `features/problem-workspace/chatbot/` | Refactor hook + `chat.tsx` |
 | Design system | `@repo/design-system/components/ai-elements/*` | No fork; reuse Conversation, Message, PromptInput |
 
 ---
@@ -251,7 +251,7 @@ Reuse `ProblemChatMessageDto` / `ProblemChatThreadDto` from `problem-chat.types.
 
 ## Implementation prompt for agents
 
-Implement **problem-chat streaming V2** per this spec. **Refactor** `features/problem-detail/chatbot/` — do not create a parallel chatbot.
+Implement **problem-chat streaming V2** per this spec. **Refactor** `features/problem-workspace/chatbot/` — do not create a parallel chatbot.
 
 1. Read [07-problem-chat-ui.md](./07-problem-chat-ui.md) and [ai/problem-chat/problem-chat-current-implementation.md](./ai/problem-chat/problem-chat-current-implementation.md).
 2. **Stage 1 only** unless the user asks for more: add Nest stream endpoint; keep blocking POST; verify with curl.
