@@ -7,14 +7,14 @@ import {
   TabsTrigger,
 } from "@repo/design-system/components/ui/tabs";
 import { cn } from "@repo/design-system/lib/utils";
-import { Chat } from "@/features/problem-workspace/chatbot/components/chat";
+import { ChatShell } from "@/features/problem-workspace/chatbot/components/chat-shell";
 import type { GetProblemChatMessagesResponse } from "@/features/problem-workspace/chatbot/lib/problem-chat-types";
 import { ProblemNotes } from "@/features/problem-workspace/components/problem-notes";
 
 const panelClass =
   "min-h-0 flex-1 overflow-y-auto pr-1 pt-1 outline-none ring-offset-background focus-visible:outline-none";
 
-export function ProblemSideTabs({
+export function ChatNotesTabs({
   learningNotes,
   problemId,
   initialChatData,
@@ -41,7 +41,7 @@ export function ProblemSideTabs({
           className={cn(panelClass, "flex min-h-0 flex-col")}
           value="chat"
         >
-          <Chat initialChatData={initialChatData} problemId={problemId} />
+          <ChatShell initialChatData={initialChatData} problemId={problemId} />
         </TabsContent>
         <TabsContent className={panelClass} value="notes">
           <ProblemNotes learningNotes={learningNotes} />

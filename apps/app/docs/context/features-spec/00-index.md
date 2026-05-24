@@ -36,6 +36,7 @@ Every **product feature** under `apps/app/features/<name>/` should have a spec i
 | `nav-drawer` | [06-nav-drawer.md](./06-nav-drawer.md) | `features/nav-drawer/` | Reuse `GET /problems` via `fetchProblemsList` | Shipped |
 | `problem-workspace` | [07-problem-chat-ui.md](./07-problem-chat-ui.md) (chatbot V1 UI) | `features/problem-workspace/` | Nest `problem-chat/` + chat Server Actions + TanStack | **Chat UI shipped (V1)** |
 | `problem-workspace` (chat streaming) | [09-problem-chat-streaming.md](./09-problem-chat-streaming.md) | `features/problem-workspace/chatbot/` | Nest stream + BFF + `useChat` | **Round 1 shipped** |
+| `problem-workspace` (chat message UI) | [10-problem-chat-message-ui.md](./10-problem-chat-message-ui.md) | `features/problem-workspace/chatbot/components/` | None (UI-only; optional vote API later) | **Shipped** |
 | `api-auth` | [08-api-auth-consolidation.md](./08-api-auth-consolidation.md) | `lib/auth/`, `features/auth/`, `app/auth/` | `apps/api/src/auth.ts` + guards; Bearer token | **Shipped** |
 | `problems-page` | [04-problems-page-list-ui.md](./04-problems-page-list-ui.md) (list UI delta) | `features/problems-page/` | catalog + tags + `patternSlug` sections | Shipped |
 | `landing` | — | `features/landing/` | — | **Spec TODO** |

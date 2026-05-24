@@ -142,7 +142,7 @@ apps/app/features/problem-workspace/chatbot/
 
 - `actions/problem-chat.actions.ts` — still used for GET history
 - `lib/problem-chat-server.ts` — still used for GET
-- Sidebar wiring (`problem-side-tabs.tsx`, etc.)
+- Sidebar wiring (`chat-notes-tabs.tsx`, etc.)
 
 ### Stage 4 — Polish (later, out of round 1)
 

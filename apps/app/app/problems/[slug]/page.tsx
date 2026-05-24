@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { TimerProvider } from "@/components/timer";
 import { ProblemDetail } from "@/features/problem-workspace/components/problem-detail";
-import { ProblemExpandableSidebar } from "@/features/problem-workspace/components/problem-expandable-sidebar";
+import { ExpandableSidebarChat } from "@/features/problem-workspace/components/expandable-sidebar-chat";
 import { ProblemSlugNavHeaderConnected } from "@/features/problem-slug-nav/components/problem-slug-nav-header-connected";
 import { buildCatalogSlugs } from "@/features/problem-slug-nav/utils/build-catalog-slugs";
 import {
@@ -145,7 +145,7 @@ export default async function ProblemBySlugPage({
               </div>
             )}
           </div>
-          <ProblemExpandableSidebar
+          <ExpandableSidebarChat
             learningNotes={bundle?.learningNotes}
             problemId={problemId}
           />

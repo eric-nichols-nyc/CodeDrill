@@ -9,7 +9,7 @@ change.
 
 ## Current Goal
 
-- None — problem chat streaming V2 round 1 shipped (`09-problem-chat-streaming.md`)
+- None — problem chat message UI round 2 shipped (`10-problem-chat-message-ui.md`)
 
 ## Completed
 
@@ -19,6 +19,7 @@ change.
 - API auth consolidation — Nest bearer plugin + app Better Auth client; sign-in/up at `/auth/*`; Bearer on BFF/actions; Neon Auth removed
 - API auth consolidation (API slice) — bearer plugin, `getSessionFromHeaders`, removed `x-user-id` guard path
 - Problem chat V1 UI — Server Actions + TanStack Query in `features/problem-workspace/chatbot/`; history load, send message, markdown assistant replies; `problemId` wired through sidebar
+- Problem chat message UI round 2 — split `chat-shell`, `message-list`, `message`, `message-thinking`, `message-actions`, `chat-input`; Shimmer thinking row; copy/edit/vote actions (votes client-only)
 
 ## Completed
 
@@ -55,3 +56,4 @@ change.
 - Feature lives at `apps/app/features/admin-chat-layout/` per `02-admin-chat-layout.md` spec
 - Problem chat UI spec: `docs/context/features-spec/07-problem-chat-ui.md`; backend reference in `docs/context/features-spec/ai/problem-chat/`
 - Problem chat streaming V2 spec: `docs/context/features-spec/09-problem-chat-streaming.md` — refactor existing chatbot in 3 stages (API → BFF → client); round 1 skips UI restructure and Framer Motion
+- Problem chat message UI: `docs/context/features-spec/10-problem-chat-message-ui.md` — component split + thinking + actions

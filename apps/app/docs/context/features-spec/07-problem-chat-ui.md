@@ -182,7 +182,7 @@ Presentational only:
 
 ## Placement & wiring
 
-- Chat lives in `ProblemExpandableSidebar` → `ProblemSideTabs` → `Chat`.
+- Chat lives in `ExpandableSidebarChat` → `ChatNotesTabs` → `ChatShell`.
 - `problemId` (UUID) passed from `app/problems/[slug]/page.tsx` through sidebar into `Chat`.
 - Without `problemId`: disabled empty state; no fetch.
 - **Optional V1:** page prefetch via `getProblemChatMessages` → pass `initialChatData` to seed TanStack `initialData`.
@@ -190,8 +190,8 @@ Presentational only:
 | File | Change |
 | ---- | ------ |
 | `app/problems/[slug]/page.tsx` | Extract `problemId`; pass to sidebar |
-| `problem-expandable-sidebar.tsx` | Forward `problemId` (+ optional initial chat data) |
-| `problem-side-tabs.tsx` | Forward to `Chat` |
+| `expandable-sidebar-chat.tsx` | Forward `problemId` (+ optional initial chat data) |
+| `chat-notes-tabs.tsx` | Forward to `ChatShell` |
 
 ---
 
