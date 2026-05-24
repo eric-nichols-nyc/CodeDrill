@@ -7,6 +7,7 @@ import {
   TabsTrigger,
 } from "@repo/design-system/components/ui/tabs";
 import { cn } from "@repo/design-system/lib/utils";
+import { Sparkles, StickyNote } from "lucide-react";
 import { ChatShell } from "@/features/problem-workspace/chat-panel/components/chat-shell";
 import { ProblemNotes } from "@/features/problem-workspace/chat-panel/components/problem-notes";
 import { ShellPanel } from "@/features/problem-workspace/shell/shell-panel";
@@ -26,10 +27,12 @@ export function ChatPanel() {
           defaultValue="chat"
         >
           <TabsList className="h-auto w-full min-w-0 shrink-0 flex-wrap justify-start gap-1 sm:flex-nowrap">
-            <TabsTrigger className="shrink-0" value="chat">
+            <TabsTrigger className="shrink-0 gap-1.5" value="chat">
+              <Sparkles className="size-3.5 text-violet-400" />
               Chat
             </TabsTrigger>
-            <TabsTrigger className="shrink-0" value="notes">
+            <TabsTrigger className="shrink-0 gap-1.5" value="notes">
+              <StickyNote className="size-3.5 text-amber-400" />
               Notes
             </TabsTrigger>
           </TabsList>
