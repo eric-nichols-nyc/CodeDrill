@@ -6,11 +6,9 @@ import {
   MessageResponse,
 } from "@repo/design-system/components/ai-elements/message";
 import type { UIMessage } from "ai";
+import { SparklesIcon } from "@/components/icons";
 import { textFromUiMessage } from "@/features/problem-workspace/chatbot/lib/problem-chat-ui-messages";
-import {
-  MessageActionsBar,
-  type MessageVote,
-} from "./message-actions";
+import { MessageActionsBar, type MessageVote } from "./message-actions";
 
 export type ChatMessageProps = {
   message: UIMessage;
@@ -37,10 +35,19 @@ export function ChatMessage({
   return (
     <div className="group/message w-full">
       <Message from={message.role}>
+        {message.role === "assistant" ? (
+          <div className="flex h-[calc(13px*1.65)] shrink-0 items-center">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-white/25 text-muted-foreground ring-1 ring-border/40">
+              <SparklesIcon size={13} />
+            </div>
+          </div>
+        ) : null}
         {textParts.map((part, index) => (
           <MessageContent key={`${message.id}-${index}`}>
             {message.role === "assistant" ? (
-              <MessageResponse isAnimating={isStreaming}>{part.text}</MessageResponse>
+              <MessageResponse isAnimating={isStreaming}>
+                {part.text}
+              </MessageResponse>
             ) : (
               part.text
             )}
