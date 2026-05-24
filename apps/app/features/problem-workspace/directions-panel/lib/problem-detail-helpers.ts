@@ -1,7 +1,7 @@
 import type {
   ProblemSolutionRow,
   ProblemTag,
-} from "@/features/problem-workspace/problem-detail-types";
+} from "@/features/problem-workspace/directions-panel/lib/problem-detail-types";
 
 export function asRecord(v: unknown): Record<string, unknown> | null {
   if (typeof v !== "object" || v === null) {

@@ -1,21 +1,48 @@
 "use client";
 
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@repo/design-system/components/ui/tabs";
+import { cn } from "@repo/design-system/lib/utils";
+import { ChatShell } from "@/features/problem-workspace/chat-panel/components/chat-shell";
+import { ProblemNotes } from "@/features/problem-workspace/chat-panel/components/problem-notes";
 import { ShellPanel } from "@/features/problem-workspace/shell/shell-panel";
 import { useWorkspace } from "@/features/problem-workspace/shell/workspace-provider";
+
+const panelClass =
+  "min-h-0 flex-1 overflow-y-auto pr-1 pt-1 outline-none ring-offset-background focus-visible:outline-none";
 
 export function ChatPanel() {
   const { data } = useWorkspace();
 
   return (
-    <ShellPanel className="bg-muted/30">
-      <div className="border-border border-b p-1">
-        <h2 className="font-semibold text-sm">Chat panel</h2>
-        <p className="text-muted-foreground text-xs">
-          Chatbot migrates here next.
-        </p>
-      </div>
-      <div className="min-h-0 flex-1 overflow-auto p-1 font-mono text-muted-foreground text-xs">
-        {data.problemId ? `problemId: ${data.problemId}` : "No problem id"}
+    <ShellPanel>
+      <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <Tabs
+          className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden p-2 pt-2"
+          defaultValue="chat"
+        >
+          <TabsList className="h-auto w-full min-w-0 shrink-0 flex-wrap justify-start gap-1 sm:flex-nowrap">
+            <TabsTrigger className="shrink-0" value="chat">
+              Chat
+            </TabsTrigger>
+            <TabsTrigger className="shrink-0" value="notes">
+              Notes
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent
+            className={cn(panelClass, "flex min-h-0 flex-col")}
+            value="chat"
+          >
+            <ChatShell problemId={data.problemId} />
+          </TabsContent>
+          <TabsContent className={panelClass} value="notes">
+            <ProblemNotes learningNotes={data.learningNotes} />
+          </TabsContent>
+        </Tabs>
       </div>
     </ShellPanel>
   );

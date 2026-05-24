@@ -2,22 +2,20 @@
 
 import { ShellPanel } from "@/features/problem-workspace/shell/shell-panel";
 import { useWorkspace } from "@/features/problem-workspace/shell/workspace-provider";
+import { ProblemOutputPanel } from "./problem-output-panel";
 
 export function OutputPanel() {
-  const { workspace } = useWorkspace();
+  const { data, workspace } = useWorkspace();
 
   return (
-    <ShellPanel className="bg-muted/30">
-      <div className="border-border border-b p-1">
-        <h2 className="font-semibold text-sm">Output panel</h2>
-        <p className="text-muted-foreground text-xs">
-          Testcase / test result tabs migrate here next.
-        </p>
-      </div>
-      <div className="min-h-0 flex-1 overflow-auto p-1 font-mono text-muted-foreground text-xs">
-        Active tab: {workspace.activeTab}
-        {workspace.lastAction ? ` · last action: ${workspace.lastAction}` : ""}
-      </div>
+    <ShellPanel>
+      <ProblemOutputPanel
+        activeTab={workspace.activeTab}
+        lastAction={workspace.lastAction}
+        lastRunOutcome={workspace.lastRunOutcome}
+        onTabChange={workspace.setActiveTab}
+        testCases={data.testCases}
+      />
     </ShellPanel>
   );
 }

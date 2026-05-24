@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, type ReactNode } from "react";
-import type { CapturedConsoleLine } from "@/features/problem-workspace/client-test-run";
+import type { CapturedConsoleLine } from "@/features/problem-workspace/lib/client-test-run";
 
-import { formatTestcaseInputFields } from "./utils/format-testcase-input-fields";
+import { formatTestcaseInputFields } from "@/features/problem-workspace/editor-panel/utils/format-testcase-input-fields";
 
 function ValueBox({
   children,

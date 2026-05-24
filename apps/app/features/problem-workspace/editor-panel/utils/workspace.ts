@@ -2,8 +2,8 @@ import {
   asRecord,
   rowKey,
   strField,
-} from "@/features/problem-workspace/problem-detail-helpers";
-import type { StarterCodeRow } from "../types";
+} from "@/features/problem-workspace/directions-panel/lib/problem-detail-helpers";
+import type { StarterCodeRow } from "../lib/types";
 
 /**
  * Pure helpers for parsing starter-code payloads, building editor state, and

@@ -15,7 +15,7 @@ import {
   collapseAdjacentCapturedConsoleLines,
   runClientTests,
   type RunClientTestsOutcome,
-} from "@/features/problem-workspace/client-test-run";
+} from "@/features/problem-workspace/lib/client-test-run";
 import {
   useCallback,
   useEffect,
@@ -27,7 +27,7 @@ import {
 import { isWorkspaceCodeApiError } from "../queries/workspace-code-errors";
 import { useSaveWorkspaceCodeMutation } from "../queries/use-save-workspace-code-mutation";
 import { useWorkspaceCodeQuery } from "../queries/use-workspace-code-query";
-import type { ConsoleEntry } from "../types";
+import type { ConsoleEntry } from "../lib/types";
 import {
   entryFunctionNameForRun,
   resolveRunStarterRow,

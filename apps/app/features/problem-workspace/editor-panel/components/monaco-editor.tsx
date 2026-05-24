@@ -9,7 +9,7 @@
 import { cn } from "@repo/design-system/lib/utils";
 import dynamic from "next/dynamic";
 
-const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
+const MonacoEditorWidget = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => (
     <div className="flex flex-1 items-center justify-center bg-muted text-muted-foreground text-sm">
@@ -37,7 +37,7 @@ function toMonacoLanguage(language: string | undefined): string {
 }
 
 /** Controlled code editor; fills parent when `className` includes flex-1 / h-full. */
-export function MonacoSolutionEdtor({
+export function MonacoEditor({
   value,
   onChange,
   className,
@@ -54,7 +54,7 @@ export function MonacoSolutionEdtor({
   return (
     <div className={cn("relative min-h-0 flex-1", className)}>
       <div className="absolute inset-0">
-        <MonacoEditor
+        <MonacoEditorWidget
           height="100%"
           language={monacoLanguage}
           onChange={(next) => onChange(next ?? "")}

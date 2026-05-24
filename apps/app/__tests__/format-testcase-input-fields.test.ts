@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatTestcaseInputFields } from "@/features/problem-workspace/components/problem-workspace/utils/format-testcase-input-fields";
+import { formatTestcaseInputFields } from "@/features/problem-workspace/editor-panel/utils/format-testcase-input-fields";
 
 describe("formatTestcaseInputFields", () => {
   it("parses LeetCode-style named inputs", () => {

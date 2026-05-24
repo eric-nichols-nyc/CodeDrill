@@ -9,21 +9,21 @@ import {
 import { Badge } from "@repo/design-system/components/ui/badge";
 import { cn } from "@repo/design-system/lib/utils";
 import { Lightbulb } from "lucide-react";
-import { ExampleItem } from "@/features/problem-workspace/components/example-item";
-import { HintItem } from "@/features/problem-workspace/components/hint-item";
-import { JsonFallback } from "@/features/problem-workspace/components/json-fallback";
+import { JsonFallback } from "@/features/problem-workspace/editor-panel/components/json-fallback";
 import {
   asRecord,
   normalizeDifficultyForDisplay,
   rowKey,
-} from "@/features/problem-workspace/problem-detail-helpers";
+} from "../lib/problem-detail-helpers";
 import type {
   ProblemRow,
   ProblemTag,
-} from "@/features/problem-workspace/problem-detail-types";
+} from "../lib/problem-detail-types";
 import { difficultyTextClass } from "@/features/problems-page/problems-list/utils/difficulty-text-class";
+import { ExampleItem } from "./example-item";
+import { HintItem } from "./hint-item";
 
-export function ProblemDescriptionTab({
+export function DirectionsDescriptionTab({
   problem,
   p,
   examples,

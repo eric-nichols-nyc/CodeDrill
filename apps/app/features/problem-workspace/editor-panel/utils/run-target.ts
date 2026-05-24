@@ -1,4 +1,4 @@
-import type { StarterCodeRow } from "../types";
+import type { StarterCodeRow } from "../lib/types";
 
 import { firstStarterFunctionName } from "./workspace";
 

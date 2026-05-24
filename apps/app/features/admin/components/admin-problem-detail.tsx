@@ -11,7 +11,7 @@ import type { AdminProblemDetail as AdminProblemDetailData } from "@/features/ad
 import {
   isProblemEditorialEmpty,
   parseProblemEditorial,
-} from "@/features/problem-workspace/parse-editorial";
+} from "@/features/problem-workspace/directions-panel/lib/parse-editorial";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (typeof value !== "object" || value === null) {

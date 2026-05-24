@@ -2,10 +2,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useProblemWorkspace } from "@/features/problem-workspace/components/problem-workspace/hooks/use-problem-workspace";
+import { useProblemWorkspace } from "@/features/problem-workspace/editor-panel/hooks/use-problem-workspace";
 
 vi.mock(
-  "@/features/problem-workspace/components/problem-workspace/queries/use-workspace-code-query",
+  "@/features/problem-workspace/editor-panel/queries/use-workspace-code-query",
   () => ({
     useWorkspaceCodeQuery: () => ({
       data: [],
@@ -16,7 +16,7 @@ vi.mock(
 );
 
 vi.mock(
-  "@/features/problem-workspace/components/problem-workspace/queries/use-save-workspace-code-mutation",
+  "@/features/problem-workspace/editor-panel/queries/use-save-workspace-code-mutation",
   () => ({
     useSaveWorkspaceCodeMutation: () => ({
       mutate: vi.fn(),

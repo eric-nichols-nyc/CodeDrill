@@ -8,10 +8,10 @@ import {
 } from "@repo/design-system/components/ui/tabs";
 import { cn } from "@repo/design-system/lib/utils";
 import type { ReactNode } from "react";
-import { ProblemSolution } from "@/features/problem-workspace/components/problem-solution";
-import type { ProblemSolutionRow } from "@/features/problem-workspace/problem-detail-types";
+import { ProblemSolution } from "./problem-solution";
+import type { ProblemSolutionRow } from "../lib/problem-detail-types";
 
-export type ProblemTabsProps = {
+export type DirectionsTabsProps = {
   description: ReactNode;
   solutions: ProblemSolutionRow[];
   editorial: ReactNode;
@@ -21,12 +21,12 @@ export type ProblemTabsProps = {
 const panelClass =
   "min-h-0 min-w-0 w-full flex-1 overflow-y-auto pr-4 pt-1 outline-none ring-offset-background focus-visible:outline-none";
 
-export function ProblemTabs({
+export function DirectionsTabs({
   description,
   solutions,
   editorial,
   className,
-}: ProblemTabsProps) {
+}: DirectionsTabsProps) {
   return (
     <Tabs
       className={cn(

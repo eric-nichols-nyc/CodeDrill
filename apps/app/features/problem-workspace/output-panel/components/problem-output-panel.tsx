@@ -13,8 +13,8 @@ import {
 } from "@repo/design-system/components/ui/tabs";
 import { CheckSquare, Terminal } from "lucide-react";
 import { useMemo } from "react";
-import type { RunClientTestsOutcome } from "@/features/problem-workspace/client-test-run";
-import { normalizeProblemTestCases } from "@/features/problem-workspace/client-test-run";
+import type { RunClientTestsOutcome } from "@/features/problem-workspace/lib/client-test-run";
+import { normalizeProblemTestCases } from "@/features/problem-workspace/lib/client-test-run";
 
 import { TestcasePanel } from "./testcase-panel";
 import { TestResultPanel } from "./test-result-panel";
@@ -58,7 +58,7 @@ export function ProblemOutputPanel({
   );
 
   return (
-    <div className="flex h-full min-h-0 flex-col p-4 pl-3">
+    <div className="flex h-full min-h-0 flex-col p-2">
       <Tabs
         className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-border bg-muted/20"
         onValueChange={onTabChange}

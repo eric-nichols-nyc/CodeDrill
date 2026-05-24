@@ -7,7 +7,7 @@ import {
 } from "@repo/design-system/components/ui/alert";
 import { Button } from "@repo/design-system/components/ui/button";
 import Link from "next/link";
-import { isWorkspaceCodeApiError } from "./queries/workspace-code-errors";
+import { isWorkspaceCodeApiError } from "../queries/workspace-code-errors";
 
 export function WorkspaceCodeStatusBanner({
   loadError,

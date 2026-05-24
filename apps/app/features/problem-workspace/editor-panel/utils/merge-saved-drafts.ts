@@ -1,4 +1,4 @@
-import type { StarterCodeRow } from "../types";
+import type { StarterCodeRow } from "../lib/types";
 import type { WorkspaceCodeEntry } from "../queries/workspace-code-api";
 
 /** Overlays saved code onto drafts by matching `StarterCodeRow.language`. */

@@ -8,7 +8,7 @@ import {
   TabsTrigger,
 } from "@repo/design-system/components/ui/tabs";
 import { useState } from "react";
-import type { ProblemTestCaseView } from "@/features/problem-workspace/client-test-run";
+import type { ProblemTestCaseView } from "@/features/problem-workspace/lib/client-test-run";
 
 import { TestcaseInputFields } from "./testcase-field-blocks";
 

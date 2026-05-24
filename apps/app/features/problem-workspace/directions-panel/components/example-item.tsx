@@ -1,4 +1,4 @@
-import { asRecord, strField } from "@/features/problem-workspace/problem-detail-helpers";
+import { asRecord, strField } from "../lib/problem-detail-helpers";
 
 export function ExampleItem({ ex, index }: { ex: unknown; index: number }) {
   const o = asRecord(ex);

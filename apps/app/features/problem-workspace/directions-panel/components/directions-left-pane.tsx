@@ -1,11 +1,11 @@
-import { ProblemDescriptionTab } from "@/features/problem-workspace/components/problem-description-tab";
-import { ProblemTabs } from "@/features/problem-workspace/components/problem-tabs";
+import { DirectionsDescriptionTab } from "./directions-description-tab";
+import { DirectionsTabs } from "./directions-tabs";
 import type {
   ProblemEditorial,
   ProblemRow,
   ProblemSolutionRow,
   ProblemTag,
-} from "@/features/problem-workspace/problem-detail-types";
+} from "../lib/problem-detail-types";
 
 function YoutubeEmbed({ videoId }: { videoId: string }) {
   const src = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`;
@@ -51,7 +51,7 @@ function EditorialPanel({ editorial }: { editorial: ProblemEditorial }) {
   );
 }
 
-export function ProblemDetailLeftPane({
+export function DirectionsLeftPane({
   p,
   problem,
   examples,
@@ -87,11 +87,11 @@ export function ProblemDetailLeftPane({
   );
 
   return (
-    <div className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden p-4">
-      <ProblemTabs
+    <div className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden p-2">
+      <DirectionsTabs
         className="min-h-0 flex-1"
         description={
-          <ProblemDescriptionTab
+          <DirectionsDescriptionTab
             exampleList={exampleList}
             examples={examples}
             hintList={hintList}

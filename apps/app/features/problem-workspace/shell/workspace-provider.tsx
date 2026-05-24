@@ -1,6 +1,6 @@
 "use client";
 
-import { useProblemWorkspace } from "@/features/problem-workspace/components/problem-workspace/hooks/use-problem-workspace";
+import { useProblemWorkspace } from "@/features/problem-workspace/editor-panel/hooks/use-problem-workspace";
 import {
   createContext,
   type ReactNode,

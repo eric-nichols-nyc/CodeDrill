@@ -9,7 +9,7 @@ import {
   PromptInputSubmit,
   PromptInputTextarea,
 } from "@repo/design-system/components/ai-elements/prompt-input";
-import type { ChatSubmitStatus } from "@/features/problem-workspace/chatbot/lib/message-list-utils";
+import type { ChatSubmitStatus } from "@/features/problem-workspace/chat-panel/lib/message-list-utils";
 
 export type ChatInputProps = {
   hasProblemId: boolean;

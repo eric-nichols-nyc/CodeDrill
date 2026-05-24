@@ -7,8 +7,8 @@ import { ProblemWorkspace } from "./problem-workspace";
 import {
   asRecord,
   isProblemSolutionRowArray,
-} from "@/features/problem-workspace/problem-detail-helpers";
-import type { ProblemSolutionRow } from "@/features/problem-workspace/problem-detail-types";
+} from "@/features/problem-workspace/directions-panel/lib/problem-detail-helpers";
+import type { ProblemSolutionRow } from "@/features/problem-workspace/directions-panel/lib/problem-detail-types";
 import { mapRowsToProblems } from "@/features/problems-page/lib/map-rows-to-problems";
 import { parseProblemsListBody } from "@/features/problems-page/lib/parse-problems-list-body";
 import type { Problem } from "@/features/problems-page/lib/types";
