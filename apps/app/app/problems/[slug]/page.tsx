@@ -1,9 +1,9 @@
+import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { TimerProvider } from "@/components/timer";
-import { ProblemDetail } from "@/features/problem-workspace/components/problem-detail";
-import { ExpandableSidebarChat } from "@/features/problem-workspace/components/expandable-sidebar-chat";
 import { ProblemSlugNavHeaderConnected } from "@/features/problem-slug-nav/components/problem-slug-nav-header-connected";
 import { buildCatalogSlugs } from "@/features/problem-slug-nav/utils/build-catalog-slugs";
+import { ProblemWorkspace } from "./problem-workspace";
 import {
   asRecord,
   isProblemSolutionRowArray,
@@ -45,7 +45,10 @@ function parseCatalogFromList(listResult: ProblemsListResult): {
   };
 }
 
-function resolveTitle(slug: string, bundle: ProblemDetailBundle | null): string {
+function resolveTitle(
+  slug: string,
+  bundle: ProblemDetailBundle | null
+): string {
   if (!bundle) {
     return slug;
   }
@@ -96,7 +99,32 @@ export default async function ProblemBySlugPage({
       ? result.body
       : null;
   const title = resolveTitle(slug, bundle);
-  const problemId = bundle ? problemIdFrom(bundle.problem) : undefined;
+
+  let loadIssueBanner: ReactNode = null;
+  if (!result.ok) {
+    loadIssueBanner = (
+      <div className="shrink-0 border-border border-b p-4">
+        <p className="text-destructive text-sm">
+          Could not load problem (HTTP {result.status}). Ensure the Nest API is
+          running, sign in, or set optional{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">
+            INTERNAL_PROBLEMS_SECRET
+          </code>{" "}
+          for server-side catalog access.
+        </p>
+      </div>
+    );
+  } else if (bundle === null) {
+    loadIssueBanner = (
+      <div className="shrink-0 border-border border-b p-4">
+        <pre className="overflow-x-auto rounded-md border border-border bg-muted p-4 text-xs">
+          {typeof result.body === "string"
+            ? result.body
+            : JSON.stringify(result.body, null, 2)}
+        </pre>
+      </div>
+    );
+  }
 
   return (
     <TimerProvider>
@@ -110,46 +138,23 @@ export default async function ProblemBySlugPage({
           title={title}
         />
 
-        <main className="flex min-h-0 flex-1 flex-row overflow-hidden">
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-            {result.ok ? null : (
-              <div className="p-6">
-                <p className="text-destructive text-sm">
-                  Could not load problem (HTTP {result.status}). Ensure the Nest
-                  API is running, sign in, or set optional{" "}
-                  <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                    INTERNAL_PROBLEMS_SECRET
-                  </code>{" "}
-                  for server-side catalog access.
-                </p>
-              </div>
-            )}
+        {loadIssueBanner}
 
-            {bundle ? (
-              <ProblemDetail
-                examples={bundle.examples}
-                hints={bundle.hints}
-                problem={bundle.problem}
-                solutions={bundle.solutions}
-                starterCode={bundle.starterCode}
-                tags={bundle.tags}
-                testCases={bundle.testCases}
-              />
-            ) : (
-              <div className="p-6">
-                <pre className="overflow-x-auto rounded-md border border-border bg-muted p-4 text-xs">
-                  {typeof result.body === "string"
-                    ? result.body
-                    : JSON.stringify(result.body, null, 2)}
-                </pre>
-              </div>
-            )}
-          </div>
-          <ExpandableSidebarChat
-            learningNotes={bundle?.learningNotes}
-            problemId={problemId}
+        {bundle ? (
+          <ProblemWorkspace
+            data={{
+              problemId: problemIdFrom(bundle.problem),
+              problem: bundle.problem,
+              examples: bundle.examples,
+              hints: bundle.hints,
+              starterCode: bundle.starterCode,
+              testCases: bundle.testCases,
+              learningNotes: bundle.learningNotes,
+              solutions: bundle.solutions,
+              tags: bundle.tags,
+            }}
           />
-        </main>
+        ) : null}
       </div>
     </TimerProvider>
   );

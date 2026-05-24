@@ -101,7 +101,6 @@ export function useProblemChat(
     error: chatError,
   } = useChat({
     id: problemId ?? "problem-chat-no-id",
-    // @ts-expect-error duplicate ai@5 type tree in monorepo lockfile; runtime uses ai@6
     transport,
     onFinish: async () => {
       if (!problemId) {
