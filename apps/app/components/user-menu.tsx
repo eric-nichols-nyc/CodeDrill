@@ -26,7 +26,21 @@ export function UserMenu({ variant = "default" }: UserMenuProps) {
   const { data, isPending } = authClient.useSession();
 
   if (isPending) {
-    return null;
+    return (
+      <button
+        aria-busy="true"
+        aria-label="Account menu"
+        className={
+          variant === "nav"
+            ? iconTriggerClassName
+            : "flex h-9 w-9 items-center justify-center rounded-md border border-border hover:bg-accent"
+        }
+        disabled
+        type="button"
+      >
+        <CircleUser className="h-4 w-4" />
+      </button>
+    );
   }
 
   if (!data?.session) {

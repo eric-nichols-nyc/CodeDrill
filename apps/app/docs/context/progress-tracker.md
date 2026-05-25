@@ -9,10 +9,11 @@ change.
 
 ## Current Goal
 
-- None — problem chat message UI round 2 shipped (`10-problem-chat-message-ui.md`)
+- None — nav-drawer list UI shipped (`12-nav-drawer-list-ui.md`)
 
 ## Completed
 
+- `nav-drawer` list UI — `/problems` toolbar parity (search, filter, sort, random); zebra rows; white active row; semibold text; sheet mounts content only when open (hydration fix)
 - Problem chat streaming Stage 1 — Nest `POST /problems/:problemId/chat/messages/stream` (SSE text-delta + finish); blocking POST unchanged
 - Problem chat streaming Stage 2 — Next BFF `/api/problems/[problemId]/chat/stream` wraps Nest SSE as AI SDK UI message stream
 - Problem chat streaming Stage 3 — `useChat` send path + streaming `chat.tsx` (history via TanStack, send via BFF stream)
@@ -20,9 +21,6 @@ change.
 - API auth consolidation (API slice) — bearer plugin, `getSessionFromHeaders`, removed `x-user-id` guard path
 - Problem chat V1 UI — Server Actions + TanStack Query in `features/problem-workspace/chatbot/`; history load, send message, markdown assistant replies; `problemId` wired through sidebar
 - Problem chat message UI round 2 — split `chat-shell`, `message-list`, `message`, `message-thinking`, `message-actions`, `chat-input`; Shimmer thinking row; copy/edit/vote actions (votes client-only)
-
-## Completed
-
 - `nav-drawer` — Problem List on workspace header opens left Sheet with catalog; sheet header Home → `/`; logo stays home link; `/problems/[slug]` parallel `fetchProblemsList`
 - `problem-slug-nav` — prev/next/random on workspace header rotate through catalog (`id` asc, wrap-around); `ProblemSlugNavHeaderConnected` + `useProblemSlugNavigation`
 - `admin-chat-layout` feature: global header with Ask AI toggle, right slide-out panel, static message list/input, hooks for panel and chat state
@@ -36,7 +34,6 @@ change.
 
 ## Next Up
 
-- `nav-drawer` list UI — zebra rows, white active row, semibold text, search + difficulty filter ([12-nav-drawer-list-ui.md](./context/features-spec/12-nav-drawer-list-ui.md))
 - Optional `problems.catalog_key` column for stable template ↔ DB matching (v1.1)
 - Wire admin chat panel to a real admin assistant endpoint when available
 - Replace dev autofill dropdown with catalog registry imports

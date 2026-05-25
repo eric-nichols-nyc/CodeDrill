@@ -5,7 +5,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@repo/design-system/components/ui/sheet";
-import { useState, type ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import type { Problem } from "@/features/problems-page/lib/types";
 import { NavDrawerHeader } from "./nav-drawer-header";
 import { NavDrawerProblemList } from "./nav-drawer-problem-list";
@@ -29,22 +29,30 @@ export function NavDrawer({
   trigger = <NavDrawerProblemListTrigger />,
 }: NavDrawerProps) {
   const [open, setOpen] = useState(false);
+  const [sheetMounted, setSheetMounted] = useState(false);
+
+  useEffect(() => {
+    setSheetMounted(true);
+  }, []);
 
   return (
     <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent
-        className="z-[100] flex w-full flex-col gap-0 p-0 sm:max-w-sm [&>button]:top-3.5 [&>button]:right-3.5"
-        side="left"
-      >
-        <NavDrawerHeader />
-        <NavDrawerProblemList
-          currentSlug={currentSlug}
-          fetchOk={fetchOk}
-          fetchStatus={fetchStatus}
-          problems={problems}
-        />
-      </SheetContent>
+      {sheetMounted ? (
+        <SheetContent
+          className="z-[100] flex w-full flex-col gap-0 p-0 sm:max-w-sm [&>button]:top-3.5 [&>button]:right-3.5"
+          side="left"
+        >
+          <NavDrawerHeader />
+          <NavDrawerProblemList
+            currentSlug={currentSlug}
+            fetchOk={fetchOk}
+            fetchStatus={fetchStatus}
+            onNavigate={() => setOpen(false)}
+            problems={problems}
+          />
+        </SheetContent>
+      ) : null}
     </Sheet>
   );
 }
