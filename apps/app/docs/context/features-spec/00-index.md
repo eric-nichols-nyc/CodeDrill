@@ -34,6 +34,7 @@ Every **product feature** under `apps/app/features/<name>/` should have a spec i
 | `problem-progress` | [03-problem-progress.md](./03-problem-progress.md) | `features/problem-progress/` | `apps/api/src/problem-progress/`, BFF `app/api/problems/[problemId]/progress/` | In progress |
 | `admin` | [05-admin-problem-filter.md](./05-admin-problem-filter.md) (catalog + added status) | `features/admin/` | `apps/api` problems CRUD via BFF | Shipped |
 | `nav-drawer` | [06-nav-drawer.md](./06-nav-drawer.md) | `features/nav-drawer/` | Reuse `GET /problems` via `fetchProblemsList` | Shipped |
+| `nav-drawer` (list UI) | [12-nav-drawer-list-ui.md](./12-nav-drawer-list-ui.md) (striping, active row, search) | `features/nav-drawer/` | None (client filter on loaded catalog) | **Spec ready** |
 | `problem-workspace` | [07-problem-chat-ui.md](./07-problem-chat-ui.md) (chatbot V1 UI) | `features/problem-workspace/` | Nest `problem-chat/` + chat Server Actions + TanStack | **Chat UI shipped (V1)** |
 | `problem-workspace` (chat streaming) | [09-problem-chat-streaming.md](./09-problem-chat-streaming.md) | `features/problem-workspace/chatbot/` | Nest stream + BFF + `useChat` | **Round 1 shipped** |
 | `problem-workspace` (chat message UI) | [10-problem-chat-message-ui.md](./10-problem-chat-message-ui.md) | `features/problem-workspace/chatbot/components/` | None (UI-only; optional vote API later) | **Shipped** |

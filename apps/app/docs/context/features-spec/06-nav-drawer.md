@@ -87,9 +87,11 @@ apps/app/features/nav-drawer/
 ## Out of scope
 
 - Vaul `Drawer` for this feature (use Sheet for left panels).
-- Section grouping, search, or filters inside the sheet.
+- Section grouping inside the sheet (flat list only in MVP).
 - Client-side catalog refetch.
 - Logo as sheet trigger.
+
+**Follow-up (not in MVP):** list styling + filtered search — [12-nav-drawer-list-ui.md](./12-nav-drawer-list-ui.md).
 
 ## Acceptance criteria
 

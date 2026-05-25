@@ -36,6 +36,7 @@ change.
 
 ## Next Up
 
+- `nav-drawer` list UI — zebra rows, white active row, semibold text, search + difficulty filter ([12-nav-drawer-list-ui.md](./context/features-spec/12-nav-drawer-list-ui.md))
 - Optional `problems.catalog_key` column for stable template ↔ DB matching (v1.1)
 - Wire admin chat panel to a real admin assistant endpoint when available
 - Replace dev autofill dropdown with catalog registry imports

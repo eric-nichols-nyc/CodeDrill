@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "context/features-spec/11-workspace-refactor.md",
+                "file": "context/features-spec/12-nav-drawer-list-ui.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "11-workspace-refactor"
+              "title": "12-nav-drawer-list-ui"
             }
           }
         ],
@@ -200,6 +200,9 @@
   },
   "active": "e60f4f2153d882ec",
   "lastOpenFiles": [
+    "context/features-spec/11-workspace-refactor.md",
+    "context/features-spec/12-nav-drawer-list-ui.md",
+    "context/features-spec/12-problem-notes.md",
     "Untitled.md",
     "context/features-spec/10-problem-chat-message-ui.md",
     "context/features-spec/07-problem-chat-ui.md"
