@@ -45,9 +45,15 @@ export const keys = () =>
         emptyToUndefined,
         z.string().url().optional()
       ),
+      /** Nest practice API origin for browser fetch (defaults to http://localhost:3030). */
+      NEXT_PUBLIC_NEON_JWT_API_URL: z.preprocess(
+        emptyToUndefined,
+        z.string().url().optional()
+      ),
     },
     runtimeEnv: {
       NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+      NEXT_PUBLIC_NEON_JWT_API_URL: process.env.NEXT_PUBLIC_NEON_JWT_API_URL,
       NEON_JWT_API_URL: process.env.NEON_JWT_API_URL,
       INTERNAL_PROBLEMS_SECRET: process.env.INTERNAL_PROBLEMS_SECRET,
       AUTH_TEST_EMAIL: process.env.AUTH_TEST_EMAIL,

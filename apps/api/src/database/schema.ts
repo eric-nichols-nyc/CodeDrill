@@ -177,6 +177,7 @@ export const problemLearningNotes = pgTable(
     body: text("body").notNull(),
     sortOrder: integer("sort_order").notNull().default(0),
     createdAt: timestamptz("created_at").notNull().defaultNow(),
+    updatedAt: timestamptz("updated_at").notNull().defaultNow(),
   },
   (t) => ({
     noteTypeCheck: check(
@@ -185,6 +186,9 @@ export const problemLearningNotes = pgTable(
     ),
     problemIdx: index("problem_learning_notes_problem_id_idx").on(t.problemId),
     userIdx: index("problem_learning_notes_user_id_idx").on(t.userId),
+    userProblemUnique: uniqueIndex(
+      "problem_learning_notes_user_id_problem_id_unique"
+    ).on(t.userId, t.problemId),
   })
 );
 

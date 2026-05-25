@@ -38,6 +38,7 @@ Every **product feature** under `apps/app/features/<name>/` should have a spec i
 | `problem-workspace` (chat streaming) | [09-problem-chat-streaming.md](./09-problem-chat-streaming.md) | `features/problem-workspace/chatbot/` | Nest stream + BFF + `useChat` | **Round 1 shipped** |
 | `problem-workspace` (chat message UI) | [10-problem-chat-message-ui.md](./10-problem-chat-message-ui.md) | `features/problem-workspace/chatbot/components/` | None (UI-only; optional vote API later) | **Shipped** |
 | `problem-workspace` (workspace refactor) | [11-workspace-refactor.md](./11-workspace-refactor.md) | `features/problem-workspace/{shell,directions-panel,editor-panel,output-panel,chat-note-panel}/` | None (UI layout only) | **In progress** — panels wired; file moves done |
+| `problem-workspace` (personal notes) | [12-problem-notes.md](./12-problem-notes.md) | `features/problem-workspace/chat-note-panel/` | Nest `problem-notes/`; client TanStack → Nest (no BFF) | **Shipped** |
 | `api-auth` | [08-api-auth-consolidation.md](./08-api-auth-consolidation.md) | `lib/auth/`, `features/auth/`, `app/auth/` | `apps/api/src/auth.ts` + guards; Bearer token | **Shipped** |
 | `problems-page` | [04-problems-page-list-ui.md](./04-problems-page-list-ui.md) (list UI delta) | `features/problems-page/` | catalog + tags + `patternSlug` sections | Shipped |
 | `landing` | — | `features/landing/` | — | **Spec TODO** |

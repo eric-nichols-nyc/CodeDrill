@@ -43,7 +43,7 @@ export function ChatPanel() {
             <ChatShell problemId={data.problemId} />
           </TabsContent>
           <TabsContent className={panelClass} value="notes">
-            <ProblemNotes learningNotes={data.learningNotes} />
+            <ProblemNotes problemId={data.problemId} />
           </TabsContent>
         </Tabs>
       </div>

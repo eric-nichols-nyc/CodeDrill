@@ -5,6 +5,7 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { DatabaseModule } from "./database/database.module";
 import { ProblemChatModule } from "./problem-chat/problem-chat.module";
+import { ProblemNotesModule } from "./problem-notes/problem-notes.module";
 import { ProblemProgressModule } from "./problem-progress/problem-progress.module";
 import { ProblemWorkspaceCodeModule } from "./problem-workspace-code/problem-workspace-code.module";
 import { ProblemsModule } from "./problems/problems.module";
@@ -14,6 +15,7 @@ import { SessionController } from "./session.controller";
   imports: [
     DatabaseModule,
     ProblemChatModule,
+    ProblemNotesModule,
     ProblemProgressModule,
     ProblemWorkspaceCodeModule,
     ProblemsModule,

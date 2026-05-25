@@ -9,9 +9,11 @@ change.
 
 ## Current Goal
 
-- None — problem chat message UI round 2 shipped (`10-problem-chat-message-ui.md`)
+- None — problem notes shipped (`12-problem-notes.md`)
 
 ## Completed
+
+- Problem notes — Nest `GET/PUT /problems/:problemId/notes`, CORS on API, TanStack client → Nest; Notes tab persists per user
 
 - Problem chat streaming Stage 1 — Nest `POST /problems/:problemId/chat/messages/stream` (SSE text-delta + finish); blocking POST unchanged
 - Problem chat streaming Stage 2 — Next BFF `/api/problems/[problemId]/chat/stream` wraps Nest SSE as AI SDK UI message stream

@@ -7,6 +7,20 @@ async function bootstrap() {
     bodyParser: false,
   });
 
+  const trustedOrigins = (
+    process.env.BETTER_AUTH_TRUSTED_ORIGINS ?? "http://localhost:3010"
+  )
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  app.enableCors({
+    origin: trustedOrigins,
+    credentials: true,
+    allowedHeaders: ["Authorization", "Content-Type"],
+    methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"],
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,

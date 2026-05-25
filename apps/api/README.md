@@ -112,6 +112,17 @@ Per-user tutor message history. **Bearer token or session cookie** — no intern
 
 Use **`@Session()`** / `session.user.id` for other user-scoped features ([NestJS + Better Auth](https://www.better-auth.com/docs/integrations/nestjs)).
 
+### Problem notes (`ProblemNotesController`)
+
+Per-user scratch-pad notes (Notes tab). **Bearer token or session cookie** — no internal-secret bypass. `:problemId` is a **UUID** matching `problems.id`. The Next app calls these routes **directly from the browser** (TanStack Query + CORS).
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/problems/:problemId/notes` | Returns `{ body, updatedAt }` for the signed-in user. Empty `{ body: "", updatedAt: null }` when no note exists. |
+| `PUT` | `/problems/:problemId/notes` | Body: `{ "body": string }` (HTML). Upserts personal note (`note_type: other`). |
+
+**CORS:** `main.ts` enables CORS for origins in `BETTER_AUTH_TRUSTED_ORIGINS` (default `http://localhost:3010`) with `Authorization` header allowed.
+
 ## curl examples
 
 ```bash
