@@ -1,23 +1,38 @@
 "use client";
 
 import { Button } from "@repo/design-system/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@repo/design-system/components/ui/popover";
 import { cn } from "@repo/design-system/lib/utils";
 import { ChevronLeft, History, Plus, Sparkles } from "lucide-react";
+import type { ProblemChatSessionSummary } from "@/features/problem-workspace/chat-panel/lib/chat-session-types";
+import { ChatSessionHistory } from "./chat-session-history";
 
 export type ChatHeaderProps = {
   title?: string;
   onNewChat?: () => void;
-  onOpenHistory?: () => void;
   onCollapse?: () => void;
-  isHistoryOpen?: boolean;
+  historyOpen?: boolean;
+  onHistoryOpenChange?: (open: boolean) => void;
+  historySessions?: ProblemChatSessionSummary[];
+  historyLoading?: boolean;
+  activeSessionId?: string | null;
+  onSelectSession?: (sessionId: string) => void;
 };
 
 export function ChatHeader({
   title = "Leet",
   onNewChat,
-  onOpenHistory,
   onCollapse,
-  isHistoryOpen = false,
+  historyOpen = false,
+  onHistoryOpenChange,
+  historySessions = [],
+  historyLoading = false,
+  activeSessionId = null,
+  onSelectSession,
 }: ChatHeaderProps) {
   return (
     <header className="shrink-0 border-border border-b bg-background">
@@ -53,21 +68,37 @@ export function ChatHeader({
         >
           <Plus className="size-4" />
         </Button>
-        <Button
-          aria-expanded={isHistoryOpen}
-          aria-label="Chat history"
-          className={cn(
-            "text-muted-foreground",
-            isHistoryOpen ? "bg-accent text-accent-foreground" : undefined
-          )}
-          disabled={!onOpenHistory}
-          onClick={onOpenHistory}
-          size="icon-sm"
-          type="button"
-          variant="ghost"
-        >
-          <History className="size-4" />
-        </Button>
+
+        <Popover onOpenChange={onHistoryOpenChange} open={historyOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              aria-expanded={historyOpen}
+              aria-label="Chat history"
+              className={cn(
+                "text-muted-foreground",
+                historyOpen ? "bg-accent text-accent-foreground" : ""
+              )}
+              size="icon-sm"
+              type="button"
+              variant="ghost"
+            >
+              <History className="size-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            align="end"
+            className="w-[min(100vw-2rem,18rem)] gap-0 border-border/80 bg-popover p-0 shadow-xl"
+            side="bottom"
+            sideOffset={4}
+          >
+            <ChatSessionHistory
+              activeSessionId={activeSessionId}
+              isLoading={historyLoading}
+              onSelectSession={onSelectSession}
+              sessions={historySessions}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
     </header>
   );

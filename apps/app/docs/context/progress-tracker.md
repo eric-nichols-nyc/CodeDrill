@@ -9,11 +9,13 @@ change.
 
 ## Current Goal
 
-- Problem chat session header Stage 3 — frontend history shell (`12-problem-chat-session-header.md`)
+- Problem chat session header Stage 4 — multi-thread persistence backend (`12-problem-chat-session-header.md`)
 
 ## Completed
 
-- Problem chat session header Stage 2 — `+` clears visible messages, draft input, and votes locally; streaming unchanged until persisted threads (Stage 3+)
+- Problem chat session header spec v1 rewrite — simpler API (extend `GET messages`, two thread routes, server actions); Stages 1–3 shipped; v1 stops at Stage 5
+- Problem chat session header Stage 3 — history dropdown on header button (`Popover` + `ChatSessionHistory`); empty state
+- Problem chat session header Stage 2 — `+` clears visible messages, draft input, and votes locally via `clearVisibleChat()`; streaming unchanged until persisted threads (Stage 4/5)
 - Problem chat session header Stage 1 — `ChatHeader` fixed at top of `chat-panel` shell; + / history placeholder actions; spec paths updated to `chat-panel/components`
 - `nav-drawer` list UI — `/problems` toolbar parity (search, filter, sort, random); zebra rows; white active row; semibold text; sheet mounts content only when open (hydration fix)
 - Problem chat streaming Stage 1 — Nest `POST /problems/:problemId/chat/messages/stream` (SSE text-delta + finish); blocking POST unchanged

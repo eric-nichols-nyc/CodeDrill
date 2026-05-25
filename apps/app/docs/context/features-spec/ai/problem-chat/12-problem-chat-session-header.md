@@ -8,65 +8,47 @@ This feature extends the existing `features/problem-workspace/chat-panel/` imple
 
 ---
 
-## Existing context
+## V1 scope (deployment target)
 
-The current chat panel already has:
+**Ship through Stage 5.** That delivers persisted multi-thread chat with header, history dropdown, new chat, thread switching, and streaming to the active thread.
 
-- persisted chat history
-- streaming tutor replies
-- message UI components
-- a `use-problem-chat.ts` hook
-- a chat shell rendered inside the problem workspace sidebar/panel
+| Stage | Status | What it delivers |
+| ----- | ------ | ---------------- |
+| 1 | Shipped | Fixed header UI |
+| 2 | Shipped | Local `+` clear (temporary until Stage 5) |
+| 3 | Shipped | History dropdown shell (empty list) |
+| 4 | Next | Backend: multi-thread persistence (extend existing APIs) |
+| 5 | Next | Frontend: wire threads, replace Stage 2 hack, pass `threadId` on stream |
 
-This feature adds session controls above the existing chat area.
-
-The final UI should roughly look like:
-
-```txt
-┌─────────────────────────────────────┐
-│ ✦ Leet                         ⛶  < │
-├─────────────────────────────────────┤
-│                           +   ⟳/history │
-├─────────────────────────────────────┤
-│                                     │
-│             chat messages            │
-│                                     │
-├─────────────────────────────────────┤
-│             chat input               │
-└─────────────────────────────────────┘
-```
-
-The header is responsible for session actions. The existing chat body remains responsible for messages and streaming.
+**Post-v1 (do not implement in this feature slice):** new-chat confirmation dialog, server-stored “last active thread”, stored thread titles, toasts, cross-device active-thread restore, delete/archive UX beyond “leave old thread in history”.
 
 ---
 
-## Important architecture decision
+## Existing context
 
-A “new chat” should eventually create a real persisted thread/session.
+### Frontend (chat-panel)
 
-It should not only clear local React state.
+- persisted chat history via `use-problem-chat.ts`
+- streaming tutor replies via BFF `/api/problems/[problemId]/chat/stream`
+- message UI in `chat-shell.tsx` and related components
+- **Stages 1–3 shipped:** `ChatHeader`, history `Popover`, `ChatSessionHistory`, local `clearVisibleChat()`
 
-Bad final behavior:
+### Backend (today)
 
-```txt
-Click + New Chat
-→ UI clears
-→ refresh page
-→ old messages come back
-```
+- `problem_chat_thread` and `problem_chat_message` tables already exist
+- **Constraint today:** one thread per `(userId, problemId)` — unique index on that pair
+- `getOrCreateThread()` always resolves the same row for a user on a problem
+- `GET /problems/:problemId/chat/messages` already returns `{ thread, messages }`
+- Stream: `POST /problems/:problemId/chat/messages/stream`
+- App reads history via **server actions** (not BFF); stream uses **BFF**
 
-Correct final behavior:
+V1 must **relax the one-thread constraint** and extend these paths — not add a parallel REST surface.
 
-```txt
-Click + New Chat
-→ create Thread B
-→ switch activeThreadId to Thread B
-→ messages are empty
-→ future streamed messages persist to Thread B
-→ history can reopen Thread A later
-```
+---
 
-Mental model:
+## Architecture (v1)
+
+### Mental model
 
 ```txt
 Problem
@@ -78,188 +60,102 @@ Problem
   └── Thread C
 ```
 
-The active thread controls what messages are shown and where new streamed messages are saved.
+The **active thread** (client state) controls which messages are shown and where new streamed messages are saved.
+
+### New chat (v1 behavior)
+
+```txt
+Click +
+→ POST create empty thread
+→ set activeThreadId to new thread
+→ messages empty
+→ future sends include threadId
+→ old thread remains in history dropdown
+```
+
+### Simpler API shape (prefer extend over duplicate)
+
+| Need | V1 approach |
+| ---- | ----------- |
+| List threads for history | **New** `GET …/chat/threads` — summaries only |
+| Create empty thread | **New** `POST …/chat/threads` |
+| Load thread + messages | **Extend** `GET …/chat/messages?threadId=` — omit `threadId` → most recently updated thread for user+problem |
+| Send / stream | **Extend** existing POST bodies with `threadId` — required once Stage 5 ships |
+
+Do **not** add a separate `GET …/chat/threads/[threadId]` if `GET …/chat/messages?threadId=` already returns `{ thread, messages }`.
+
+Do **not** add Next BFF routes for list/load/create unless there is a concrete need — use **server actions** matching existing chat-panel patterns. Keep BFF for stream only.
+
+### Thread summaries (computed in v1)
+
+`ProblemChatSessionSummary` for the UI:
+
+```ts
+export type ProblemChatSessionSummary = {
+  id: string;
+  title: string | null;       // null in v1 → UI shows "Untitled chat"
+  preview: string | null;     // latest user message, truncated (~80 chars), or null
+  createdAt: string;
+  updatedAt: string;
+  messageCount: number;
+};
+```
+
+Compute `messageCount`, `updatedAt`, and `preview` in the list query — **no title column migration in v1**.
+
+### Active thread (client-only in v1)
+
+- `activeThreadId` lives in React / TanStack Query (via `use-chat-sessions.ts`)
+- Optional `localStorage` restore is post-v1
+- On first load with no active id: use latest thread from list or create one on first send
 
 ---
 
 ## Frontend behavior overview
 
-The frontend should have three visible areas:
-
-1. `ChatHeader`
-   - Shows chat title/app label
-   - New chat button
-   - History button
-   - Optional collapse/expand button if the parent panel supports it
-
-2. `ChatSessionHistory`
-   - Opens from the history button
-   - Lists previous threads for the current problem
-   - Clicking a thread switches the active chat
-
-3. Existing `ChatShell` / message area
-   - Renders messages for the active thread
-   - Sends messages using existing streaming path
-   - Keeps message UI actions unchanged
+1. **`ChatHeader`** — title, `+`, history button → `Popover` dropdown
+2. **`ChatSessionHistory`** — dropdown body: loading / empty / session rows
+3. **`ChatShell` / message area** — messages for active thread; streaming unchanged in UX
 
 ---
 
 ## Target frontend component structure
 
-Keep this inside the existing chat-panel feature folder.
-
 ```txt
 apps/app/features/problem-workspace/chat-panel/
   components/
-    chat-shell.tsx                 # existing shell, updated to include ChatHeader
-    chat-header.tsx                # new header UI (fixed at top of chat)
-    chat-session-history.tsx       # history popover/panel
-    chat-session-history-item.tsx  # single thread row
-    clear-chat-dialog.tsx          # optional confirmation dialog
-
+    chat-shell.tsx
+    chat-header.tsx                 # header + history Popover trigger
+    chat-session-history.tsx        # dropdown list content
+    chat-session-history-item.tsx
   hooks/
-    use-problem-chat.ts            # existing hook, later extended with active thread support
-    use-chat-sessions.ts           # loads/creates/switches threads
-
+    use-problem-chat.ts             # messages + stream; accepts activeThreadId (Stage 5)
+    use-chat-sessions.ts            # list / create / select threads (Stage 5)
   lib/
-    chat-session-types.ts          # thread/session types
+    chat-session-types.ts
+    problem-chat-types.ts           # extend with threadId on send types (Stage 5)
 ```
 
-Do not create:
-
-```txt
-chat-panel-v2/
-new-chat-panel/
-session-chat-panel/
-chatbot/                           # legacy duplicate folder — use chat-panel only
-```
-
-This is a refactor/extension of the existing chat panel.
+Do not create `chat-panel-v2/`, `chatbot/`, or duplicate chat folders.
 
 ---
 
-## Stage 1 — Frontend header only
+## Stage 1 — Frontend header only ✅ Shipped
 
-### Goal
-
-Add the visible chat header UI and wire it into the existing chat shell without changing backend behavior.
-
-This stage is intentionally UI-only.
-
-### What to build
-
-Create:
-
-```txt
-apps/app/features/problem-workspace/chat-panel/components/chat-header.tsx
-```
-
-Update:
-
-```txt
-apps/app/features/problem-workspace/chat-panel/components/chat-shell.tsx
-```
-
-so the header is **fixed at the top of the chat** (does not scroll with messages) and appears above the existing message list.
-
-### `ChatHeader` responsibilities
-
-The component should render:
-
-- left title area, for example `Leet`
-- new chat button with plus icon
-- history button with clock/history icon
-- optional collapse button prop, but do not implement layout collapse unless already available
-
-### Suggested props
-
-```ts
-type ChatHeaderProps = {
-  title?: string;
-  onNewChat?: () => void;
-  onOpenHistory?: () => void;
-  onCollapse?: () => void;
-  isHistoryOpen?: boolean;
-};
-```
-
-### UI rules
-
-- Use `@repo/design-system` primitives when available.
-- Use `lucide-react` icons only.
-- Use semantic tokens like `bg-background`, `border-border`, `text-muted-foreground`.
-- Do not hardcode bright custom colors.
-- Pin the header at the top of the chat shell (`shrink-0`; message list scrolls below).
-- Do not change message rendering.
-- Do not change streaming behavior.
-- Do not touch Nest/API in this stage.
-
-### Temporary behavior
-
-For Stage 1:
-
-- `onNewChat` can be a placeholder callback.
-- `onOpenHistory` can toggle a placeholder history panel or log locally.
-- The point is to land the header safely first.
+Add `ChatHeader` fixed at top of `ChatShell`. UI only; no backend changes.
 
 ### Acceptance criteria
 
-- [ ] `ChatHeader` exists.
-- [ ] `ChatShell` renders `ChatHeader` fixed above messages (header stays visible while scrolling).
-- [ ] Existing message list still renders.
-- [ ] Existing chat input still works.
-- [ ] Existing streaming behavior is unchanged.
-- [ ] No backend files are modified.
-- [ ] `pnpm typecheck` passes for `apps/app`.
-
-### Cursor prompt for Stage 1
-
-```txt
-Implement Stage 1 of `12-problem-chat-session-header.md`.
-
-Read the existing chat-panel files under:
-`apps/app/features/problem-workspace/chat-panel/`
-
-Add a new `chat-header.tsx` component under:
-`apps/app/features/problem-workspace/chat-panel/components/`
-
-Then update the existing `chat-shell.tsx` so the header is fixed at the top, above the existing message list/input area.
-
-Important constraints:
-- UI only for Stage 1.
-- Do not change streaming behavior.
-- Do not modify Nest/API routes.
-- Do not create a duplicate chat-panel folder.
-- Use design-system tokens and lucide-react icons.
-- Keep existing message UI and input behavior unchanged.
-- Run `pnpm typecheck` for `apps/app`.
-```
+- [x] `ChatHeader` exists.
+- [x] Header fixed above scrolling messages.
+- [x] Message list, input, and streaming unchanged.
+- [x] No backend changes.
 
 ---
 
-## Stage 2 — Local new chat UX
+## Stage 2 — Local new chat UX ✅ Shipped (temporary)
 
-### Goal
-
-Make the `+` button clear the visible chat locally so the UX can be tested before persisted threads are added.
-
-This is a temporary frontend-only version of new chat.
-
-### Frontend behavior
-
-Clicking `+` should:
-
-1. clear visible messages in the current `useChat` state
-2. clear the draft input if possible
-3. show the existing empty chat state
-
-### Important warning
-
-This is not the final implementation.
-
-Until Stage 3/4 exist, refreshing may reload the old persisted thread.
-
-Add a code comment near the local reset explaining:
+`+` calls `clearVisibleChat()`, clears draft and votes. **Replaced in Stage 5** by real thread creation.
 
 ```ts
 // Temporary Stage 2 behavior. Real new chat will create and switch to a persisted thread.
@@ -267,143 +163,108 @@ Add a code comment near the local reset explaining:
 
 ### Acceptance criteria
 
-- [ ] New chat button clears visible messages.
-- [ ] Empty chat state appears.
-- [ ] Input remains usable.
-- [ ] Sending a new message still streams.
-- [ ] No backend changes yet.
+- [x] `+` clears visible messages locally.
+- [x] Input and streaming still work.
+- [x] No backend changes.
 
 ---
 
-## Stage 3 — Frontend history shell
+## Stage 3 — Frontend history shell ✅ Shipped
 
-### Goal
-
-Add the frontend history UI without real API integration yet.
-
-This gives the component structure before backend thread endpoints exist.
-
-### What to build
-
-Create:
-
-```txt
-components/chat-session-history.tsx
-components/chat-session-history-item.tsx
-lib/chat-session-types.ts
-```
-
-### Temporary data
-
-Use local mock data or an empty state only.
-
-Do not fake complex behavior.
-
-### Suggested type
-
-```ts
-export type ProblemChatSessionSummary = {
-  id: string;
-  title: string | null;
-  preview: string | null;
-  createdAt: string;
-  updatedAt: string;
-  messageCount: number;
-};
-```
-
-### UI behavior
-
-History panel should support:
-
-- loading state
-- empty state: `No previous chats yet`
-- list of sessions
-- click handler prop for selecting a session
+History list in a **dropdown** (`Popover` on history button in `ChatHeader`). Empty `sessions={[]}` until Stage 5.
 
 ### Acceptance criteria
 
-- [ ] History button opens/closes history UI.
-- [ ] Empty state works.
-- [ ] Session item component exists.
-- [ ] No real backend dependency yet.
+- [x] History opens/closes as dropdown.
+- [x] Empty state: `No previous chats yet`.
+- [x] `ChatSessionHistoryItem` exists.
+- [x] No backend dependency.
 
 ---
 
-## Stage 4 — Persisted thread API
+## Stage 4 — Multi-thread persistence (backend)
 
 ### Goal
 
-Add real persisted chat session/thread support.
+Enable multiple persisted threads per user per problem. Extend existing Nest routes and app server layer — minimal new surface area.
 
-This is the first backend stage.
+### 4a. Schema migration
 
-### Required routes
+- Drop unique index `problem_chat_thread_user_problem_unique` on `(user_id, problem_id)`.
+- Existing rows become valid first entries in history — no data loss.
+- Update schema comment: many threads per `(user, problem)`.
 
-Add BFF routes in the Next app and matching Nest routes if they do not already exist.
+### 4b. Nest service changes
+
+Replace implicit-only `getOrCreateThread(userId, problemId)` with:
+
+- `listThreads(userId, problemId)` → summaries (`id`, `createdAt`, `updatedAt`, `messageCount`, `preview`)
+- `createThread(userId, problemId)` → new empty thread row
+- `getThreadMessages(userId, problemId, threadId?)` → if `threadId` omitted, use latest by `updatedAt`; verify ownership
+- `resolveThreadForSend(userId, threadId)` → validate thread belongs to user+problem before persist/stream
+
+Stop upserting a single thread on every message send once Stage 5 passes explicit `threadId`.
+
+### 4c. Nest routes
 
 ```txt
-GET  /api/problems/[problemId]/chat/threads
-POST /api/problems/[problemId]/chat/threads
-GET  /api/problems/[problemId]/chat/threads/[threadId]
+GET  /problems/:problemId/chat/threads          # list summaries
+POST /problems/:problemId/chat/threads          # create empty thread
+GET  /problems/:problemId/chat/messages?threadId=   # extend existing route
+POST /problems/:problemId/chat/messages/stream  # extend body: threadId (required in Stage 5)
 ```
 
-### Route responsibilities
-
-#### `GET /threads`
-
-Returns session summaries for the problem.
+Responses:
 
 ```ts
 type GetProblemChatThreadsResponse = {
   threads: ProblemChatSessionSummary[];
 };
-```
 
-#### `POST /threads`
-
-Creates a new empty thread for the problem.
-
-```ts
 type CreateProblemChatThreadResponse = {
   thread: ProblemChatSessionSummary;
 };
-```
 
-#### `GET /threads/[threadId]`
-
-Returns a specific thread and its messages.
-
-```ts
-type GetProblemChatThreadResponse = {
-  thread: ProblemChatSessionSummary;
+// Existing shape — unchanged
+type GetProblemChatMessagesResponse = {
+  thread: ProblemChatThreadDto;
   messages: ProblemChatMessageDto[];
 };
 ```
 
+### 4d. App access layer
+
+Add server actions in `chat-panel/actions/` (mirror existing `getProblemChatMessagesAction` pattern):
+
+- `listProblemChatThreadsAction(problemId)`
+- `createProblemChatThreadAction(problemId)`
+- Extend `getProblemChatMessagesAction(problemId, threadId?)`
+
+Extend stream BFF + Nest stream handler to accept `threadId` in the request body (wire fully in Stage 5; schema/types can land in Stage 4).
+
 ### Auth
 
-Use the same auth pattern as the existing problem chat BFF/streaming routes.
+Same as existing chat: `ProblemsUserGuard`, bearer/session via app auth helpers.
 
 ### Acceptance criteria
 
-- [ ] Thread list endpoint works.
-- [ ] Create thread endpoint works.
-- [ ] Get thread messages endpoint works.
-- [ ] Unauthorized users cannot access routes.
-- [ ] Existing default chat still works.
+- [ ] Migration applied; multiple threads per user+problem allowed.
+- [ ] Existing single-thread conversations still load (appear in thread list).
+- [ ] `GET …/chat/threads` returns summaries with `messageCount` and `preview`.
+- [ ] `POST …/chat/threads` creates an empty thread.
+- [ ] `GET …/chat/messages?threadId=` returns correct messages; omitting id returns latest thread.
+- [ ] Unauthorized / wrong-user thread access returns friendly errors.
+- [ ] Server actions callable from `apps/app`; no unnecessary new BFF routes.
 
 ---
 
-## Stage 5 — Active thread state
+## Stage 5 — Wire frontend (completes v1)
 
 ### Goal
 
-Make the frontend aware of the active chat thread.
+Connect header, history dropdown, and `useProblemChat` to real threads. Remove Stage 2 local-only reset.
 
-### Hook behavior
-
-Add or extend hooks so the chat UI has:
+### New hook: `use-chat-sessions.ts`
 
 ```ts
 type ChatSessionState = {
@@ -415,205 +276,95 @@ type ChatSessionState = {
 };
 ```
 
-### New chat final behavior
+- Load thread list on mount (TanStack Query).
+- `createNewThread` → `POST` create + set active + empty messages.
+- `selectThread` → `GET messages?threadId=` + hydrate `useChat` + close dropdown.
+- **Remove** `clearVisibleChat()` from user-facing `+` path (delete or keep internal only).
 
-Clicking `+` should:
+### `use-problem-chat.ts` changes
 
-1. call create thread endpoint
-2. set the new thread as active
-3. clear/hydrate messages for that active thread
-4. close history panel
-5. keep input ready for a new question
+- Accept `activeThreadId` (required once sessions hook is wired).
+- `useChat({ id: \`${problemId}:${activeThreadId}\` })` so switching threads resets chat state cleanly.
+- History query keyed by `problemId` + `activeThreadId`.
+- `onFinish`: refetch active thread messages + invalidate thread list (updates `preview` / `messageCount`).
+- Stream transport sends `threadId` in body.
 
-### Select history behavior
+### `chat-shell.tsx` wiring
 
-Clicking a previous thread should:
+Pass real `historySessions`, `activeSessionId`, `historyLoading`, `onSelectSession`, and `onNewChat={createNewThread}` into `ChatHeader`.
 
-1. fetch that thread’s messages
-2. set it as active
-3. hydrate chat messages
-4. close history panel
+### V1 UX rules
 
-### Acceptance criteria
-
-- [ ] `+` creates a real thread.
-- [ ] History item switches active thread.
-- [ ] Messages update when active thread changes.
-- [ ] No duplicate messages after switching.
-
----
-
-## Stage 6 — Streaming sends to active thread
-
-### Goal
-
-Ensure streamed messages persist to the selected thread.
-
-### Required request change
-
-The stream send body should include the active thread id:
-
-```ts
-type PostProblemChatMessageRequest = {
-  content: string;
-  threadId?: string;
-  metadata?: {
-    code?: string;
-    language?: string;
-  };
-};
-```
-
-### Behavior
-
-When a message is sent:
-
-- if `activeThreadId` exists, persist/stream into that thread
-- if no active thread exists, create or resolve a default thread before sending
+- `+` creates persisted thread immediately — **no confirmation dialog in v1**.
+- History dropdown closes on select, outside click, Escape, or new chat.
+- `title` null → `ChatSessionHistoryItem` shows “Untitled chat”.
 
 ### Acceptance criteria
 
-- [ ] New messages save to the active thread.
-- [ ] Switching threads before sending does not leak messages.
-- [ ] Refresh shows messages under the correct thread.
-- [ ] Streaming still works token-by-token.
+- [ ] `+` creates a real thread and shows empty chat.
+- [ ] History lists prior threads with preview/count.
+- [ ] Selecting a thread loads its messages.
+- [ ] Streaming saves to the active thread.
+- [ ] Page refresh reloads latest thread if no client active id (acceptable v1); messages never leak across threads in one session.
+- [ ] Stage 2 `clearVisibleChat` no longer used for `+`.
+- [ ] `pnpm typecheck` passes for `apps/app` (fix pre-existing errors if they block CI).
 
 ---
 
-## Stage 7 — Clear chat behavior
-
-### Goal
-
-Define the final clear/reset behavior.
-
-### Recommended behavior
-
-Do not permanently delete messages in v1.
-
-Implement clear as:
-
-```txt
-Archive/leave current thread in history
-+ create a new empty active thread
-```
-
-User-facing copy:
-
-```txt
-Start a new chat?
-Your current conversation will remain in history.
-```
-
-### Optional component
-
-```txt
-components/clear-chat-dialog.tsx
-```
-
-### Acceptance criteria
-
-- [ ] Clear/new chat does not destroy old history.
-- [ ] New empty thread becomes active.
-- [ ] Previous thread remains available in history.
-
----
-
-## Stage 8 — Persistence polish
-
-### Goal
-
-Improve the production feel.
-
-### Enhancements
-
-- remember last active thread per problem
-- update thread title from first user message
-- show preview from first user message or latest message
-- invalidate thread list after new messages
-- handle missing/deleted thread gracefully
-- add basic toast feedback for new chat / thread load failures
-
-### Thread title rule
-
-Default thread title:
-
-```txt
-First user message, truncated to around 40 characters
-```
-
-Example:
-
-```txt
-Can you explain two pointers...
-```
-
-### Acceptance criteria
-
-- [ ] Thread title/preview updates after first message.
-- [ ] Last active thread restores on refresh if possible.
-- [ ] History list updates after messages are sent.
-
----
-
-## Stage 9 — Testing checklist
+## V1 testing checklist
 
 ### Frontend
 
-- [ ] Header renders correctly.
-- [ ] New chat button works.
-- [ ] History opens/closes.
-- [ ] Empty history state works.
-- [ ] Selecting old thread hydrates messages.
-- [ ] Input still works after switching threads.
-- [ ] Streaming still animates correctly.
+- [ ] Header renders; history dropdown opens/closes.
+- [ ] `+` creates new empty persisted chat.
+- [ ] History shows previous threads; select switches messages.
+- [ ] Input and streaming work after thread switch.
+- [ ] Empty history state when only one thread exists (or copy TBD: show current thread vs empty — prefer listing all threads including active).
 
-### Backend/API
+### Backend
 
-- [ ] Thread list requires auth.
-- [ ] Create thread requires auth.
-- [ ] Get thread requires auth.
+- [ ] Thread list / create / messages require auth.
 - [ ] User cannot access another user's thread.
-- [ ] Invalid thread id returns a friendly error.
+- [ ] Invalid `threadId` returns friendly error.
+- [ ] Legacy users with one thread see it in history.
 
 ### Regression
 
-- [ ] Existing persisted chat history still loads.
-- [ ] Existing message UI actions still work.
-- [ ] Existing streaming endpoint still works.
-- [ ] No duplicate chat-panel implementations were created.
-- [ ] `pnpm typecheck` passes.
+- [ ] Existing message UI actions (copy, edit, vote) still work.
+- [ ] Streaming still token-by-token.
+- [ ] No duplicate chat-panel implementations.
 
 ---
 
 ## Out of scope
 
-Do not implement in this feature:
+**Product (not v1):**
 
 - deleting chat history permanently
+- new-chat confirmation dialog
 - cross-problem chat history
-- pinned chats
-- folders
+- pinned chats, folders, export, share
 - AI summaries of old chats
-- exporting chats
-- sharing chats
-- vector memory
-- new tutor prompt behavior
+- vector memory / tutor prompt changes
+- server-persisted “last active thread per problem”
+- stored thread title column (computed preview only in v1)
+
+**Technical:**
+
+- `GET …/chat/threads/[threadId]` as a separate route
+- BFF routes for thread list/load (use server actions)
+- `clear-chat-dialog.tsx` (post-v1)
 
 ---
 
 ## Implementation guidance for agents
 
-Start with Stage 1 only.
+1. Stages 1–3 are **done** — do not redo unless fixing bugs.
+2. Implement **Stage 4** (backend + server actions + stream body types) before Stage 5.
+3. Implement **Stage 5** as one frontend slice; remove Stage 2 temporary `+` behavior.
+4. Read existing `apps/api/src/problem-chat/` and `apps/app/features/problem-workspace/chat-panel/` before changing behavior.
+5. Do not create parallel chat folders.
+6. Run `pnpm typecheck` from `apps/app` when touching types.
+7. Update `progress-tracker.md` when a stage ships.
 
-Do not jump to backend threads until the header is wired into the existing chat UI.
-
-Each stage should preserve previous stages and keep the existing streaming/chat behavior working.
-
-When implementing a stage:
-
-1. Read this full spec.
-2. Read the existing chat-panel files.
-3. Implement only the requested stage.
-4. Do not create parallel chat-panel folders.
-5. Run typecheck.
-6. Update progress docs if your project uses them.
+**Do not implement post-v1 items** unless the user explicitly expands scope.

@@ -41,10 +41,12 @@ export function ChatShell({
     setEditDraft(undefined);
     setEditDraftKey((key) => key + 1);
     setVotes({});
+    setIsHistoryOpen(false);
   }, [clearVisibleChat, isSending]);
 
-  const handleOpenHistory = useCallback(() => {
-    setIsHistoryOpen((open) => !open);
+  const handleSelectSession = useCallback((_sessionId: string) => {
+    // Stage 3 placeholder — wired when thread API lands (Stage 4/5).
+    setIsHistoryOpen(false);
   }, []);
 
   const handleSubmit = async (message: PromptInputMessage) => {
@@ -80,9 +82,13 @@ export function ChatShell({
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <ChatHeader
-        isHistoryOpen={isHistoryOpen}
+        activeSessionId={null}
+        historyLoading={false}
+        historyOpen={isHistoryOpen}
+        historySessions={[]}
+        onHistoryOpenChange={setIsHistoryOpen}
         onNewChat={handleNewChat}
-        onOpenHistory={handleOpenHistory}
+        onSelectSession={handleSelectSession}
       />
 
       <MessageList
