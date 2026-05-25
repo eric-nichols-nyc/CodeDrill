@@ -22,6 +22,7 @@ export function ChatShell({
     isSending,
     error,
     sendMessage,
+    clearVisibleChat,
     submitStatus,
     hasProblemId,
   } = useProblemChat(problemId, { initialData: initialChatData });
@@ -32,8 +33,15 @@ export function ChatShell({
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const handleNewChat = useCallback(() => {
-    // Stage 1 placeholder — wired in later stages.
-  }, []);
+    if (isSending) {
+      return;
+    }
+
+    clearVisibleChat();
+    setEditDraft(undefined);
+    setEditDraftKey((key) => key + 1);
+    setVotes({});
+  }, [clearVisibleChat, isSending]);
 
   const handleOpenHistory = useCallback(() => {
     setIsHistoryOpen((open) => !open);

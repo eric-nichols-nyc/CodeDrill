@@ -9,10 +9,11 @@ change.
 
 ## Current Goal
 
-- Problem chat session header Stage 2 — local new chat UX (`12-problem-chat-session-header.md`)
+- Problem chat session header Stage 3 — frontend history shell (`12-problem-chat-session-header.md`)
 
 ## Completed
 
+- Problem chat session header Stage 2 — `+` clears visible messages, draft input, and votes locally; streaming unchanged until persisted threads (Stage 3+)
 - Problem chat session header Stage 1 — `ChatHeader` fixed at top of `chat-panel` shell; + / history placeholder actions; spec paths updated to `chat-panel/components`
 - `nav-drawer` list UI — `/problems` toolbar parity (search, filter, sort, random); zebra rows; white active row; semibold text; sheet mounts content only when open (hydration fix)
 - Problem chat streaming Stage 1 — Nest `POST /problems/:problemId/chat/messages/stream` (SSE text-delta + finish); blocking POST unchanged

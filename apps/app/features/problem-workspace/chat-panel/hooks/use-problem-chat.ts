@@ -156,6 +156,11 @@ export function useProblemChat(
     [problemId, sendChatMessage, status]
   );
 
+  const clearVisibleChat = useCallback(() => {
+    // Temporary Stage 2 behavior. Real new chat will create and switch to a persisted thread.
+    setMessages([]);
+  }, [setMessages]);
+
   const activeError = chatError ?? historyQuery.error;
   const isSending = status === "submitted" || status === "streaming";
   const submitStatus = mapSubmitStatus(status);
@@ -166,6 +171,7 @@ export function useProblemChat(
     isSending,
     error: activeError ? errorMessage(activeError) : null,
     sendMessage,
+    clearVisibleChat,
     submitStatus,
     canSend: canSendMessage(problemId, status),
     hasProblemId: Boolean(problemId),
