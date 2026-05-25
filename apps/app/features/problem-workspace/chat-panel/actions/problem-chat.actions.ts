@@ -2,13 +2,17 @@
 
 import { ProblemChatApiError } from "../lib/problem-chat-errors";
 import {
+  createProblemChatThread,
   getProblemChatMessages,
+  listProblemChatThreads,
   postProblemChatMessage,
 } from "../lib/problem-chat-server";
 import type {
+  CreateProblemChatThreadResponse,
+  GetProblemChatMessagesResponse,
+  GetProblemChatThreadsResponse,
   PostProblemChatMessageRequest,
   PostProblemChatMessageResponse,
-  GetProblemChatMessagesResponse,
   ProblemChatActionResult,
 } from "../lib/problem-chat-types";
 
@@ -23,10 +27,34 @@ function toActionError(error: unknown): ProblemChatActionResult<never> {
 }
 
 export async function getProblemChatMessagesAction(
-  problemId: string
+  problemId: string,
+  threadId?: string
 ): Promise<ProblemChatActionResult<GetProblemChatMessagesResponse>> {
   try {
-    return { ok: true, data: await getProblemChatMessages(problemId) };
+    return {
+      ok: true,
+      data: await getProblemChatMessages(problemId, threadId),
+    };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function listProblemChatThreadsAction(
+  problemId: string
+): Promise<ProblemChatActionResult<GetProblemChatThreadsResponse>> {
+  try {
+    return { ok: true, data: await listProblemChatThreads(problemId) };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function createProblemChatThreadAction(
+  problemId: string
+): Promise<ProblemChatActionResult<CreateProblemChatThreadResponse>> {
+  try {
+    return { ok: true, data: await createProblemChatThread(problemId) };
   } catch (error) {
     return toActionError(error);
   }

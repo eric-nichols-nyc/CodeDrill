@@ -248,13 +248,14 @@ Same as existing chat: `ProblemsUserGuard`, bearer/session via app auth helpers.
 
 ### Acceptance criteria
 
-- [ ] Migration applied; multiple threads per user+problem allowed.
-- [ ] Existing single-thread conversations still load (appear in thread list).
-- [ ] `GET …/chat/threads` returns summaries with `messageCount` and `preview`.
-- [ ] `POST …/chat/threads` creates an empty thread.
-- [ ] `GET …/chat/messages?threadId=` returns correct messages; omitting id returns latest thread.
-- [ ] Unauthorized / wrong-user thread access returns friendly errors.
-- [ ] Server actions callable from `apps/app`; no unnecessary new BFF routes.
+- [x] Migration applied; multiple threads per user+problem allowed.
+- [x] Existing single-thread conversations still load (appear in thread list).
+- [x] `GET …/chat/threads` returns summaries with `messageCount` and `preview`.
+- [x] `POST …/chat/threads` creates an empty thread.
+- [x] `GET …/chat/messages?threadId=` returns correct messages; omitting id returns latest thread.
+- [x] Unauthorized / wrong-user thread access returns friendly errors.
+- [x] Server actions callable from `apps/app`; no unnecessary new BFF routes.
+- [x] Stream request body accepts optional `threadId` (wired fully in Stage 5).
 
 ---
 

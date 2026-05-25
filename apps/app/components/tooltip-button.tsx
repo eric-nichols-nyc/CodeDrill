@@ -1,18 +1,18 @@
 "use client";
 
-import { Button, type ButtonProps } from "@repo/design-system/components/ui/button";
+import { Button } from "@repo/design-system/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@repo/design-system/components/ui/tooltip";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 type TooltipButtonProps = {
   buttonText: string;
   content: ReactNode;
-  buttonVariant?: ButtonProps["variant"];
-  buttonSize?: ButtonProps["size"];
+  buttonVariant?: ComponentProps<typeof Button>["variant"];
+  buttonSize?: ComponentProps<typeof Button>["size"];
   side?: "top" | "right" | "bottom" | "left";
 };
 

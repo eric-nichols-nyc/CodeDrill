@@ -5,10 +5,13 @@ import { apiBaseUrl } from "@/lib/auth/api-url";
 import { ProblemChatApiError } from "./problem-chat-errors";
 import { problemChatErrorFromResponse } from "./parse-problem-chat-error";
 import type {
+  CreateProblemChatThreadResponse,
   GetProblemChatMessagesResponse,
+  GetProblemChatThreadsResponse,
   PostProblemChatMessageRequest,
   PostProblemChatMessageResponse,
   ProblemChatMessageDto,
+  ProblemChatSessionSummary,
   ProblemChatThreadDto,
 } from "./problem-chat-types";
 
@@ -46,8 +49,16 @@ async function requireAuthHeaders(): Promise<Record<string, string>> {
   });
 }
 
-function chatMessagesPath(problemId: string): string {
-  return `${apiBaseUrl()}/problems/${encodeURIComponent(problemId)}/chat/messages`;
+function chatMessagesPath(problemId: string, threadId?: string): string {
+  const base = `${apiBaseUrl()}/problems/${encodeURIComponent(problemId)}/chat/messages`;
+  if (!threadId) {
+    return base;
+  }
+  return `${base}?threadId=${encodeURIComponent(threadId)}`;
+}
+
+function chatThreadsPath(problemId: string): string {
+  return `${apiBaseUrl()}/problems/${encodeURIComponent(problemId)}/chat/threads`;
 }
 
 function isProblemChatThreadDto(value: unknown): value is ProblemChatThreadDto {
@@ -106,15 +117,55 @@ function isPostProblemChatMessageResponse(
   );
 }
 
+function isProblemChatSessionSummary(
+  value: unknown
+): value is ProblemChatSessionSummary {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const o = value as Record<string, unknown>;
+  return (
+    typeof o.id === "string" &&
+    (o.title === null || typeof o.title === "string") &&
+    (o.preview === null || typeof o.preview === "string") &&
+    typeof o.createdAt === "string" &&
+    typeof o.updatedAt === "string" &&
+    typeof o.messageCount === "number"
+  );
+}
+
+function isGetProblemChatThreadsResponse(
+  value: unknown
+): value is GetProblemChatThreadsResponse {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const o = value as Record<string, unknown>;
+  return (
+    Array.isArray(o.threads) &&
+    o.threads.every(isProblemChatSessionSummary)
+  );
+}
+
+function isCreateProblemChatThreadResponse(
+  value: unknown
+): value is CreateProblemChatThreadResponse {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const o = value as Record<string, unknown>;
+  return isProblemChatSessionSummary(o.thread);
+}
+
 async function upstreamFetch(
-  problemId: string,
+  path: string,
   init?: RequestInit,
   authHeaders?: Record<string, string>
 ): Promise<Response> {
   const auth = authHeaders ?? (await requireAuthHeaders());
 
   try {
-    return await fetch(chatMessagesPath(problemId), {
+    return await fetch(path, {
       ...init,
       headers: {
         ...auth,
@@ -130,15 +181,11 @@ async function upstreamFetch(
   }
 }
 
-export async function getProblemChatMessages(
-  problemId: string
-): Promise<GetProblemChatMessagesResponse> {
-  const auth = await apiAuthHeaders();
-  if (!auth) {
-    return emptyChatHistory(problemId);
-  }
-
-  const res = await upstreamFetch(problemId, undefined, auth);
+async function parseJsonResponse<T>(
+  res: Response,
+  isValid: (value: unknown) => value is T,
+  invalidMessage: string
+): Promise<T> {
   const text = await readResponse(res);
 
   if (!res.ok) {
@@ -149,13 +196,13 @@ export async function getProblemChatMessages(
   try {
     body = JSON.parse(text);
   } catch {
-    throw new ProblemChatApiError("Invalid chat history response.", {
+    throw new ProblemChatApiError(invalidMessage, {
       status: res.status,
     });
   }
 
-  if (!isGetProblemChatMessagesResponse(body)) {
-    throw new ProblemChatApiError("Invalid chat history response.", {
+  if (!isValid(body)) {
+    throw new ProblemChatApiError(invalidMessage, {
       status: res.status,
     });
   }
@@ -163,35 +210,53 @@ export async function getProblemChatMessages(
   return body;
 }
 
+export async function getProblemChatMessages(
+  problemId: string,
+  threadId?: string
+): Promise<GetProblemChatMessagesResponse> {
+  const auth = await apiAuthHeaders();
+  if (!auth) {
+    return emptyChatHistory(problemId);
+  }
+
+  return parseJsonResponse(
+    await upstreamFetch(chatMessagesPath(problemId, threadId), undefined, auth),
+    isGetProblemChatMessagesResponse,
+    "Invalid chat history response."
+  );
+}
+
+export async function listProblemChatThreads(
+  problemId: string
+): Promise<GetProblemChatThreadsResponse> {
+  return parseJsonResponse(
+    await upstreamFetch(chatThreadsPath(problemId)),
+    isGetProblemChatThreadsResponse,
+    "Invalid chat threads response."
+  );
+}
+
+export async function createProblemChatThread(
+  problemId: string
+): Promise<CreateProblemChatThreadResponse> {
+  return parseJsonResponse(
+    await upstreamFetch(chatThreadsPath(problemId), { method: "POST" }),
+    isCreateProblemChatThreadResponse,
+    "Invalid create chat thread response."
+  );
+}
+
 export async function postProblemChatMessage(
   problemId: string,
   body: PostProblemChatMessageRequest
 ): Promise<PostProblemChatMessageResponse> {
-  const res = await upstreamFetch(problemId, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const text = await readResponse(res);
-
-  if (!res.ok) {
-    throw problemChatErrorFromResponse(res, text);
-  }
-
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(text);
-  } catch {
-    throw new ProblemChatApiError("Invalid chat message response.", {
-      status: res.status,
-    });
-  }
-
-  if (!isPostProblemChatMessageResponse(parsed)) {
-    throw new ProblemChatApiError("Invalid chat message response.", {
-      status: res.status,
-    });
-  }
-
-  return parsed;
+  return parseJsonResponse(
+    await upstreamFetch(chatMessagesPath(problemId), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }),
+    isPostProblemChatMessageResponse,
+    "Invalid chat message response."
+  );
 }

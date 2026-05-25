@@ -21,8 +21,26 @@ export type GetProblemChatMessagesResponse = {
   messages: ProblemChatMessageDto[];
 };
 
+export type ProblemChatSessionSummary = {
+  id: string;
+  title: string | null;
+  preview: string | null;
+  createdAt: string;
+  updatedAt: string;
+  messageCount: number;
+};
+
+export type GetProblemChatThreadsResponse = {
+  threads: ProblemChatSessionSummary[];
+};
+
+export type CreateProblemChatThreadResponse = {
+  thread: ProblemChatSessionSummary;
+};
+
 export type PostProblemChatMessageRequest = {
   content: string;
+  threadId?: string;
   metadata?: {
     code?: string;
     language?: string;

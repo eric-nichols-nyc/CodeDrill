@@ -20,6 +20,23 @@ export type GetProblemChatMessagesResponse = {
   messages: ProblemChatMessageDto[];
 };
 
+export type ProblemChatSessionSummary = {
+  id: string;
+  title: string | null;
+  preview: string | null;
+  createdAt: string;
+  updatedAt: string;
+  messageCount: number;
+};
+
+export type GetProblemChatThreadsResponse = {
+  threads: ProblemChatSessionSummary[];
+};
+
+export type CreateProblemChatThreadResponse = {
+  thread: ProblemChatSessionSummary;
+};
+
 /** POST /problems/:problemId/chat/messages — both persisted messages + updated thread. */
 export type PostProblemChatMessageResponse = {
   thread: ProblemChatThreadDto;

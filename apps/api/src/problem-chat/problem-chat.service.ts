@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, count, desc, eq } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import {
   problemChatMessages,
@@ -19,7 +19,10 @@ import {
   writeStreamEvent,
 } from "./problem-chat-stream.util";
 import type {
+  CreateProblemChatThreadResponse,
+  GetProblemChatThreadsResponse,
   ProblemChatMessageDto,
+  ProblemChatSessionSummary,
   ProblemChatStreamEvent,
   ProblemChatThreadDto,
   PostProblemChatMessageResponse,
@@ -31,6 +34,7 @@ type AppDb = NeonHttpDatabase<typeof schema>;
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 const CHAT_MODEL = "gpt-4o-mini";
+const PREVIEW_MAX_LENGTH = 80;
 
 type StoredMessage = typeof problemChatMessages.$inferSelect;
 type StoredThread = typeof problemChatThreads.$inferSelect;
@@ -88,7 +92,77 @@ export class ProblemChatService {
     }
   }
 
-  private async getOrCreateThread(userId: string, problemId: string) {
+  private truncatePreview(content: string): string {
+    const trimmed = content.trim();
+    if (trimmed.length <= PREVIEW_MAX_LENGTH) {
+      return trimmed;
+    }
+    return `${trimmed.slice(0, PREVIEW_MAX_LENGTH - 1)}…`;
+  }
+
+  private serializeSessionSummary(input: {
+    thread: StoredThread;
+    messageCount: number;
+    preview: string | null;
+  }): ProblemChatSessionSummary {
+    return {
+      id: input.thread.id,
+      title: null,
+      preview: input.preview,
+      createdAt: input.thread.createdAt.toISOString(),
+      updatedAt: input.thread.updatedAt.toISOString(),
+      messageCount: input.messageCount,
+    };
+  }
+
+  private async getOwnedThread(
+    userId: string,
+    problemId: string,
+    threadId: string
+  ): Promise<StoredThread> {
+    await this.assertProblemExists(problemId);
+
+    const [thread] = await this.db
+      .select()
+      .from(problemChatThreads)
+      .where(
+        and(
+          eq(problemChatThreads.id, threadId),
+          eq(problemChatThreads.userId, userId),
+          eq(problemChatThreads.problemId, problemId)
+        )
+      )
+      .limit(1);
+
+    if (!thread) {
+      throw new NotFoundException(`Chat thread not found: ${threadId}`);
+    }
+
+    return thread;
+  }
+
+  private async getLatestThread(
+    userId: string,
+    problemId: string
+  ): Promise<StoredThread | null> {
+    await this.assertProblemExists(problemId);
+
+    const [thread] = await this.db
+      .select()
+      .from(problemChatThreads)
+      .where(
+        and(
+          eq(problemChatThreads.userId, userId),
+          eq(problemChatThreads.problemId, problemId)
+        )
+      )
+      .orderBy(desc(problemChatThreads.updatedAt))
+      .limit(1);
+
+    return thread ?? null;
+  }
+
+  private async insertThread(userId: string, problemId: string) {
     await this.assertProblemExists(problemId);
 
     const [thread] = await this.db
@@ -97,14 +171,92 @@ export class ProblemChatService {
         userId,
         problemId,
       })
-      .onConflictDoUpdate({
-        target: [problemChatThreads.userId, problemChatThreads.problemId],
-        set: { updatedAt: new Date() },
-      })
       .returning();
 
     if (!thread) {
-      throw new Error("Failed to resolve problem chat thread");
+      throw new Error("Failed to create problem chat thread");
+    }
+
+    return thread;
+  }
+
+  private async resolveThreadForRead(
+    userId: string,
+    problemId: string,
+    threadId?: string
+  ): Promise<StoredThread> {
+    if (threadId) {
+      return this.getOwnedThread(userId, problemId, threadId);
+    }
+
+    const latest = await this.getLatestThread(userId, problemId);
+    if (latest) {
+      return latest;
+    }
+
+    return this.insertThread(userId, problemId);
+  }
+
+  private async resolveThreadForSend(
+    userId: string,
+    problemId: string,
+    threadId?: string
+  ): Promise<StoredThread> {
+    if (threadId) {
+      return this.getOwnedThread(userId, problemId, threadId);
+    }
+
+    const latest = await this.getLatestThread(userId, problemId);
+    if (latest) {
+      return latest;
+    }
+
+    return this.insertThread(userId, problemId);
+  }
+
+  private async getThreadMessageCount(threadId: string): Promise<number> {
+    const [row] = await this.db
+      .select({ value: count() })
+      .from(problemChatMessages)
+      .where(eq(problemChatMessages.threadId, threadId));
+
+    return Number(row?.value ?? 0);
+  }
+
+  private async getLatestUserPreview(threadId: string): Promise<string | null> {
+    const [row] = await this.db
+      .select({ content: problemChatMessages.content })
+      .from(problemChatMessages)
+      .where(
+        and(
+          eq(problemChatMessages.threadId, threadId),
+          eq(problemChatMessages.role, "user")
+        )
+      )
+      .orderBy(desc(problemChatMessages.createdAt))
+      .limit(1);
+
+    if (!row?.content) {
+      return null;
+    }
+
+    return this.truncatePreview(row.content);
+  }
+
+  private async reloadThread(threadId: string, userId: string) {
+    const [thread] = await this.db
+      .select()
+      .from(problemChatThreads)
+      .where(
+        and(
+          eq(problemChatThreads.id, threadId),
+          eq(problemChatThreads.userId, userId)
+        )
+      )
+      .limit(1);
+
+    if (!thread) {
+      throw new NotFoundException(`Chat thread not found: ${threadId}`);
     }
 
     return thread;
@@ -208,7 +360,11 @@ export class ProblemChatService {
     problemId: string,
     dto: PostProblemChatMessageDto
   ) {
-    const thread = await this.getOrCreateThread(userId, problemId);
+    const thread = await this.resolveThreadForSend(
+      userId,
+      problemId,
+      dto.threadId
+    );
 
     const userMessage = await this.insertMessage({
       threadId: thread.id,
@@ -296,10 +452,7 @@ export class ProblemChatService {
 
     await this.touchThread(input.threadId, input.userId);
 
-    const refreshedThread = await this.getOrCreateThread(
-      input.userId,
-      input.problemId
-    );
+    const refreshedThread = await this.reloadThread(input.threadId, input.userId);
 
     input.write({
       type: "finish",
@@ -575,8 +728,55 @@ export class ProblemChatService {
     }
   }
 
-  async getThreadMessages(userId: string, problemId: string) {
-    const thread = await this.getOrCreateThread(userId, problemId);
+  async listThreads(
+    userId: string,
+    problemId: string
+  ): Promise<GetProblemChatThreadsResponse> {
+    await this.assertProblemExists(problemId);
+
+    const threads = await this.db
+      .select()
+      .from(problemChatThreads)
+      .where(
+        and(
+          eq(problemChatThreads.userId, userId),
+          eq(problemChatThreads.problemId, problemId)
+        )
+      )
+      .orderBy(desc(problemChatThreads.updatedAt));
+
+    const summaries = await Promise.all(
+      threads.map(async (thread) => {
+        const messageCount = await this.getThreadMessageCount(thread.id);
+        const preview = await this.getLatestUserPreview(thread.id);
+        return this.serializeSessionSummary({ thread, messageCount, preview });
+      })
+    );
+
+    return { threads: summaries };
+  }
+
+  async createThread(
+    userId: string,
+    problemId: string
+  ): Promise<CreateProblemChatThreadResponse> {
+    const thread = await this.insertThread(userId, problemId);
+
+    return {
+      thread: this.serializeSessionSummary({
+        thread,
+        messageCount: 0,
+        preview: null,
+      }),
+    };
+  }
+
+  async getThreadMessages(
+    userId: string,
+    problemId: string,
+    threadId?: string
+  ) {
+    const thread = await this.resolveThreadForRead(userId, problemId, threadId);
 
     const messages = await this.db
       .select()
@@ -610,7 +810,7 @@ export class ProblemChatService {
 
     await this.touchThread(thread.id, userId);
 
-    const refreshedThread = await this.getOrCreateThread(userId, problemId);
+    const refreshedThread = await this.reloadThread(thread.id, userId);
 
     return {
       thread: this.serializeThread(refreshedThread),

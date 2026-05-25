@@ -9,7 +9,11 @@ change.
 
 ## Current Goal
 
-- Problem chat session header Stage 4 — multi-thread persistence backend (`12-problem-chat-session-header.md`)
+- Problem chat session header Stage 5 — wire frontend threads (`12-problem-chat-session-header.md`)
+
+## Completed
+
+- Problem chat session header Stage 4 — multi-thread API: migration drops `(user, problem)` unique index; Nest `GET/POST …/chat/threads`; extended `GET messages?threadId=` + optional `threadId` on stream POST; server actions + types
 
 ## Completed
 

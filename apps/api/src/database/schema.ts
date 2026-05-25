@@ -310,7 +310,7 @@ export const submissionTestResults = pgTable(
   })
 );
 
-/** One AI tutor thread per (user, problem). */
+/** Many AI tutor threads per (user, problem). */
 export const problemChatThreads = pgTable(
   "problem_chat_thread",
   {
@@ -323,7 +323,7 @@ export const problemChatThreads = pgTable(
     updatedAt: timestamptz("updated_at").notNull().defaultNow(),
   },
   (t) => ({
-    userProblemUnique: uniqueIndex("problem_chat_thread_user_problem_unique").on(
+    userProblemIdx: index("problem_chat_thread_user_problem_idx").on(
       t.userId,
       t.problemId
     ),

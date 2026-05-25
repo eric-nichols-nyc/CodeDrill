@@ -39,6 +39,14 @@ function textFromUiMessage(message: UIMessage): string {
     .trim();
 }
 
+function parseThreadId(value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return;
+  }
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
 /** Accept `{ content }` (curl) or `useChat` `{ messages }` bodies. */
 export function parseChatStreamRequestBody(
   body: unknown
@@ -46,6 +54,8 @@ export function parseChatStreamRequestBody(
   if (!isRecord(body)) {
     return null;
   }
+
+  const threadId = parseThreadId(body.threadId);
 
   if (typeof body.content === "string") {
     const content = body.content.trim();
@@ -56,6 +66,7 @@ export function parseChatStreamRequestBody(
     return {
       upstreamBody: {
         content,
+        threadId,
         metadata: parseMetadata(body.metadata),
       },
     };
@@ -82,6 +93,7 @@ export function parseChatStreamRequestBody(
   return {
     upstreamBody: {
       content,
+      threadId,
       metadata: parseMetadata(body.metadata),
     },
     originalMessages,

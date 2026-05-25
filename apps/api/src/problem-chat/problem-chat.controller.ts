@@ -6,6 +6,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -36,14 +37,33 @@ export class ProblemChatController {
     this.problemChatService = problemChatService;
   }
 
+  @Get(":problemId/chat/threads")
+  listThreads(
+    @Param("problemId", ParseUUIDPipe) problemId: string,
+    @Req() request: RequestWithUserId
+  ) {
+    return this.problemChatService.listThreads(request.userId!, problemId);
+  }
+
+  @Post(":problemId/chat/threads")
+  @HttpCode(201)
+  createThread(
+    @Param("problemId", ParseUUIDPipe) problemId: string,
+    @Req() request: RequestWithUserId
+  ) {
+    return this.problemChatService.createThread(request.userId!, problemId);
+  }
+
   @Get(":problemId/chat/messages")
   getMessages(
     @Param("problemId", ParseUUIDPipe) problemId: string,
+    @Query("threadId") threadId: string | undefined,
     @Req() request: RequestWithUserId
   ) {
     return this.problemChatService.getThreadMessages(
       request.userId!,
-      problemId
+      problemId,
+      threadId
     );
   }
 
