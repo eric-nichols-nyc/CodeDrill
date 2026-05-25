@@ -2,6 +2,7 @@
 
 import type { PromptInputMessage } from "@repo/design-system/components/ai-elements/prompt-input";
 import { useCallback, useState } from "react";
+import { useChatSessions } from "@/features/problem-workspace/chat-panel/hooks/use-chat-sessions";
 import { useProblemChat } from "@/features/problem-workspace/chat-panel/hooks/use-problem-chat";
 import type { GetProblemChatMessagesResponse } from "@/features/problem-workspace/chat-panel/lib/problem-chat-types";
 import { ChatHeader } from "./chat-header";
@@ -16,42 +17,72 @@ export function ChatShell({
   problemId?: string;
   initialChatData?: GetProblemChatMessagesResponse;
 }) {
+  const [editDraft, setEditDraft] = useState<string | undefined>();
+  const [editDraftKey, setEditDraftKey] = useState(0);
+  const [votes, setVotes] = useState<Record<string, MessageVote>>({});
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  const {
+    activeThreadId,
+    setActiveThreadId,
+    threads,
+    isLoadingThreads,
+    createNewThread,
+    selectThread,
+  } = useChatSessions(problemId, { historyEnabled: isHistoryOpen });
+
   const {
     messages,
     isLoadingHistory,
     isSending,
     error,
     sendMessage,
-    clearVisibleChat,
     submitStatus,
     hasProblemId,
-  } = useProblemChat(problemId, { initialData: initialChatData });
+    hasActiveThread,
+  } = useProblemChat(problemId, {
+    initialData: initialChatData,
+    activeThreadId,
+    onActiveThreadResolved: setActiveThreadId,
+  });
 
-  const [editDraft, setEditDraft] = useState<string | undefined>();
-  const [editDraftKey, setEditDraftKey] = useState(0);
-  const [votes, setVotes] = useState<Record<string, MessageVote>>({});
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const resetLocalUiState = useCallback(() => {
+    setEditDraft(undefined);
+    setEditDraftKey((key) => key + 1);
+    setVotes({});
+  }, []);
 
-  const handleNewChat = useCallback(() => {
+  const handleNewChat = useCallback(async () => {
     if (isSending) {
       return;
     }
 
-    clearVisibleChat();
-    setEditDraft(undefined);
-    setEditDraftKey((key) => key + 1);
-    setVotes({});
-    setIsHistoryOpen(false);
-  }, [clearVisibleChat, isSending]);
+    try {
+      await createNewThread();
+      resetLocalUiState();
+      setIsHistoryOpen(false);
+    } catch {
+      // Error surfaced via hook state when applicable.
+    }
+  }, [createNewThread, isSending, resetLocalUiState]);
 
-  const handleSelectSession = useCallback((_sessionId: string) => {
-    // Stage 3 placeholder — wired when thread API lands (Stage 4/5).
-    setIsHistoryOpen(false);
-  }, []);
+  const handleSelectSession = useCallback(
+    (sessionId: string) => {
+      if (sessionId === activeThreadId) {
+        setIsHistoryOpen(false);
+        return;
+      }
+
+      selectThread(sessionId);
+      resetLocalUiState();
+      setIsHistoryOpen(false);
+    },
+    [activeThreadId, resetLocalUiState, selectThread]
+  );
 
   const handleSubmit = async (message: PromptInputMessage) => {
     const text = message.text.trim();
-    if (!text || isSending || !hasProblemId) {
+    if (!text || isSending || !hasProblemId || !hasActiveThread) {
       return;
     }
     try {
@@ -79,13 +110,15 @@ export function ChatShell({
     });
   }, []);
 
+  const chatInputEnabled = Boolean(hasProblemId) && Boolean(hasActiveThread);
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <ChatHeader
-        activeSessionId={null}
-        historyLoading={false}
+        activeSessionId={activeThreadId}
+        historyLoading={isLoadingThreads}
         historyOpen={isHistoryOpen}
-        historySessions={[]}
+        historySessions={threads}
         onHistoryOpenChange={setIsHistoryOpen}
         onNewChat={handleNewChat}
         onSelectSession={handleSelectSession}
@@ -110,7 +143,7 @@ export function ChatShell({
       <ChatInput
         editDraft={editDraft}
         editDraftKey={editDraftKey}
-        hasProblemId={hasProblemId}
+        hasProblemId={chatInputEnabled}
         isSending={isSending}
         onSubmit={handleSubmit}
         submitStatus={submitStatus}

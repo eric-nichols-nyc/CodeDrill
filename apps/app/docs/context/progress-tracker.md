@@ -9,14 +9,12 @@ change.
 
 ## Current Goal
 
-- Problem chat session header Stage 5 — wire frontend threads (`12-problem-chat-session-header.md`)
+- Problem chat session header Stage 6 (post-v1) — Radix hydration on problem workspace
 
 ## Completed
 
+- Problem chat session header Stage 5 — `use-chat-sessions.ts` + thread-aware `use-problem-chat.ts`; lazy history list; `+` creates persisted thread; stream sends `threadId`; hydration keyed by `problemId:activeThreadId`
 - Problem chat session header Stage 4 — multi-thread API: migration drops `(user, problem)` unique index; Nest `GET/POST …/chat/threads`; extended `GET messages?threadId=` + optional `threadId` on stream POST; server actions + types
-
-## Completed
-
 - Problem chat session header spec v1 rewrite — simpler API (extend `GET messages`, two thread routes, server actions); Stages 1–3 shipped; v1 stops at Stage 5
 - Problem chat session header Stage 3 — history dropdown on header button (`Popover` + `ChatSessionHistory`); empty state
 - Problem chat session header Stage 2 — `+` clears visible messages, draft input, and votes locally via `clearVisibleChat()`; streaming unchanged until persisted threads (Stage 4/5)
@@ -59,7 +57,8 @@ change.
 
 ## Session Notes
 
-- Feature lives at `apps/app/features/admin-chat-layout/` per `02-admin-chat-layout.md` spec
+- Stage 5 spec includes v1 simplifications: bootstrap from latest messages only; lazy thread list on history open; explicit hydration/stream checklist
+- Stage 6 (post-v1): Radix hydration on problem page — use client wrapper for `dynamic({ ssr: false })`, not server `page.tsx`; attempted fix reverted (Next 16 build error)
 - Problem chat UI spec: `docs/context/features-spec/07-problem-chat-ui.md`; backend reference in `docs/context/features-spec/ai/problem-chat/`
 - Problem chat streaming V2 spec: `docs/context/features-spec/09-problem-chat-streaming.md` — refactor existing chatbot in 3 stages (API → BFF → client); round 1 skips UI restructure and Framer Motion
 - Problem chat message UI: `docs/context/features-spec/10-problem-chat-message-ui.md` — component split + thinking + actions

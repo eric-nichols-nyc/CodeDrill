@@ -47,6 +47,23 @@ function parseThreadId(value: unknown): string | undefined {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
+/** Mirrors DefaultChatTransport body merge (extra transport body + SDK fields). */
+export function mergeDefaultChatTransportBody(input: {
+  transportBody?: Record<string, unknown>;
+  chatId: string;
+  messages: UIMessage[];
+  trigger: "submit-message" | "regenerate-message";
+  messageId?: string;
+}): Record<string, unknown> {
+  return {
+    ...input.transportBody,
+    id: input.chatId,
+    messages: input.messages,
+    trigger: input.trigger,
+    messageId: input.messageId,
+  };
+}
+
 /** Accept `{ content }` (curl) or `useChat` `{ messages }` bodies. */
 export function parseChatStreamRequestBody(
   body: unknown

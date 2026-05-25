@@ -17,10 +17,11 @@ This feature extends the existing `features/problem-workspace/chat-panel/` imple
 | 1 | Shipped | Fixed header UI |
 | 2 | Shipped | Local `+` clear (temporary until Stage 5) |
 | 3 | Shipped | History dropdown shell (empty list) |
-| 4 | Next | Backend: multi-thread persistence (extend existing APIs) |
-| 5 | Next | Frontend: wire threads, replace Stage 2 hack, pass `threadId` on stream |
+| 4 | Shipped | Backend: multi-thread persistence (extend existing APIs) |
+| 5 | Shipped | Frontend: wire threads per **V1 simplifications** (lazy history, messages bootstrap) |
+| 6 | Post-v1 | Problem workspace Radix hydration (dev console warnings) |
 
-**Post-v1 (do not implement in this feature slice):** new-chat confirmation dialog, server-stored “last active thread”, stored thread titles, toasts, cross-device active-thread restore, delete/archive UX beyond “leave old thread in history”.
+**Post-v1 (do not implement in this feature slice):** new-chat confirmation dialog, server-stored “last active thread”, stored thread titles, toasts, cross-device active-thread restore, delete/archive UX beyond “leave old thread in history”, **Radix `useId` hydration mismatch fixes** (Stage 6).
 
 ---
 
@@ -265,50 +266,168 @@ Same as existing chat: `ProblemsUserGuard`, bearer/session via app auth helpers.
 
 Connect header, history dropdown, and `useProblemChat` to real threads. Remove Stage 2 local-only reset.
 
+Keep v1 **minimal**: one bootstrap path, lazy history fetch, no extra persistence layers.
+
+---
+
+### V1 simplifications (prefer these over heavier patterns)
+
+#### 1. Bootstrap active thread from messages only (not from thread list)
+
+On mount, do **not** require `GET …/chat/threads` to render chat.
+
+1. Call existing `getProblemChatMessages(problemId)` with **no** `threadId` (latest thread; API creates one if needed).
+2. Set `activeThreadId` from `response.thread.id`.
+3. Hydrate `useChat` from `response.messages`.
+
+Thread list is **not** on the critical path for first paint.
+
+#### 2. Lazy-load history when the dropdown opens
+
+Fetch `listProblemChatThreads` only when `historyOpen` becomes `true` (TanStack Query `enabled: historyOpen`).
+
+Benefits:
+
+- avoids mount race between list + messages
+- fewer requests when the user never opens history
+- list can include **all** threads (including active) — no special empty state when only one thread exists
+
+After `+` or `onFinish`, invalidate the threads query **if it has been fetched** (or refetch when dropdown next opens).
+
+#### 3. Reset shell UI state on thread change
+
+On **`createNewThread`** and **`selectThread`**, reset the same local state as Stage 2 `+`:
+
+- clear draft input (`editDraft` + `editDraftKey`)
+- clear `votes`
+
+Do not carry votes or draft across threads.
+
+#### 4. Single orchestration owner
+
+`use-chat-sessions.ts` owns `activeThreadId`, list/create/select, and lazy list query.
+
+`use-problem-chat.ts` accepts `activeThreadId` and handles messages/stream only — it does **not** fetch the thread list.
+
+`ChatShell` composes both; avoid a third parallel source of thread state.
+
+#### 5. Known v1 limitation (document, do not fix in Stage 5)
+
+After **full page refresh**, active thread resets to **latest by `updatedAt`** (no `localStorage`, no server “last active”). Acceptable for v1.
+
+---
+
+### Non-negotiable implementation checklist
+
+Stage 5 is not done unless all of these are addressed:
+
+| Item | Why |
+| ---- | --- |
+| Hydration keyed by **`problemId` + `activeThreadId`** (not `problemId` alone) | Without this, history select on the same problem may not swap messages |
+| Stream send includes **`threadId`** in upstream body | Without this, messages save to latest server thread while UI shows another |
+| `onFinish` refetches **`getProblemChatMessages(problemId, activeThreadId)`** | Without this, wrong messages can reappear after stream |
+| `onFinish` invalidates **`problemChatKeys.threads(problemId)`** when list was loaded | Keeps preview/count fresh in dropdown |
+| `useChat({ id: \`${problemId}:${activeThreadId}\` })` with stable id only when `activeThreadId` is set | Resets chat state cleanly on thread switch |
+
+---
+
 ### New hook: `use-chat-sessions.ts`
 
 ```ts
 type ChatSessionState = {
   activeThreadId: string | null;
+  setActiveThreadId: (threadId: string) => void;
   threads: ProblemChatSessionSummary[];
   isLoadingThreads: boolean;
+  historyEnabled: boolean; // true when dropdown open — drives lazy list query
+  openHistory: () => void;   // optional helper; or pass historyOpen from shell
   createNewThread: () => Promise<void>;
   selectThread: (threadId: string) => Promise<void>;
 };
 ```
 
-- Load thread list on mount (TanStack Query).
-- `createNewThread` → `POST` create + set active + empty messages.
-- `selectThread` → `GET messages?threadId=` + hydrate `useChat` + close dropdown.
-- **Remove** `clearVisibleChat()` from user-facing `+` path (delete or keep internal only).
+- **`createNewThread`** → `POST` create → set `activeThreadId` → empty messages (via callback into `useProblemChat` or shared setter) → close dropdown → invalidate threads query if loaded.
+- **`selectThread`** → set `activeThreadId` → `useProblemChat` hydration loads messages → close dropdown → reset draft/votes in shell.
+- **Remove** `clearVisibleChat()` from the `+` path.
+
+Thread list query:
+
+```ts
+useQuery({
+  queryKey: problemChatKeys.threads(problemId),
+  queryFn: () => listProblemChatThreads(problemId),
+  enabled: Boolean(problemId) && historyEnabled,
+});
+```
+
+---
 
 ### `use-problem-chat.ts` changes
 
-- Accept `activeThreadId` (required once sessions hook is wired).
-- `useChat({ id: \`${problemId}:${activeThreadId}\` })` so switching threads resets chat state cleanly.
-- History query keyed by `problemId` + `activeThreadId`.
-- `onFinish`: refetch active thread messages + invalidate thread list (updates `preview` / `messageCount`).
-- Stream transport sends `threadId` in body.
+- Accept `activeThreadId: string | null` and `onActiveThreadResolved?: (threadId: string) => void` for bootstrap.
+- **Bootstrap query** (no `threadId`) runs once when `problemId` is set and `activeThreadId` is null; on success call `onActiveThreadResolved(response.thread.id)`.
+- **Messages query** runs when `activeThreadId` is set: `getProblemChatMessages(problemId, activeThreadId)`.
+- `useChat({ id: activeThreadId ? \`${problemId}:${activeThreadId}\` : \`pending:${problemId}\` })` — disable send until `activeThreadId` is set.
+- Hydration ref tracks **`${problemId}:${activeThreadId}`**, not `problemId` alone.
+- `onFinish`: refetch active thread + invalidate threads list key.
+- Stream transport / send path includes `threadId: activeThreadId` in body (verify `DefaultChatTransport` body hook for `@ai-sdk/react`).
+
+---
 
 ### `chat-shell.tsx` wiring
 
-Pass real `historySessions`, `activeSessionId`, `historyLoading`, `onSelectSession`, and `onNewChat={createNewThread}` into `ChatHeader`.
+- Pass `historyOpen` / `onHistoryOpenChange`; set `historyEnabled = historyOpen` for lazy list.
+- Pass `historySessions={threads}`, `historyLoading`, `activeSessionId={activeThreadId}`, `onSelectSession={selectThread}`, `onNewChat={createNewThread}`.
+- Reset draft/votes in shell callbacks wrapping create/select (or inside hook if shell state moved later).
+
+---
 
 ### V1 UX rules
 
-- `+` creates persisted thread immediately — **no confirmation dialog in v1**.
+- `+` creates persisted thread immediately — **no confirmation dialog**.
 - History dropdown closes on select, outside click, Escape, or new chat.
 - `title` null → `ChatSessionHistoryItem` shows “Untitled chat”.
+- History list shows **all** threads for the problem (including the active one).
 
 ### Acceptance criteria
 
-- [ ] `+` creates a real thread and shows empty chat.
-- [ ] History lists prior threads with preview/count.
-- [ ] Selecting a thread loads its messages.
-- [ ] Streaming saves to the active thread.
-- [ ] Page refresh reloads latest thread if no client active id (acceptable v1); messages never leak across threads in one session.
-- [ ] Stage 2 `clearVisibleChat` no longer used for `+`.
-- [ ] `pnpm typecheck` passes for `apps/app` (fix pre-existing errors if they block CI).
+- [x] Bootstrap: chat loads via latest messages; `activeThreadId` set from response.
+- [x] Thread list fetched **only when** history dropdown opens.
+- [x] `+` creates a real thread and shows empty chat.
+- [x] History lists threads with preview/count; select loads that thread’s messages.
+- [x] Streaming saves to the active thread (`threadId` on send).
+- [x] No message leak across threads in one session (hydration + `useChat` id checklist above).
+- [x] Draft and votes reset on new chat and thread select.
+- [x] Stage 2 `clearVisibleChat` no longer used for `+`.
+- [x] Page refresh loads latest thread (known v1 limitation).
+- [x] `pnpm typecheck` passes for `apps/app`.
+
+---
+
+## Stage 6 — Problem workspace hydration (post-v1)
+
+### Goal
+
+Reduce or eliminate dev **React hydration mismatch** warnings from Radix UI (`aria-controls`, `data-panel-id`, etc.) on `/problems/[slug]`. These are noisy in dev; functionality usually still works.
+
+### Do not do (failed / invalid in Next.js App Router)
+
+- `next/dynamic({ ssr: false })` **inside a Server Component** (e.g. `app/problems/[slug]/page.tsx`) — build error in Next 16: *"`ssr: false` is not allowed with `next/dynamic` in Server Components"*.
+- `suppressHydrationWarning` on root `layout` — does **not** suppress descendant attribute mismatches.
+
+### Valid approaches (pick one when implementing Stage 6)
+
+1. **Client wrapper component** — `"use client"` file that calls `dynamic(..., { ssr: false })` and is imported from the server page (thin server page stays valid).
+2. **`mounted` gate** inside existing client components (e.g. defer entire `Sheet` in nav-drawer, or workspace shell) — plain HTML until `useEffect`, then mount Radix tree.
+3. **Investigate root cause** — compare prod vs dev (Turbopack), rule out browser extensions, audit conditional trees that change `useId` order.
+
+### Acceptance criteria
+
+- [ ] `pnpm build` passes.
+- [ ] No hydration mismatch warnings on problem workspace load in dev (or documented residual cases).
+- [ ] Problem workspace and nav drawer remain fully functional.
+
+**Not part of Stage 5.** Do not block v1 chat threads on this work.
 
 ---
 
@@ -316,11 +435,13 @@ Pass real `historySessions`, `activeSessionId`, `historyLoading`, `onSelectSessi
 
 ### Frontend
 
+- [ ] Chat loads on open without waiting for thread list (bootstrap via latest messages).
+- [ ] Thread list loads only when history dropdown opens.
 - [ ] Header renders; history dropdown opens/closes.
-- [ ] `+` creates new empty persisted chat.
-- [ ] History shows previous threads; select switches messages.
-- [ ] Input and streaming work after thread switch.
-- [ ] Empty history state when only one thread exists (or copy TBD: show current thread vs empty — prefer listing all threads including active).
+- [ ] `+` creates new empty persisted chat; draft/votes cleared.
+- [ ] History shows all threads; select switches messages and clears draft/votes.
+- [ ] Input and streaming work after thread switch; stream uses active `threadId`.
+- [ ] Full page refresh loads latest thread (expected v1 behavior).
 
 ### Backend
 
@@ -350,19 +471,22 @@ Pass real `historySessions`, `activeSessionId`, `historyLoading`, `onSelectSessi
 - server-persisted “last active thread per problem”
 - stored thread title column (computed preview only in v1)
 
-**Technical:**
+**Technical (not v1):**
 
 - `GET …/chat/threads/[threadId]` as a separate route
 - BFF routes for thread list/load (use server actions)
 - `clear-chat-dialog.tsx` (post-v1)
+- Eager thread-list fetch on every chat mount (use lazy load on dropdown open)
+- `localStorage` / server persistence of last active thread per problem
+- Stage 6 Radix hydration fixes (see Stage 6 — use client wrapper, not `dynamic` in server page)
 
 ---
 
 ## Implementation guidance for agents
 
-1. Stages 1–3 are **done** — do not redo unless fixing bugs.
-2. Implement **Stage 4** (backend + server actions + stream body types) before Stage 5.
-3. Implement **Stage 5** as one frontend slice; remove Stage 2 temporary `+` behavior.
+1. Stages 1–4 are **done** — do not redo unless fixing bugs.
+2. Implement **Stage 5** as one frontend slice following **V1 simplifications** above; remove Stage 2 temporary `+` behavior.
+3. **Stage 6** (hydration) is post-v1 — do not mix into Stage 5.
 4. Read existing `apps/api/src/problem-chat/` and `apps/app/features/problem-workspace/chat-panel/` before changing behavior.
 5. Do not create parallel chat folders.
 6. Run `pnpm typecheck` from `apps/app` when touching types.
