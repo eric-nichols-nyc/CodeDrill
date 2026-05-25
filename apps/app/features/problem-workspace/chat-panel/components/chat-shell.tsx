@@ -4,6 +4,7 @@ import type { PromptInputMessage } from "@repo/design-system/components/ai-eleme
 import { useCallback, useState } from "react";
 import { useProblemChat } from "@/features/problem-workspace/chat-panel/hooks/use-problem-chat";
 import type { GetProblemChatMessagesResponse } from "@/features/problem-workspace/chat-panel/lib/problem-chat-types";
+import { ChatHeader } from "./chat-header";
 import { ChatInput } from "./chat-input";
 import type { MessageVote } from "./message-actions";
 import { MessageList } from "./message-list";
@@ -28,6 +29,15 @@ export function ChatShell({
   const [editDraft, setEditDraft] = useState<string | undefined>();
   const [editDraftKey, setEditDraftKey] = useState(0);
   const [votes, setVotes] = useState<Record<string, MessageVote>>({});
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  const handleNewChat = useCallback(() => {
+    // Stage 1 placeholder — wired in later stages.
+  }, []);
+
+  const handleOpenHistory = useCallback(() => {
+    setIsHistoryOpen((open) => !open);
+  }, []);
 
   const handleSubmit = async (message: PromptInputMessage) => {
     const text = message.text.trim();
@@ -61,6 +71,12 @@ export function ChatShell({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
+      <ChatHeader
+        isHistoryOpen={isHistoryOpen}
+        onNewChat={handleNewChat}
+        onOpenHistory={handleOpenHistory}
+      />
+
       <MessageList
         hasProblemId={hasProblemId}
         isLoadingHistory={isLoadingHistory}

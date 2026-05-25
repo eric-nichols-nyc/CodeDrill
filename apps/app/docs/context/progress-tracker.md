@@ -9,10 +9,11 @@ change.
 
 ## Current Goal
 
-- None — nav-drawer list UI shipped (`12-nav-drawer-list-ui.md`)
+- Problem chat session header Stage 2 — local new chat UX (`12-problem-chat-session-header.md`)
 
 ## Completed
 
+- Problem chat session header Stage 1 — `ChatHeader` fixed at top of `chat-panel` shell; + / history placeholder actions; spec paths updated to `chat-panel/components`
 - `nav-drawer` list UI — `/problems` toolbar parity (search, filter, sort, random); zebra rows; white active row; semibold text; sheet mounts content only when open (hydration fix)
 - Problem chat streaming Stage 1 — Nest `POST /problems/:problemId/chat/messages/stream` (SSE text-delta + finish); blocking POST unchanged
 - Problem chat streaming Stage 2 — Next BFF `/api/problems/[problemId]/chat/stream` wraps Nest SSE as AI SDK UI message stream
