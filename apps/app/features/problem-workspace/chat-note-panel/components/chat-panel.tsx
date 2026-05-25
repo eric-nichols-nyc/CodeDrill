@@ -8,8 +8,8 @@ import {
 } from "@repo/design-system/components/ui/tabs";
 import { cn } from "@repo/design-system/lib/utils";
 import { Sparkles, StickyNote } from "lucide-react";
-import { ChatShell } from "@/features/problem-workspace/chat-panel/components/chat-shell";
-import { ProblemNotes } from "@/features/problem-workspace/chat-panel/components/problem-notes";
+import { ChatShell } from "@/features/problem-workspace/chat-note-panel/components/chat-shell";
+import { ProblemNotes } from "@/features/problem-workspace/chat-note-panel/components/problem-notes";
 import { ShellPanel } from "@/features/problem-workspace/shell/shell-panel";
 import { useWorkspace } from "@/features/problem-workspace/shell/workspace-provider";
 

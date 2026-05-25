@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseChatStreamRequestBody,
   parseProblemChatStreamEventLine,
-} from "@/features/problem-workspace/chat-panel/lib/parse-problem-chat-stream-request";
+} from "@/features/problem-workspace/chat-note-panel/lib/parse-problem-chat-stream-request";
 
 describe("parse-problem-chat-stream-request", () => {
   describe("parseChatStreamRequestBody", () => {

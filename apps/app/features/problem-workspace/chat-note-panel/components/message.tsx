@@ -7,7 +7,7 @@ import {
 } from "@repo/design-system/components/ai-elements/message";
 import type { UIMessage } from "ai";
 import { SparklesIcon } from "@/components/icons";
-import { textFromUiMessage } from "@/features/problem-workspace/chat-panel/lib/problem-chat-ui-messages";
+import { textFromUiMessage } from "@/features/problem-workspace/chat-note-panel/lib/problem-chat-ui-messages";
 import { MessageActionsBar, type MessageVote } from "./message-actions";
 
 export type ChatMessageProps = {

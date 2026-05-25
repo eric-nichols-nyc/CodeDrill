@@ -1,6 +1,6 @@
 "use client";
 
-import { ChatPanel } from "@/features/problem-workspace/chat-panel/components/chat-panel";
+import { ChatPanel } from "@/features/problem-workspace/chat-note-panel/components/chat-panel";
 import { DirectionsPanel } from "@/features/problem-workspace/directions-panel/components/directions-panel";
 import { EditorPanel } from "@/features/problem-workspace/editor-panel/components/editor-panel";
 import { OutputPanel } from "@/features/problem-workspace/output-panel/components/output-panel";

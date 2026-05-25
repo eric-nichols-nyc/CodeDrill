@@ -43,7 +43,7 @@ Each panel is a top-level folder under `features/problem-workspace/` (not nested
 | `directions-panel/` | `DirectionsPanel` | Problem statement tabs (Description / Solutions / Editorial) |
 | `editor-panel/` | `EditorPanel` | Monaco, language select, Run / Reset / Submit, code-save banner |
 | `output-panel/` | `OutputPanel` | Testcase + Test Result tabs (`ProblemOutputPanel` behavior) |
-| `chat-panel/` | `ChatPanel` | Chat + Notes tabs (formerly sidebar chat) |
+| `chat-note-panel/` | `ChatPanel` | Chat + Notes tabs (formerly sidebar chat) |
 
 ### Route integration
 
@@ -111,7 +111,7 @@ apps/app/features/problem-workspace/
       test-result-panel.tsx
       testcase-field-blocks.tsx
 
-  chat-panel/
+  chat-note-panel/
     components/
       chat-panel.tsx                # NEW root — ← chat-notes-tabs.tsx (rename)
       chat-shell.tsx                # ← chatbot/components/chat-shell.tsx
@@ -147,7 +147,7 @@ apps/app/features/problem-workspace/
   components/problem-detail.tsx
   components/expandable-sidebar-chat.tsx
   components/problem-workspace/problem-workspace.tsx
-  chatbot/                            # entire tree moved to chat-panel/
+  chatbot/                            # entire tree moved to chat-note-panel/
 ```
 
 ---
@@ -179,9 +179,9 @@ apps/app/features/problem-workspace/
 | `components/problem-workspace/testcase-panel.tsx` | `output-panel/components/testcase-panel.tsx` | |
 | `components/problem-workspace/test-result-panel.tsx` | `output-panel/components/test-result-panel.tsx` | |
 | `components/problem-workspace/testcase-field-blocks.tsx` | `output-panel/components/testcase-field-blocks.tsx` | |
-| `chatbot/**` | `chat-panel/**` | Same internal structure |
-| `components/chat-notes-tabs.tsx` | `chat-panel/components/chat-panel.tsx` | Export `ChatPanel` |
-| `components/problem-notes.tsx` | `chat-panel/components/problem-notes.tsx` | |
+| `chatbot/**` | `chat-note-panel/**` | Same internal structure |
+| `components/chat-notes-tabs.tsx` | `chat-note-panel/components/chat-panel.tsx` | Export `ChatPanel` |
+| `components/problem-notes.tsx` | `chat-note-panel/components/problem-notes.tsx` | |
 | `client-test-run.ts` | `lib/client-test-run.ts` | Shared by editor + output |
 | `components/problem-detail.tsx` | **DELETE** | Replaced by `WorkspaceShell` + panels |
 | `components/expandable-sidebar-chat.tsx` | **DELETE** | Replaced by shell right column |
@@ -316,7 +316,7 @@ type WorkspaceShellProps = {
 - [ ] Four panel folders exist with files per migration map.
 - [ ] `ShellPanel` accepts `children` only.
 - [ ] `WorkspaceShell` uses design-system `ResizablePanelGroup` (no `SplitLayout`, no `ExpandableSidebarChat`).
-- [ ] Chatbot code lives under `chat-panel/` only.
+- [ ] Chatbot code lives under `chat-note-panel/` only.
 - [ ] Problem tabs live under `directions-panel/` only.
 - [ ] Monaco lives under `editor-panel/` only.
 - [ ] Output tabs live under `output-panel/` only.

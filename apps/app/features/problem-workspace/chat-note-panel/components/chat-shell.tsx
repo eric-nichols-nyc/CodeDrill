@@ -2,8 +2,8 @@
 
 import type { PromptInputMessage } from "@repo/design-system/components/ai-elements/prompt-input";
 import { useCallback, useState } from "react";
-import { useProblemChat } from "@/features/problem-workspace/chat-panel/hooks/use-problem-chat";
-import type { GetProblemChatMessagesResponse } from "@/features/problem-workspace/chat-panel/lib/problem-chat-types";
+import { useProblemChat } from "@/features/problem-workspace/chat-note-panel/hooks/use-problem-chat";
+import type { GetProblemChatMessagesResponse } from "@/features/problem-workspace/chat-note-panel/lib/problem-chat-types";
 import { ChatInput } from "./chat-input";
 import type { MessageVote } from "./message-actions";
 import { MessageList } from "./message-list";
