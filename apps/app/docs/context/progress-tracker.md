@@ -9,11 +9,13 @@ change.
 
 ## Current Goal
 
-- None (auth feature spec + tutor sign-in gate shipped)
+- AI problem form generation Stage 5 — unit tests for client/server helpers
 
 ## Completed
 
 - Auth feature spec `14-auth.md` + tutor chat sign-in gate (`useApiAuth`, `TutorSignInPrompt`, `ChatShell` unsigned/pending states)
+- Admin AI problem form generation Stage 4 — success message, dirty overwrite confirm (`AlertDialog`), prompt max length + counter; `isProblemFormDirty`; server prompt length guard
+- Admin AI problem form generation — moved OpenAI to Nest `POST /problems/generate`; Next BFF proxies; `OPENAI_API_KEY` only on `apps/api`
 - Problem chat starter suggestions Stage 1 — static empty-thread chips (`chat-suggestions.tsx`, `problem-chat-starter-suggestions.ts`); click sends via stream path; visibility gated on empty thread + loaded history
 - Problem chat session header Stage 5 — `use-chat-sessions.ts` + thread-aware `use-problem-chat.ts`; lazy history list; `+` creates persisted thread; stream sends `threadId`; hydration keyed by `problemId:activeThreadId`
 - Problem chat session header Stage 4 — multi-thread API: migration drops `(user, problem)` unique index; Nest `GET/POST …/chat/threads`; extended `GET messages?threadId=` + optional `threadId` on stream POST; server actions + types

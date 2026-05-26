@@ -14,7 +14,10 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>;
 }
 
-export function readOpenAiErrorMessage(completion: unknown, httpStatus: number): string {
+export function readOpenAiErrorMessage(
+  completion: unknown,
+  httpStatus: number
+): string {
   const root = asRecord(completion);
   const err = root?.error;
   const errRec = asRecord(err);

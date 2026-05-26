@@ -33,6 +33,7 @@ Every **product feature** under `apps/app/features/<name>/` should have a spec i
 | `admin-chat-layout` | [02-admin-chat-layout.md](./02-admin-chat-layout.md) | `features/admin-chat-layout/` | None (static chat) | Shipped |
 | `problem-progress` | [03-problem-progress.md](./03-problem-progress.md) | `features/problem-progress/` | `apps/api/src/problem-progress/`, BFF `app/api/problems/[problemId]/progress/` | In progress |
 | `admin` | [05-admin-problem-filter.md](./05-admin-problem-filter.md) (catalog + added status) | `features/admin/` | `apps/api` problems CRUD via BFF | Shipped |
+| `admin` (AI problem form generation) | [12-ai-problem-form-generation.md](./12-ai-problem-form-generation.md) | `features/admin/components/` | Nest `POST /problems/generate` + BFF `app/api/admin/problems/generate/` | **In progress** — Stages 1–4 shipped; Stage 5 tests remaining |
 | `nav-drawer` | [06-nav-drawer.md](./06-nav-drawer.md) | `features/nav-drawer/` | Reuse `GET /problems` via `fetchProblemsList` | Shipped |
 | `nav-drawer` (list UI) | [12-nav-drawer-list-ui.md](./12-nav-drawer-list-ui.md) (striping, active row, `/problems` toolbar parity) | `features/nav-drawer/` | None (client filter on loaded catalog) | **Shipped** |
 | `problem-workspace` | [07-problem-chat-ui.md](./07-problem-chat-ui.md) (chatbot V1 UI) | `features/problem-workspace/` | Nest `problem-chat/` + chat Server Actions + TanStack | **Chat UI shipped (V1)** |

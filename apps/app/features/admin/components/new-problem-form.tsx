@@ -10,9 +10,9 @@ import { Button } from "@repo/design-system/components/ui/button";
 import { Input } from "@repo/design-system/components/ui/input";
 import { Label } from "@repo/design-system/components/ui/label";
 import { Textarea } from "@repo/design-system/components/ui/textarea";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, RotateCcw, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { type ReactNode, useCallback, useEffect, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AdminEditorialQuill } from "@/features/admin/components/admin-editorial-quill";
 import { DevAdminProblemFill } from "@/features/admin/components/dev-admin-problem-fill";
 import { GenerateProblemFromPrompt } from "@/features/admin/components/generate-problem-from-prompt";
@@ -21,7 +21,7 @@ import {
   formatSubmitError,
 } from "@/features/admin/lib/build-problem-payload";
 import type { CreateProblemBody } from "@/features/admin/lib/create-problem-schema";
-import { normalizeCreateProblemBody } from "@/features/admin/lib/problem-form-values";
+import { normalizeCreateProblemBody, isProblemFormDirty } from "@/features/admin/lib/problem-form-values";
 
 type StarterCodeRow = CreateProblemBody["starterCode"][number];
 type ExampleRow = NonNullable<CreateProblemBody["examples"]>[number];
@@ -210,6 +210,9 @@ export function NewProblemForm({
   showDevFill?: boolean;
 }) {
   const router = useRouter();
+  const formBaselineRef = useRef(
+    normalizeCreateProblemBody(initialValues ?? createEmptyForm())
+  );
   const [values, setValues] = useState<CreateProblemBody>(() =>
     normalizeCreateProblemBody(initialValues ?? createEmptyForm())
   );
@@ -224,10 +227,17 @@ export function NewProblemForm({
     (method === "PUT" ? "Problem updated." : "Problem created.");
 
   useEffect(() => {
-    setValues(normalizeCreateProblemBody(initialValues ?? createEmptyForm()));
+    const baseline = normalizeCreateProblemBody(initialValues ?? createEmptyForm());
+    formBaselineRef.current = baseline;
+    setValues(baseline);
     setMessage(null);
     setStatus("idle");
   }, [initialValues]);
+
+  const hasUnsavedFormValues = useMemo(
+    () => isProblemFormDirty(values, formBaselineRef.current),
+    [values]
+  );
 
   const set = (key: keyof CreateProblemBody) => (v: string | boolean) => {
     setValues((prev) => ({ ...prev, [key]: v }));
@@ -482,6 +492,14 @@ export function NewProblemForm({
     setStatus("idle");
   }, []);
 
+  const handleResetForm = useCallback(() => {
+    const empty = createEmptyForm();
+    setValues(empty);
+    formBaselineRef.current = empty;
+    setMessage(null);
+    setStatus("idle");
+  }, []);
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("submitting");
@@ -517,7 +535,9 @@ export function NewProblemForm({
     setStatus("success");
     setMessage(resolvedSuccessMessage);
     if (method === "POST") {
-      setValues(createEmptyForm());
+      const empty = createEmptyForm();
+      setValues(empty);
+      formBaselineRef.current = empty;
     }
     await onSubmitted?.(body, values);
     router.refresh();
@@ -530,7 +550,18 @@ export function NewProblemForm({
       onSubmit={onSubmit}
     >
       {showDevFill ? (
-        <div className="flex flex-col gap-6 border border-muted border-dashed px-2 py-3">
+        <div className="relative flex flex-col gap-6 border border-muted border-dashed px-2 py-3 pt-10">
+          <Button
+            aria-label="Reset form"
+            className="absolute top-2 right-2"
+            onClick={handleResetForm}
+            size="sm"
+            title="Reset form"
+            type="button"
+            variant="outline"
+          >
+            <RotateCcw aria-hidden className="size-4" />
+          </Button>
           <div className="flex flex-col gap-2">
             <p className="text-muted-foreground text-xs">Development only</p>
             <DevAdminProblemFill onFill={handleDevFill} />
@@ -538,9 +569,12 @@ export function NewProblemForm({
           <div className="flex flex-col gap-2 border-muted border-t border-dashed pt-4">
             <p className="text-muted-foreground text-xs">
               OpenAI — set <code className="text-foreground">OPENAI_API_KEY</code> in{" "}
-              <code className="text-foreground">apps/app</code> env
+              <code className="text-foreground">apps/api</code> env
             </p>
-            <GenerateProblemFromPrompt onFilled={handleDevFill} />
+            <GenerateProblemFromPrompt
+              hasUnsavedFormValues={hasUnsavedFormValues}
+              onFilled={handleDevFill}
+            />
           </div>
         </div>
       ) : null}

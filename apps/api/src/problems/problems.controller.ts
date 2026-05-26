@@ -13,8 +13,12 @@ import { AllowAnonymous } from "@thallesp/nestjs-better-auth";
 // biome-ignore lint/style/useImportType: Nest uses emitted constructor param metadata
 import { CreateProblemDto } from "./dto/create-problem.dto";
 // biome-ignore lint/style/useImportType: Nest uses emitted constructor param metadata
+import { GenerateProblemFromPromptDto } from "./dto/generate-problem-from-prompt.dto";
+// biome-ignore lint/style/useImportType: Nest uses emitted constructor param metadata
 import { ListProblemsQueryDto } from "./dto/list-problems-query.dto";
 import { ProblemsAccessGuard } from "./guards/problems-access.guard";
+// biome-ignore lint/style/useImportType: Nest uses emitted constructor param metadata
+import { ProblemGenerateService } from "./problem-generate.service";
 // biome-ignore lint/style/useImportType: Nest uses emitted constructor param metadata
 import { ProblemsService } from "./problems.service";
 
@@ -27,14 +31,25 @@ import { ProblemsService } from "./problems.service";
 @Controller("problems")
 export class ProblemsController {
   private readonly problemsService: ProblemsService;
+  private readonly problemGenerateService: ProblemGenerateService;
 
-  constructor(problemsService: ProblemsService) {
+  constructor(
+    problemsService: ProblemsService,
+    problemGenerateService: ProblemGenerateService
+  ) {
     this.problemsService = problemsService;
+    this.problemGenerateService = problemGenerateService;
   }
 
   @Post()
   create(@Body() body: CreateProblemDto) {
     return this.problemsService.create(body);
+  }
+
+  /** Must stay above `:id` routes so `generate` is not parsed as a UUID. */
+  @Post("generate")
+  generateFromPrompt(@Body() body: GenerateProblemFromPromptDto) {
+    return this.problemGenerateService.generateFromPrompt(body.prompt);
   }
 
   @Put(":id")

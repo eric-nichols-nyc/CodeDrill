@@ -34,11 +34,6 @@ export const keys = () =>
         emptyToUndefined,
         z.string().optional()
       ),
-      /** Optional — `POST /api/admin/problems/generate` (natural language → problem JSON). */
-      OPENAI_API_KEY: z.preprocess(
-        emptyToUndefined,
-        z.string().min(10).optional()
-      ),
     },
     client: {
       NEXT_PUBLIC_SITE_URL: z.preprocess(
@@ -53,6 +48,5 @@ export const keys = () =>
       AUTH_TEST_EMAIL: process.env.AUTH_TEST_EMAIL,
       AUTH_TEST_PASSWORD: process.env.AUTH_TEST_PASSWORD,
       AUTH_TEST_NAME: process.env.AUTH_TEST_NAME,
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     },
   });

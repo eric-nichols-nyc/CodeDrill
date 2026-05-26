@@ -169,3 +169,13 @@ export function detailToFormValues(
     }),
   });
 }
+
+export function isProblemFormDirty(
+  current: CreateProblemBody,
+  baseline: CreateProblemBody
+): boolean {
+  return (
+    JSON.stringify(normalizeCreateProblemBody(current)) !==
+    JSON.stringify(normalizeCreateProblemBody(baseline))
+  );
+}
