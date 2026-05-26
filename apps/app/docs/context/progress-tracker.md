@@ -9,10 +9,11 @@ change.
 
 ## Current Goal
 
-- Problem chat session header Stage 6 (post-v1) — Radix hydration on problem workspace
+- None (problem chat starter suggestions Stage 1 shipped)
 
 ## Completed
 
+- Problem chat starter suggestions Stage 1 — static empty-thread chips (`chat-suggestions.tsx`, `problem-chat-starter-suggestions.ts`); click sends via stream path; visibility gated on empty thread + loaded history
 - Problem chat session header Stage 5 — `use-chat-sessions.ts` + thread-aware `use-problem-chat.ts`; lazy history list; `+` creates persisted thread; stream sends `threadId`; hydration keyed by `problemId:activeThreadId`
 - Problem chat session header Stage 4 — multi-thread API: migration drops `(user, problem)` unique index; Nest `GET/POST …/chat/threads`; extended `GET messages?threadId=` + optional `threadId` on stream POST; server actions + types
 - Problem chat session header spec v1 rewrite — simpler API (extend `GET messages`, two thread routes, server actions); Stages 1–3 shipped; v1 stops at Stage 5
@@ -57,6 +58,7 @@ change.
 
 ## Session Notes
 
+- Problem chat starter suggestions Stage 1 shipped — spec `13-problem-chat-starter-suggestions.md`
 - Stage 5 spec includes v1 simplifications: bootstrap from latest messages only; lazy thread list on history open; explicit hydration/stream checklist
 - Stage 6 (post-v1): Radix hydration on problem page — use client wrapper for `dynamic({ ssr: false })`, not server `page.tsx`; attempted fix reverted (Next 16 build error)
 - Problem chat UI spec: `docs/context/features-spec/07-problem-chat-ui.md`; backend reference in `docs/context/features-spec/ai/problem-chat/`

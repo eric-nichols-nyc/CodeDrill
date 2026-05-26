@@ -212,7 +212,7 @@ Presentational only:
 
 - Next BFF route under `app/api/problems/.../chat/`
 - Streaming responses
-- Clickable starter prompt chips
+- Clickable starter prompt chips — see [13-problem-chat-starter-suggestions.md](../../13-problem-chat-starter-suggestions.md)
 - POST `metadata.code` / `metadata.language` (needs shared workspace context — V1.1)
 - Admin chat wiring
 - Nest / DB / tutor prompt changes

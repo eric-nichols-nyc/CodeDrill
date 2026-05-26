@@ -5,8 +5,10 @@ import { useCallback, useState } from "react";
 import { useChatSessions } from "@/features/problem-workspace/chat-panel/hooks/use-chat-sessions";
 import { useProblemChat } from "@/features/problem-workspace/chat-panel/hooks/use-problem-chat";
 import type { GetProblemChatMessagesResponse } from "@/features/problem-workspace/chat-panel/lib/problem-chat-types";
+import { problemChatStarterSuggestions } from "@/features/problem-workspace/chat-panel/lib/problem-chat-starter-suggestions";
 import { ChatHeader } from "./chat-header";
 import { ChatInput } from "./chat-input";
+import { ChatSuggestions } from "./chat-suggestions";
 import type { MessageVote } from "./message-actions";
 import { MessageList } from "./message-list";
 
@@ -93,6 +95,21 @@ export function ChatShell({
     }
   };
 
+  const handleSuggestionClick = useCallback(
+    async (text: string) => {
+      if (isSending || !hasProblemId || !hasActiveThread) {
+        return;
+      }
+      try {
+        await sendMessage(text);
+        setEditDraft(undefined);
+      } catch {
+        // Error surfaced via hook state.
+      }
+    },
+    [hasActiveThread, hasProblemId, isSending, sendMessage]
+  );
+
   const handleEditMessage = useCallback((text: string) => {
     setEditDraft(text);
     setEditDraftKey((key) => key + 1);
@@ -111,6 +128,12 @@ export function ChatShell({
   }, []);
 
   const chatInputEnabled = Boolean(hasProblemId) && Boolean(hasActiveThread);
+  const showSuggestions =
+    hasProblemId &&
+    hasActiveThread &&
+    !isLoadingHistory &&
+    messages.length === 0 &&
+    !isSending;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -133,6 +156,13 @@ export function ChatShell({
         submitStatus={submitStatus}
         votes={votes}
       />
+
+      {showSuggestions ? (
+        <ChatSuggestions
+          onSuggestionClick={handleSuggestionClick}
+          suggestions={problemChatStarterSuggestions}
+        />
+      ) : null}
 
       {error ? (
         <p className="mx-2 mb-1 text-destructive text-xs" role="alert">
