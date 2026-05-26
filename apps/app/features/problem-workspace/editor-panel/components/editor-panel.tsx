@@ -9,14 +9,16 @@ import {
   SelectValue,
 } from "@repo/design-system/components/ui/select";
 import { Play, RotateCcw, Send } from "lucide-react";
+import { useApiAuth } from "@/features/auth/hooks/use-api-auth";
+import { EditorRunSubmitAuthPrompt } from "@/features/problem-workspace/editor-panel/components/editor-run-submit-auth-prompt";
 import { JsonFallback } from "@/features/problem-workspace/editor-panel/components/json-fallback";
 import { MonacoEditor } from "@/features/problem-workspace/editor-panel/components/monaco-editor";
-import { WorkspaceCodeStatusBanner } from "@/features/problem-workspace/editor-panel/components/workspace-code-status-banner";
 import { ShellPanel } from "@/features/problem-workspace/shell/shell-panel";
 import { useWorkspace } from "@/features/problem-workspace/shell/workspace-provider";
 
 export function EditorPanel() {
   const { data, workspace } = useWorkspace();
+  const { isSignedIn } = useApiAuth();
   const {
     rows,
     drafts,
@@ -29,9 +31,6 @@ export function EditorPanel() {
     handleSubmit,
     canReset,
     isSavingCode,
-    workspaceCodeLoadError,
-    workspaceCodeSaveError,
-    clearWorkspaceCodeSaveError,
   } = workspace;
 
   const starterBody = (() => {
@@ -82,40 +81,39 @@ export function EditorPanel() {
   return (
     <ShellPanel className="bg-card text-card-foreground">
       <div className="flex h-full min-h-0 flex-col p-2">
-        <WorkspaceCodeStatusBanner
-          loadError={workspaceCodeLoadError}
-          onDismissSaveError={clearWorkspaceCodeSaveError}
-          saveError={workspaceCodeSaveError}
-        />
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {starterBody}
         </div>
-        <div className="mt-2 flex shrink-0 flex-wrap items-center justify-end gap-3 rounded-md border border-border bg-muted/20 px-3 py-2">
-          <div className="flex items-center gap-2">
-            <Button
-              aria-label="Reset to starter code"
-              disabled={isPending || isSavingCode || !canReset}
-              onClick={handleReset}
-              size="icon"
-              type="button"
-              variant="outline"
-            >
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-            <Button
-              disabled={isPending || isSavingCode}
-              onClick={handleRun}
-              size="sm"
-              variant="outline"
-            >
-              <Play />
-              Run
-            </Button>
-            <Button disabled={isPending} onClick={handleSubmit} size="sm">
-              <Send />
-              Submit
-            </Button>
-          </div>
+        <div className="mt-2 flex w-full shrink-0 items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-2">
+          {isSignedIn ? (
+            <div className="ml-auto flex shrink-0 items-center gap-2">
+              <Button
+                aria-label="Reset to starter code"
+                disabled={isPending || isSavingCode || !canReset}
+                onClick={handleReset}
+                size="icon"
+                type="button"
+                variant="outline"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+              <Button
+                disabled={isPending || isSavingCode}
+                onClick={handleRun}
+                size="sm"
+                variant="outline"
+              >
+                <Play />
+                Run
+              </Button>
+              <Button disabled={isPending} onClick={handleSubmit} size="sm">
+                <Send />
+                Submit
+              </Button>
+            </div>
+          ) : (
+            <EditorRunSubmitAuthPrompt />
+          )}
         </div>
       </div>
     </ShellPanel>
