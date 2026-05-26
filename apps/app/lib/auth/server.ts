@@ -2,23 +2,9 @@ import "server-only";
 
 import { apiBaseUrl } from "./api-url";
 import { apiAuthHeaders } from "./api-auth-headers";
+import type { ApiAuthSession, ApiAuthState, ApiAuthUser } from "./types";
 
-export type ApiAuthUser = {
-  id: string;
-  email: string;
-  name: string | null;
-  image?: string | null;
-};
-
-export type ApiAuthSession = {
-  id: string;
-  expiresAt: string;
-};
-
-export type ApiAuthState = {
-  session: ApiAuthSession | null;
-  user: ApiAuthUser | null;
-};
+export type { ApiAuthSession, ApiAuthState, ApiAuthUser } from "./types";
 
 const emptyState: ApiAuthState = { session: null, user: null };
 

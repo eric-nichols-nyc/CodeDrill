@@ -1,7 +1,14 @@
 "use client";
 
+import {
+  Conversation,
+  ConversationContent,
+  ConversationEmptyState,
+} from "@repo/design-system/components/ai-elements/conversation";
 import type { PromptInputMessage } from "@repo/design-system/components/ai-elements/prompt-input";
 import { useCallback, useState } from "react";
+import { TutorSignInPrompt } from "@/features/auth/components/tutor-sign-in-prompt";
+import { useApiAuth } from "@/features/auth/hooks/use-api-auth";
 import { useChatSessions } from "@/features/problem-workspace/chat-panel/hooks/use-chat-sessions";
 import { useProblemChat } from "@/features/problem-workspace/chat-panel/hooks/use-problem-chat";
 import type { GetProblemChatMessagesResponse } from "@/features/problem-workspace/chat-panel/lib/problem-chat-types";
@@ -12,7 +19,24 @@ import { ChatSuggestions } from "./chat-suggestions";
 import type { MessageVote } from "./message-actions";
 import { MessageList } from "./message-list";
 
-export function ChatShell({
+function ignoreChatSubmit() {
+  return;
+}
+
+function ChatAuthLoading() {
+  return (
+    <Conversation className="min-h-0 flex-1">
+      <ConversationContent>
+        <ConversationEmptyState
+          description="Checking your session…"
+          title="Chat"
+        />
+      </ConversationContent>
+    </Conversation>
+  );
+}
+
+function SignedInChatShell({
   problemId,
   initialChatData,
 }: {
@@ -179,5 +203,48 @@ export function ChatShell({
         submitStatus={submitStatus}
       />
     </div>
+  );
+}
+
+export function ChatShell({
+  problemId,
+  initialChatData,
+}: {
+  problemId?: string;
+  initialChatData?: GetProblemChatMessagesResponse;
+}) {
+  const { isPending: isAuthPending, isSignedIn } = useApiAuth();
+
+  if (isAuthPending) {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col">
+        <ChatHeader />
+        <ChatAuthLoading />
+        <ChatInput
+          hasProblemId={false}
+          isSending={false}
+          onSubmit={ignoreChatSubmit}
+        />
+      </div>
+    );
+  }
+
+  if (!isSignedIn) {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col">
+        <ChatHeader />
+        <TutorSignInPrompt />
+        <ChatInput
+          hasProblemId={false}
+          isSending={false}
+          onSubmit={ignoreChatSubmit}
+          signedOut
+        />
+      </div>
+    );
+  }
+
+  return (
+    <SignedInChatShell initialChatData={initialChatData} problemId={problemId} />
   );
 }

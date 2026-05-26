@@ -11,7 +11,8 @@ import {
 import { CircleUser } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { authClient, signOutAndClearToken } from "@/lib/auth/client";
+import { useApiAuth } from "@/features/auth/hooks/use-api-auth";
+import { signOutAndClearToken } from "@/lib/auth/client";
 
 const iconTriggerClassName =
   "flex h-8 w-8 items-center justify-center rounded transition-colors duration-150 text-[var(--nav-icon)] hover:bg-white/5 hover:text-[var(--nav-icon-hover)]";
@@ -23,7 +24,7 @@ type UserMenuProps = {
 
 export function UserMenu({ variant = "default" }: UserMenuProps) {
   const router = useRouter();
-  const { data, isPending } = authClient.useSession();
+  const { isPending, isSignedIn, user } = useApiAuth();
 
   if (isPending) {
     return (
@@ -43,7 +44,7 @@ export function UserMenu({ variant = "default" }: UserMenuProps) {
     );
   }
 
-  if (!data?.session) {
+  if (!isSignedIn) {
     return (
       <Button asChild size="sm" variant="outline">
         <Link href="/auth/sign-in">Sign in</Link>
@@ -52,7 +53,7 @@ export function UserMenu({ variant = "default" }: UserMenuProps) {
   }
 
   const email =
-    data.user && typeof data.user.email === "string" ? data.user.email : "Account";
+    user && typeof user.email === "string" ? user.email : "Account";
 
   async function onSignOut() {
     await signOutAndClearToken();

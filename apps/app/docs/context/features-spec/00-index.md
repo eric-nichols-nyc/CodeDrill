@@ -41,6 +41,7 @@ Every **product feature** under `apps/app/features/<name>/` should have a spec i
 | `problem-workspace` (chat starter suggestions) | [13-problem-chat-starter-suggestions.md](./13-problem-chat-starter-suggestions.md) | `features/problem-workspace/chat-panel/` | None (UI-only; static copy) | **Shipped (Stage 1)** |
 | `problem-workspace` (workspace refactor) | [11-workspace-refactor.md](./11-workspace-refactor.md) | `features/problem-workspace/{shell,directions-panel,editor-panel,output-panel,chat-panel}/` | None (UI layout only) | **In progress** — panels wired; file moves done |
 | `api-auth` | [08-api-auth-consolidation.md](./08-api-auth-consolidation.md) | `lib/auth/`, `features/auth/`, `app/auth/` | `apps/api/src/auth.ts` + guards; Bearer token | **Shipped** |
+| `auth` | [14-auth.md](./14-auth.md) (session model, route guard, tutor requires sign-in) | `features/auth/`, `lib/auth/` | Better Auth on Nest; BFF `/api/auth/*` | **Shipped** |
 | `problems-page` | [04-problems-page-list-ui.md](./04-problems-page-list-ui.md) (list UI delta) | `features/problems-page/` | catalog + tags + `patternSlug` sections | Shipped |
 | `landing` | — | `features/landing/` | — | **Spec TODO** |
 | `docs` | — | `features/docs/` | — | **Spec TODO** |

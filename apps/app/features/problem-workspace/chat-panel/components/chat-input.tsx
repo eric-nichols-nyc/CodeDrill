@@ -14,10 +14,12 @@ import type { ChatSubmitStatus } from "@/features/problem-workspace/chat-panel/l
 export type ChatInputProps = {
   hasProblemId: boolean;
   isSending: boolean;
-  submitStatus: ChatSubmitStatus;
+  submitStatus?: ChatSubmitStatus;
   onSubmit: (message: PromptInputMessage) => void | Promise<void>;
   editDraft?: string;
   editDraftKey?: number;
+  /** When true, input is disabled with sign-in copy (unsigned tutor). */
+  signedOut?: boolean;
 };
 
 export function ChatInput({
@@ -27,23 +29,28 @@ export function ChatInput({
   onSubmit,
   editDraft,
   editDraftKey = 0,
+  signedOut = false,
 }: ChatInputProps) {
+  const enabled = hasProblemId && !signedOut;
+
   return (
     <PromptInputProvider initialInput={editDraft ?? ""} key={editDraftKey}>
       <PromptInput className="m-2 mt-0" onSubmit={onSubmit}>
         <PromptInputBody>
           <PromptInputTextarea
-            disabled={!hasProblemId || isSending}
+            disabled={!enabled || isSending}
             placeholder={
-              hasProblemId
-                ? "Type a message…"
-                : "Chat unavailable for this problem."
+              signedOut
+                ? "Sign in to use the tutor."
+                : hasProblemId
+                  ? "Type a message…"
+                  : "Chat unavailable for this problem."
             }
           />
         </PromptInputBody>
         <PromptInputFooter>
           <PromptInputSubmit
-            disabled={!hasProblemId || isSending}
+            disabled={!enabled || isSending}
             status={submitStatus}
           />
         </PromptInputFooter>
