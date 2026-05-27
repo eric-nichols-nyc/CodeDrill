@@ -8,7 +8,7 @@ The pnpm workspace package name is **`neon-jwt-api`**; the app lives in **`apps/
 
 ## Prerequisites
 
-- Node.js 18+ (follow what your Nest / better-auth install resolves to)
+- Node.js **22.12+** (required for ESM-only deps: `@thallesp/nestjs-better-auth`, `better-auth`; see [Vercel](#vercel))
 - [pnpm](https://pnpm.io/) (monorepo uses `pnpm@10`)
 - A [Neon](https://neon.tech/) Postgres database and `DATABASE_URL`
 
@@ -192,6 +192,14 @@ Replace the UUID with a real `problems.id` from your database.
 | `pnpm db:generate` | Drizzle: generate SQL migrations |
 | `pnpm db:migrate` | Drizzle: run migrations |
 | `pnpm db:studio` | Drizzle Kit Studio |
+
+## Vercel
+
+1. Set the Vercel project **Root Directory** to `apps/api`.
+2. Set **Node.js Version** to **22.x** in Project Settings → General (must be ≥ 22.12 for `require(esm)`).
+3. `vercel.json` in this folder runs `pnpm build`, serves all routes via `api/index.ts`, and uses the `nodejs22.x` runtime.
+
+If you still see `ERR_REQUIRE_ESM`, confirm the dashboard Node version is 22.12+ (not 18 or 20).
 
 ## References
 
