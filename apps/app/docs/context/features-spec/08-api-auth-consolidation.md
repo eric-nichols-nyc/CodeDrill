@@ -13,6 +13,7 @@ Replace the split **Neon Auth (frontend) + Better Auth (Nest API)** setup with *
 - `apps/app/docs/prd.md` § auth alignment — product context.
 - [Better Auth — Bearer plugin](https://www.better-auth.com/docs/plugins/bearer)
 - [Better Auth — NestJS](https://www.better-auth.com/docs/integrations/nestjs)
+- **`apps/api/README.md`** (Deploy) — production API URL, `BETTER_AUTH_*` on Render, `NEON_JWT_API_URL` on the Next host
 
 ## User story
 

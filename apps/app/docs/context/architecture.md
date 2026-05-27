@@ -1,5 +1,14 @@
 # Architecture Context
 
+## Environments
+
+| Environment | Next app (`apps/app`) | Practice API (`apps/api`) |
+| ----------- | --------------------- | ------------------------- |
+| Local dev   | `http://localhost:3010` | `http://localhost:3030` (`NEON_JWT_API_URL`) |
+| Deployed API (Render) | Set `NEON_JWT_API_URL` in host env | e.g. `https://nestjs-backend-vxu2.onrender.com` |
+
+Deploy steps, env vars, and optional free-tier keep-alive ping: **`apps/api/README.md`** (Deploy section). Auth env (`BETTER_AUTH_URL`, trusted origins) must use the same API public URL.
+
 ## Stack
 
 | Layer     | Technology                  | Role   |

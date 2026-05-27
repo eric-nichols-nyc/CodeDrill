@@ -7,6 +7,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
+  // Vercel sets NODE_ENV=production during `turbo build`; without this, react-dom
+  // loads production test-utils and `React.act` is missing (see React 19 + RTL).
+  define: {
+    "process.env.NODE_ENV": JSON.stringify("test"),
+  },
   test: {
     environment: "jsdom",
     globals: true,

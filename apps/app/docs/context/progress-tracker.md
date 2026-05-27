@@ -28,6 +28,7 @@ change.
 - Problem chat streaming Stage 2 — Next BFF `/api/problems/[problemId]/chat/stream` wraps Nest SSE as AI SDK UI message stream
 - Problem chat streaming Stage 3 — `useChat` send path + streaming `chat.tsx` (history via TanStack, send via BFF stream)
 - API auth consolidation — Nest bearer plugin + app Better Auth client; sign-in/up at `/auth/*`; Bearer on BFF/actions; Neon Auth removed
+- Practice API deployed on Render (`https://nestjs-backend-vxu2.onrender.com`) — documented in `apps/api/README.md` Deploy + `architecture.md` Environments
 - API auth consolidation (API slice) — bearer plugin, `getSessionFromHeaders`, removed `x-user-id` guard path
 - Problem chat V1 UI — Server Actions + TanStack Query in `features/problem-workspace/chatbot/`; history load, send message, markdown assistant replies; `problemId` wired through sidebar
 - Problem chat message UI round 2 — split `chat-shell`, `message-list`, `message`, `message-thinking`, `message-actions`, `chat-input`; Shimmer thinking row; copy/edit/vote actions (votes client-only)

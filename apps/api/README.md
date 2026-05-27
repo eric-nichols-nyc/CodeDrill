@@ -201,14 +201,27 @@ NestJS is a **long-running HTTP server** (`pnpm start` → `node dist/main.js`).
 
 Repo root includes [`render.yaml`](../../render.yaml).
 
+**Current deployment (example):** [https://nestjs-backend-vxu2.onrender.com/](https://nestjs-backend-vxu2.onrender.com/) — `GET /` returns the Nest health/hello string.
+
 1. [render.com](https://render.com) → **New** → **Blueprint** → connect this repo.
 2. Add env vars: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `BETTER_AUTH_TRUSTED_ORIGINS`, optional `OPENAI_API_KEY`, `INTERNAL_PROBLEMS_SECRET`.
-3. Set `BETTER_AUTH_URL` to the Render URL (e.g. `https://codedrill-api.onrender.com`).
+3. Set `BETTER_AUTH_URL` to your Render service URL (must match the public origin, e.g. `https://nestjs-backend-vxu2.onrender.com`).
 4. Add that URL + your Next app origin to `BETTER_AUTH_TRUSTED_ORIGINS`.
+5. In the Next app (Vercel/local), set `NEON_JWT_API_URL` to the same API origin (see `apps/app/.env.example`).
 
 **Manual setup (no Blueprint):** Web Service → Root Directory `.` → Build `pnpm install --frozen-lockfile && pnpm --filter neon-jwt-api build` → Start `node apps/api/dist/main.js` → Node **22**.
 
-Free tier spins down after ~15 minutes idle (cold start on next request).
+#### Free tier: cold starts and keep-alive ping
+
+Render **free** services spin down after ~15 minutes with no traffic. The next request can take 30–90+ seconds (Nest cold start).
+
+Optional mitigation (not a repo cron — external monitor):
+
+1. [UptimeRobot](https://uptimerobot.com) or [cron-job.org](https://cron-job.org) → HTTP monitor.
+2. URL: your service root, e.g. `https://nestjs-backend-vxu2.onrender.com/`
+3. Interval: every **10–14 minutes** (stay under Render’s idle window).
+
+For production traffic, use a **paid** Render instance (always on) instead of relying on pings.
 
 ### Other free / low-cost options
 
