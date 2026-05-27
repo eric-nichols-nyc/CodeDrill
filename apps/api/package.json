@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "engines": {
-    "node": ">=22.12.0"
+    "node": "22.x"
   },
   "scripts": {
     "build": "nest build",
@@ -48,6 +48,9 @@
     "drizzle-kit": "^0.31.10",
     "jest": "^30.4.2",
     "ts-jest": "^29.4.9",
-    "typescript": "^5.9.3"
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "webpack": "^5.107.2",
+    "webpack-node-externals": "^3.0.0"
   }
 }

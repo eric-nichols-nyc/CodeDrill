@@ -198,9 +198,9 @@ Replace the UUID with a real `problems.id` from your database.
 1. Set the Vercel project **Root Directory** to `apps/api`.
 2. Set **Node.js Version** to **22.x** in Project Settings → General (must be ≥ 22.12 for `require(esm)`).
 3. **Framework Preset** → Other. **Output Directory** → `public` (or leave blank if the dashboard allows it).
-4. `vercel.json` runs `pnpm build`, sets `outputDirectory` to `public` (empty placeholder for static output), and routes all traffic to `api/index.ts`.
+4. `vercel.json` runs `pnpm build` (webpack bundles ESM auth deps into `dist/serverless.js`), sets `outputDirectory` to `public`, and routes all traffic to `api/index.ts` → `dist/serverless.js`.
 
-If you still see `ERR_REQUIRE_ESM`, confirm the dashboard Node version is 22.12+ (not 18 or 20).
+Do **not** point Vercel at `src/` — that compiles to CJS `require()` and breaks `@thallesp/nestjs-better-auth` (ESM-only). Set Node.js to **22.x** in the dashboard as a backup.
 
 ## References
 
