@@ -193,14 +193,45 @@ Replace the UUID with a real `problems.id` from your database.
 | `pnpm db:migrate` | Drizzle: run migrations |
 | `pnpm db:studio` | Drizzle Kit Studio |
 
-## Vercel
+## Deploy (recommended: Render)
 
-1. Set the Vercel project **Root Directory** to `apps/api`.
-2. Set **Node.js Version** to **22.x** in Project Settings → General (must be ≥ 22.12 for `require(esm)`).
-3. **Framework Preset** → Other. **Output Directory** → `public` (or leave blank if the dashboard allows it).
-4. `vercel.json` runs `pnpm build` (webpack bundles ESM auth deps into `dist/serverless.js`), sets `outputDirectory` to `public`, and routes all traffic to `api/index.ts` → `dist/serverless.js`.
+NestJS is a **long-running HTTP server** (`pnpm start` → `node dist/main.js`). That maps cleanly to a container/web service, not Vercel’s serverless function model (which caused ESM / export issues).
 
-Do **not** point Vercel at `src/` — that compiles to CJS `require()` and breaks `@thallesp/nestjs-better-auth` (ESM-only). Set Node.js to **22.x** in the dashboard as a backup.
+### Render (free tier, best fit)
+
+Repo root includes [`render.yaml`](../../render.yaml).
+
+1. [render.com](https://render.com) → **New** → **Blueprint** → connect this repo.
+2. Add env vars: `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `BETTER_AUTH_TRUSTED_ORIGINS`, optional `OPENAI_API_KEY`, `INTERNAL_PROBLEMS_SECRET`.
+3. Set `BETTER_AUTH_URL` to the Render URL (e.g. `https://codedrill-api.onrender.com`).
+4. Add that URL + your Next app origin to `BETTER_AUTH_TRUSTED_ORIGINS`.
+
+**Manual setup (no Blueprint):** Web Service → Root Directory `.` → Build `pnpm install --frozen-lockfile && pnpm --filter neon-jwt-api build` → Start `node apps/api/dist/main.js` → Node **22**.
+
+Free tier spins down after ~15 minutes idle (cold start on next request).
+
+### Other free / low-cost options
+
+| Platform | Fit for Nest | Notes |
+|----------|----------------|-------|
+| [Render](https://render.com) | Excellent | Free web service; use config above |
+| [Fly.io](https://fly.io) | Excellent | Free allowance; deploy via Dockerfile |
+| [Railway](https://railway.app) | Excellent | Mostly usage-based credits now; very simple `railway up` |
+| [Koyeb](https://www.koyeb.com) | Good | Free nano instances |
+| Vercel | Poor | Built for Next/static + short serverless functions; ongoing ESM/export friction |
+
+You do **not** need to replace better-auth — any of the web-service hosts above run the same `dist/main.js` you use locally.
+
+### Vercel (zero-config)
+
+Vercel [detects Nest from `src/main.ts`](https://vercel.com/docs/frameworks/backend/nestjs) automatically. Do **not** set `framework: null`, do **not** add `api/index.ts`, and do **not** set `outputDirectory: public` — those override detection and caused the ESM / “no exports” errors.
+
+1. Project **Root Directory** → `apps/api`
+2. **Node.js Version** → **22.x**
+3. `vercel.json` only sets monorepo install + `pnpm build` (no `functions` / `rewrites`)
+4. Entrypoint stays `src/main.ts` (same as a normal Nest deploy)
+
+This app adds `@thallesp/nestjs-better-auth` (ESM-only). Node **22.x** on Vercel is required if you see `ERR_REQUIRE_ESM`; a plain Nest app without that package often works on older Node.
 
 ## References
 

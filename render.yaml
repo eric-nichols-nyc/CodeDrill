@@ -1,0 +1,27 @@
+# Render Blueprint — CodeDrill API (NestJS)
+# https://render.com/docs/blueprint-spec
+#
+# Connect repo → New Blueprint → select this file.
+# Set secrets in the Render dashboard (DATABASE_URL, BETTER_AUTH_*, etc.).
+
+services:
+  - type: web
+    name: codedrill-api
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: .
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter neon-jwt-api build
+    startCommand: node apps/api/dist/main.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        sync: false
+      - key: BETTER_AUTH_SECRET
+        sync: false
+      - key: BETTER_AUTH_URL
+        sync: false
+      - key: BETTER_AUTH_TRUSTED_ORIGINS
+        sync: false
