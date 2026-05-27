@@ -14,5 +14,13 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "vitest.config.ts", "playwright.config.ts"]
+  "exclude": [
+    "node_modules",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "__tests__",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "playwright.config.ts"
+  ]
 }
