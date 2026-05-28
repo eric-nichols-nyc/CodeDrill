@@ -37,7 +37,7 @@ const { getToken } = await auth();
 const token = await getToken();
 if (!token) throw new Error("Not authenticated");
 
-await fetch(`${process.env.NEST_CLERK_API_URL}/me`, {
+await fetch(`${process.env.NEST_CLERK_API_URL}/api/me`, {
   headers: { Authorization: `Bearer ${token}` },
   cache: "no-store",
 });

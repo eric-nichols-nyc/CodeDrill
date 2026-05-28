@@ -1,24 +1,27 @@
 import { Controller, Get } from "@nestjs/common";
 import { CurrentUserId } from "./auth/current-user.decorator";
 // biome-ignore lint/style/useImportType: Nest constructor injection
-import { ClerkService } from "./auth/clerk.service";
+import { UsersService } from "./users/users.service";
 
 @Controller()
 export class MeController {
-  private readonly clerkService: ClerkService;
+  private readonly usersService: UsersService;
 
-  constructor(clerkService: ClerkService) {
-    this.clerkService = clerkService;
+  constructor(usersService: UsersService) {
+    this.usersService = usersService;
   }
 
   @Get("me")
   async getMe(@CurrentUserId() userId: string) {
-    const user = await this.clerkService.client.users.getUser(userId);
+    const row = await this.usersService.findById(userId);
     return {
-      userId: user.id,
-      email: user.primaryEmailAddress?.emailAddress ?? null,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      emailVerified: row.emailVerified,
+      image: row.image,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
     };
   }
 }

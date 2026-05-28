@@ -1,73 +1,73 @@
 # Stage 4: API authentication
 
-**Goal:** Protected routes on **`apps/nest-clerk-api`** reject invalid callers; valid Clerk sessions resolve to a local **`users`** row. `GET /me` returns the **DB user**, not Clerk’s live API profile.
+**Goal:** Protected routes verify Clerk JWT; handlers resolve **`user`** by `id = sub`. **`GET /me`** returns the DB row, not Clerk’s live API.
 
-**Depends on:** [Stage 1 — Foundation](./01-foundation.md), [Stage 3 — Webhook provisioning](./03-webhook-provisioning.md) (for populated DB during testing).
+**Depends on:** Stages [1](./01-foundation.md), [3](./03-webhook-provisioning.md).
 
-**Blocks:** [Stage 5 — API authorization](./05-api-authorization.md).
+**Blocks:** Stage 5.
 
 ---
 
 ## Scope
 
-### `ClerkService` (`apps/nest-clerk-api/src/auth/clerk.service.ts`)
+### `ClerkService`
 
-- `verifyToken` via `@clerk/backend` with `CLERK_SECRET_KEY`
-- Optional `CLERK_AUTHORIZED_PARTIES` (comma-separated)
+- `verifyToken` with `CLERK_SECRET_KEY`, optional `CLERK_AUTHORIZED_PARTIES`
 - `createClerkClient` for webhook enrichment only
 
-### `ClerkAuthGuard` — global (preferred)
+### `ClerkAuthGuard` (global)
 
-Use **`APP_GUARD`** + `@Public()` on health, root, and `/webhooks/clerk`:
+- `APP_GUARD` + `@Public()` on `/api`, `/api/health`, `/api/webhooks/clerk` (`setGlobalPrefix("api")` in `main.ts`)
+- Bearer JWT → `request.userId = payload.sub` (this **is** `user.id`)
 
-- Parse `Authorization: Bearer <token>`
-- Missing/invalid → `401 Unauthorized`
-- On success: attach JWT payload and `request.userId = payload.sub` (Clerk id)
+### `@CurrentUserId()`
 
-Simpler than per-route `@UseGuards` for a small API; new public routes must opt in with `@Public()`.
+- Returns Clerk `sub` — same value stored in **`user.id`**
 
-**Reference:** `apps/nest-clerk-api/src/auth/auth.module.ts`, `clerk-auth.guard.ts`, `public.decorator.ts`.
-
-### `@CurrentUserId()` decorator
-
-- Returns Clerk `sub` (`clerkUserId`) from the request
-- Controllers pass this to `UsersService.findByClerkId`
-
-### `UsersService` (`apps/nest-clerk-api/src/users/`)
+### `UsersService`
 
 | Method | Use |
 |--------|-----|
-| `findByClerkId(clerkUserId)` | Resolve DB user |
-| `upsertFromClerk(...)` | Used by webhook (may live in service or webhooks layer) |
-| `deleteByClerkId(clerkUserId)` | Webhook `user.deleted` |
+| `findById(id)` | `user` where `id = sub` |
+| `upsertFromClerk(...)` | Webhook (Stage 3) |
+| `deleteById(id)` | Webhook `user.deleted` |
 
-**Valid JWT + no DB row → `404`** with a clear message (webhook not synced yet). Do not auto-insert on JWT verify.
+Alias `findByClerkId` → `findById` is fine; there is **no** separate `clerk_user_id` column.
 
-### `GET /me`
+**Valid JWT + no `user` row → `404`** (webhook not synced). Never insert on JWT verify.
 
-- Protected (no `@Public()`)
-- Response: DB `users` row (id, clerkUserId, email, names, imageUrl, timestamps)
-- **Not** `clerkClient.users.getUser` as the primary source
+### `GET /api/me`
 
-### Auth module
+Return DB **`user`** fields, e.g.:
 
-- Global guard + export `ClerkService`, `UsersModule`
+```json
+{
+  "id": "user_...",
+  "name": "...",
+  "email": "...",
+  "emailVerified": true,
+  "image": "...",
+  "createdAt": "...",
+  "updatedAt": "..."
+}
+```
+
+Do **not** use `clerkClient.users.getUser` as the primary response.
 
 ---
 
 ## Acceptance criteria
 
-- [ ] Request without `Authorization` → 401 (except `@Public()` routes).
-- [ ] Expired/invalid JWT → 401.
-- [ ] Valid JWT + existing `users` row → handler runs; `sub` matches `clerkUserId`.
+- [ ] No `Authorization` → 401 (except `@Public()`).
+- [ ] Bad JWT → 401.
+- [ ] Valid JWT + `user` row → 200; `sub === user.id`.
 - [ ] Valid JWT + missing row → 404.
-- [ ] `GET /me` returns DB fields after webhook provisioning.
-- [ ] `POST /webhooks/clerk` stays `@Public()` (no JWT).
+- [ ] `GET /api/me` returns DB shape after webhook.
+- [ ] Webhook stays `@Public()`.
 
 ---
 
 ## Out of scope
 
-- Ownership filters on problem/progress/chat rows (Stage 5).
-- Next.js provisioning screen (Stage 6).
-- Modifying `apps/api` auth.
+- `problem_*` authorization (Stage 5).
+- `apps/api` Better Auth routes.

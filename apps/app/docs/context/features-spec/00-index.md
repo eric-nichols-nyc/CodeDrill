@@ -43,7 +43,7 @@ Every **product feature** under `apps/app/features/<name>/` should have a spec i
 | `problem-workspace` (workspace refactor) | [11-workspace-refactor.md](./11-workspace-refactor.md) | `features/problem-workspace/{shell,directions-panel,editor-panel,output-panel,chat-panel}/` | None (UI layout only) | **In progress** — panels wired; file moves done |
 | `api-auth` | [08-api-auth-consolidation.md](./08-api-auth-consolidation.md) | `lib/auth/`, `features/auth/`, `app/auth/` | `apps/api/src/auth.ts` + guards; Bearer token | **Shipped** |
 | `auth` | [14-auth.md](./14-auth.md) (session model, route guard, tutor requires sign-in) | `features/auth/`, `lib/auth/` | Better Auth on Nest; BFF `/api/auth/*` | **Shipped** |
-| `clerk-neon-auth` | [clerk-neon-auth/](./clerk-neon-auth/README.md) ([00 Drizzle](./clerk-neon-auth/00-drizzle.md) → foundation → webhook → API auth → authz) | *Deferred* (`apps/app` Clerk UI) | **`apps/nest-clerk-api/`** only — do not edit `apps/api` | **In progress** — spec tailored; backend Stages 0–1, 3–5 |
+| `clerk-neon-auth` | [clerk-neon-auth/](./clerk-neon-auth/README.md) — reuse Better Auth **`user`** table (`id` = Clerk `sub`); [00 Drizzle](./clerk-neon-auth/00-drizzle.md) | *Deferred* (`apps/app` Clerk UI) | **`apps/nest-clerk-api/`** — shared Neon DB; no `apps/api` edits | **In progress** — Stages 0–1, 3–5 |
 | `problems-page` | [04-problems-page-list-ui.md](./04-problems-page-list-ui.md) (list UI delta) | `features/problems-page/` | catalog + tags + `patternSlug` sections | Shipped |
 | `landing` | — | `features/landing/` | — | **Spec TODO** |
 | `docs` | — | `features/docs/` | — | **Spec TODO** |

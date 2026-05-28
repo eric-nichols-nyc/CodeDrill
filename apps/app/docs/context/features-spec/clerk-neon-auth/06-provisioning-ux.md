@@ -14,17 +14,17 @@
 
 ### Gate before protected app chrome
 
-1. Call **`GET ${NEST_CLERK_API_URL}/me`** with Clerk Bearer token.
+1. Call **`GET ${NEST_CLERK_API_URL}/api/me`** with Clerk Bearer token.
 2. Map outcomes:
 
 | API result | UI state |
 |------------|----------|
 | 200 + user body | Render app shell + children |
-| 404 | `provisioning` — no `users` row yet (webhook delay) |
+| 404 | `provisioning` — no **`user`** row yet (webhook delay) |
 | 401 | Redirect to sign-in |
 | Network / 5xx / missing API URL | `error` with short `detail` |
 
-**No workspace check** — CodeDrill does not have `GET /workspaces/mine`. Provisioning complete means **`GET /me` returns 200**.
+**No workspace check** — CodeDrill does not have `GET /workspaces/mine`. Provisioning complete means **`GET /api/me` returns 200**.
 
 ### `ProvisionWait` component (name TBD)
 

@@ -25,18 +25,19 @@ export class WebhooksService {
         return { ok: true, synced: true };
 
       case "session.created": {
-        const user = evt.data.user;
-        if (user) {
-          await this.syncUser(user);
-          this.logger.log(`Synced user (session.created): ${user.id}`);
+        const clerkUser = evt.data.user;
+        if (clerkUser) {
+          await this.syncUser(clerkUser);
+          this.logger.log(`Synced user (session.created): ${clerkUser.id}`);
           return { ok: true, synced: true };
         }
         return { ok: true, synced: false };
       }
 
       case "user.deleted": {
-        const deleted = await this.usersService.deleteByClerkId(evt.data.id ?? "");
-        this.logger.log(`Deleted user (user.deleted): ${evt.data.id}, found=${deleted}`);
+        const id = evt.data.id ?? "";
+        const deleted = await this.usersService.deleteById(id);
+        this.logger.log(`Deleted user (user.deleted): ${id}, found=${deleted}`);
         return { ok: true, synced: deleted };
       }
 
@@ -47,33 +48,40 @@ export class WebhooksService {
   }
 
   private async syncUser(data: UserJSON): Promise<void> {
-    const clerkUserId = data.id;
-    let email =
-      data.email_addresses?.find((e) => e.id === data.primary_email_address_id)
-        ?.email_address ??
-      data.email_addresses?.[0]?.email_address ??
-      null;
+    const id = data.id;
+    const primaryEmail = data.email_addresses?.find(
+      (e) => e.id === data.primary_email_address_id
+    );
+
+    let email: string | null =
+      primaryEmail?.email_address ?? data.email_addresses?.[0]?.email_address ?? null;
 
     if (!email) {
-      email = await this.fetchEmailFromClerk(clerkUserId);
+      email = await this.fetchEmailFromClerk(id);
     }
 
+    const emailVerified =
+      primaryEmail?.verification?.status === "verified" ||
+      data.email_addresses?.some((e) => e.verification?.status === "verified") ||
+      false;
+
     await this.usersService.upsertFromClerkProfile({
-      clerkUserId,
+      id,
       email,
       firstName: data.first_name ?? null,
       lastName: data.last_name ?? null,
       imageUrl: data.image_url ?? null,
+      emailVerified,
     });
   }
 
-  private async fetchEmailFromClerk(clerkUserId: string): Promise<string | null> {
+  private async fetchEmailFromClerk(id: string): Promise<string | null> {
     try {
-      const user = await this.clerkService.client.users.getUser(clerkUserId);
-      return user.primaryEmailAddress?.emailAddress ?? null;
+      const clerkUser = await this.clerkService.client.users.getUser(id);
+      return clerkUser.primaryEmailAddress?.emailAddress ?? null;
     } catch (error) {
       this.logger.warn(
-        `Could not enrich email for ${clerkUserId}: ${error instanceof Error ? error.message : String(error)}`
+        `Could not enrich email for ${id}: ${error instanceof Error ? error.message : String(error)}`
       );
       return null;
     }

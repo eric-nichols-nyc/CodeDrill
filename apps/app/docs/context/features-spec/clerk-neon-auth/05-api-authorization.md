@@ -1,102 +1,69 @@
 # Stage 5: API authorization
 
-**Goal:** User-owned CRUD in **`apps/nest-clerk-api`** only touches rows for the authenticated user. Authorization lives in **Drizzle** service queries, not client-supplied ids.
+**Goal:** User-owned data is scoped to **`user.id`** (= Clerk `sub`). Practice tables already use **`user_id` text** in `apps/api` schema — align values, do not invent a second id space.
 
 **Depends on:** [Stage 4 — API authentication](./04-api-authentication.md).
 
-**Blocks:** Nothing (Stage 6 is parallel UX, deferred).
-
-**Note:** Today `nest-clerk-api` only has `users`. This stage defines rules for **when** problem/progress/chat routes are added here or shared schema is extended — using **`apps/api/src/database/schema.ts`** as the domain reference, without editing `apps/api` in this feature.
+**Blocks:** Nothing (Stage 6 deferred).
 
 ---
 
 ## Scope
 
-### Ownership model (CodeDrill)
+### Ownership model
 
 | Resource | Scope |
 |----------|--------|
-| `users` | Self only (`clerkUserId` from JWT) |
-| `problem_progress`, `submissions`, `problem_workspace_code`, `problem_chat_thread`, … | `user_id` → `users.id` (internal uuid), **or** filter by `clerkUserId` until FK migration |
+| **`user`** | Self only: `id = JWT sub` |
+| **`problem_progress`, `submissions`, `problem_workspace_code`, `problem_chat_thread`, …** | `user_id = user.id` (text) |
 
-**Schema chain (when nested routes exist):** e.g. `problem_chat_message` → `problem_chat_thread` → `users`.
+**Today:** `apps/api/src/database/schema.ts` stores `userId` as **text without FK** to `user`. Queries must filter:
 
-Define FKs in Drizzle with `references(() => users.id, { onDelete: "cascade" })` so `user.deleted` webhook cascades app data.
+```ts
+eq(problemProgress.userId, user.id)
+```
+
+where `user.id` is the Clerk `sub` string from `findById(sub)`.
+
+### Legacy / orphan `user_id` rows
+
+Dev DB may contain `user_id` values that **do not** match any current `user.id` (e.g. old Neon Auth UUIDs). New Clerk users use `user.id = sub`. Document migration or ignore orphans in dev.
+
+**Future (optional):** add FK `user_id` → `user.id` with `onDelete: "cascade"` in a dedicated migration — not required for initial Clerk backend slice.
 
 ### Controller pattern
 
-1. Route is not `@Public()` (global guard).
-2. `@CurrentUserId() clerkUserId: string`
-3. `const user = await usersService.findByClerkId(clerkUserId)` — 404 if missing
-4. Delegate to `*ForUser` service methods with `user.id`
+1. Global guard (not `@Public()`).
+2. `@CurrentUserId() sub: string`
+3. `const user = await usersService.findById(sub)` → 404 if missing
+4. `*ForUser` methods receive `user.id`
 
 ### Service naming
 
 - `findProgressForUser`, `upsertWorkspaceCodeForUser`, etc.
-- No unscoped `findOne(id)` on tenant data without owner check.
-
-### Drizzle patterns
-
-**By internal user id:**
-
-```ts
-await db.query.problemProgress.findFirst({
-  where: (t, { and, eq }) =>
-    and(eq(t.id, progressId), eq(t.userId, user.id)),
-});
-```
-
-**By clerk id (transitional, if column still stores Clerk sub):**
-
-```ts
-await db
-  .select()
-  .from(problemProgress)
-  .where(
-    and(
-      eq(problemProgress.id, progressId),
-      eq(problemProgress.userId, clerkUserId)
-    )
-  );
-```
-
-Prefer migrating `user_id` columns to FK → `users.id` for consistency with `clerkUserId` on the profile table.
-
-**Deletes:** `delete` / `deleteMany` with scoped `where`; zero rows → 404.
-
-### Cross-resource rules (when implemented)
-
-- **Create progress / workspace code / chat:** set `userId` from `findByClerkId`, never from request body.
-- **Read problem catalog:** may stay public or internal-secret on `apps/api` until merged; do not conflate with user auth.
+- Never trust `userId` from request body on create.
 
 ### Failure semantics
 
-- Wrong or another user’s id → **`NotFoundException` (404)**, not 403.
+- Another user’s resource → **404**, not 403.
 
-### Explicit non-goals
+### Legacy Better Auth tables
 
-- Workspaces, boards, Trellix-style tenancy.
-- Role-based access (admin, guest) unless product adds it later.
-- Postgres RLS.
-
-### Security hardening
-
-- Any new user-owned route must use global guard (or explicit guard) + `*ForUser` methods.
-- No unauthenticated list/get/delete on tenant data.
+Do not use `session.token` for API auth after Clerk cutover. `session` / `account` are not part of authorization checks.
 
 ---
 
 ## Acceptance criteria
 
-- [ ] User A cannot read/update User B’s progress (or equivalent) by id → 404.
-- [ ] List endpoints return only rows for resolved `users.id`.
-- [ ] Creates set `userId` from DB user, not request body.
-- [ ] `user.deleted` webhook removes `users` row and cascades dependent rows (once FKs exist).
-- [ ] `apps/api` unchanged by this feature.
+- [ ] User A cannot access User B’s `problem_progress` (etc.) by id → 404.
+- [ ] Lists filtered by `user_id = user.id`.
+- [ ] Creates set `userId` from `findById(sub)`, not body.
+- [ ] `user.deleted` webhook removes **`user`**; document orphan vs cascaded practice data.
+- [ ] No `apps/api` source changes for this feature.
 
 ---
 
 ## Reference (read-only)
 
-- Domain tables: `apps/api/src/database/schema.ts`
-- Auth implementation target: `apps/nest-clerk-api/src/`
+- Practice columns: `apps/api/src/database/schema.ts`
+- Auth API: `apps/nest-clerk-api/src/`

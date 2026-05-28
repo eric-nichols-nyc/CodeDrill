@@ -1,26 +1,39 @@
-import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 const timestamptz = (name: string) =>
   timestamp(name, { withTimezone: true, mode: "date" });
 
 /**
- * Local profile for a Clerk account. Child tables should reference `users.id`
- * with `onDelete: "cascade"` when added (progress, submissions, etc.).
+ * Better Auth profile table (existing in shared Neon DB).
+ * Clerk JWT `sub` is stored as `user.id`.
  */
-export const users = pgTable("users", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  clerkUserId: text("clerk_user_id").notNull().unique(),
-  email: text("email"),
-  firstName: text("first_name"),
-  lastName: text("last_name"),
-  imageUrl: text("image_url"),
-  createdAt: timestamptz("created_at").notNull().defaultNow(),
-  updatedAt: timestamptz("updated_at").notNull().defaultNow(),
+export const user = pgTable("user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  emailVerified: boolean("emailVerified").notNull(),
+  image: text("image"),
+  createdAt: timestamptz("createdAt").notNull(),
+  updatedAt: timestamptz("updatedAt").notNull(),
+});
+
+/** Legacy Better Auth — used only to delete rows before removing `user`. */
+export const session = pgTable("session", {
+  id: text("id").primaryKey(),
+  userId: text("userId").notNull(),
+});
+
+/** Legacy Better Auth — used only to delete rows before removing `user`. */
+export const account = pgTable("account", {
+  id: text("id").primaryKey(),
+  userId: text("userId").notNull(),
 });
 
 export const schema = {
-  users,
+  user,
+  session,
+  account,
 };
 
-export type UserRow = typeof users.$inferSelect;
-export type NewUserRow = typeof users.$inferInsert;
+export type UserRow = typeof user.$inferSelect;
+export type NewUserRow = typeof user.$inferInsert;

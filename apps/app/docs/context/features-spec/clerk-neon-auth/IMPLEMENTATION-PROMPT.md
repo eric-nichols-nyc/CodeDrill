@@ -1,87 +1,66 @@
 # Implementation prompt (copy-paste)
 
-Use for **`apps/nest-clerk-api`** only. Staged spec: `apps/app/docs/context/features-spec/clerk-neon-auth/`. **Do not modify `apps/api`** for this feature.
+Use for **`apps/nest-clerk-api`** only. Spec: `apps/app/docs/context/features-spec/clerk-neon-auth/`. **Do not modify `apps/api`**.
 
-**Active now:** Stages 0, 1, 3, 4, 5 (backend). **Deferred:** 2, 6 (frontend), `@repo/clerk`.
+**Active:** Stages 0, 1, 3, 4, 5. **Deferred:** 2, 6, `@repo/clerk`.
 
 ---
 
 ## Prompt
 
-Implement **Clerk authentication + Neon user provisioning + Nest authorization** for **CodeDrill** in **`apps/nest-clerk-api`**. Deliver backend stages before frontend. Complete acceptance criteria per stage before moving on.
+Implement **Clerk + Neon** for CodeDrill in **`apps/nest-clerk-api`**. The database is usually **shared with `apps/api`** and already has Better Auth tables.
 
-### Constraints
+### Hard constraints
 
-- **Target:** `apps/nest-clerk-api/` only — no edits to `apps/api/`.
-- **ORM:** Drizzle + Neon HTTP (`drizzle-orm/neon-http`), not Prisma.
-- **No workspaces/boards** — Trellix tenancy model does not apply.
-- **Webhook secret env:** `CLERK_WEBHOOK_SECRET` (exact name).
-- **`@repo/clerk`:** out of scope (separate feature).
+- **Only** `apps/nest-clerk-api/**`
+- **Reuse existing `user` table** — `id` (text) = Clerk JWT `sub`. **No** `users` table, **no** `clerk_user_id` column.
+- **Do not** write to `session` / `account` on Clerk sign-in (legacy Better Auth).
+- On `user.deleted`: delete `session` + `account` for that `userId`, then delete `user`.
+- Env: `CLERK_WEBHOOK_SECRET` (exact name).
+- Run without asking: `pnpm --filter nest-clerk-api test`, `typecheck`, `build`; `db:push` only after confirming schema matches live `user` DDL.
 
-### Stage 0 — Drizzle + Neon
+### Database (read first)
 
-- Follow `00-drizzle.md`: `schema.ts`, `drizzle.ts`, `drizzle.config.ts`, `database.module.ts`.
-- Scripts: `db:push`, `db:generate`, `db:migrate`, `db:studio`, plus `dev` / `build` / `test` / `typecheck` via `pnpm --filter nest-clerk-api`.
+Live tables include: `user`, `session`, `account`, `verification`, plus practice tables. See [README.md](./README.md) § Database model.
+
+**`user` columns:** `id`, `name`, `email`, `emailVerified`, `image`, `createdAt`, `updatedAt` (camelCase in Postgres).
+
+### Stage 0 — Drizzle
+
+- [00-drizzle.md](./00-drizzle.md): `drizzle.ts`, `DRIZZLE`, shared DB rules.
+- `schema.ts` → `pgTable("user", …)` only for auth (do not pull entire DB).
 
 ### Stage 1 — Foundation
 
-- `users`: uuid `id`, unique `clerkUserId`, optional email/names/image, timestamps.
-- `src/config/env.ts`: require `DATABASE_URL`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET`.
-- `pnpm --filter nest-clerk-api db:push` after schema changes.
+- Match Better Auth `user` in Drizzle.
+- `src/config/env.ts`: `DATABASE_URL`, `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET`.
+- `UsersService.findById(sub)`.
 
-### Stage 2 — Clerk frontend (deferred)
+### Stage 3 — Webhook
 
-- Skip until scheduled; use `@clerk/nextjs` in `apps/app`, call `NEST_CLERK_API_URL` (port 3031).
+- `setGlobalPrefix("api")`; `POST /api/webhooks/clerk`, `rawBody: true`, `@Public()`.
+- Upsert `user` with `id = Clerk sub`; map name/email/image/emailVerified.
+- `user.deleted` → delete legacy `session`/`account`, then `user`.
 
-### Stage 3 — Webhook provisioning
+### Stage 4 — Auth
 
-- `POST /webhooks/clerk`: `rawBody: true`, `verifyWebhook`, `@Public()`.
-- Events: `user.created`, `user.updated`, `session.created` (with user), `user.deleted`.
-- Drizzle upsert on `clerkUserId`; delete on `user.deleted`.
-- Enrich missing email via Clerk Backend API.
-- No default workspace. Document ngrok + Clerk Dashboard.
+- Global `ClerkAuthGuard`; `@CurrentUserId()` = `sub` = `user.id`.
+- `GET /api/me` → DB `user` row; JWT without row → 404.
 
-### Stage 4 — API authentication
+### Stage 5 — Authorization
 
-- Global `ClerkAuthGuard` + `@Public()` for health/webhooks.
-- `UsersService.findByClerkId`; JWT without DB row → 404.
-- `GET /me` returns **DB user** (not Clerk API as primary).
-
-### Stage 5 — API authorization
-
-- `*ForUser` Drizzle methods for user-owned data when routes are added.
-- FK `user_id` → `users.id` with `onDelete: "cascade"` where possible.
-- Wrong owner → 404. `userId` on create from DB user, not body.
-- Use `apps/api/src/database/schema.ts` as domain reference only.
-
-### Stage 6 — Provisioning UX (deferred)
-
-- Gate on `GET /me` 200, not workspaces.
+- Scope practice rows with `user_id = user.id` (text); see `apps/api/src/database/schema.ts` (reference only).
+- Orphan `user_id` from pre-Clerk ids — document, do not fix in `apps/api`.
 
 ### Principles
 
-1. Clerk owns identity; webhooks own `users` rows; JWT verify does not insert users.
-2. Authorization = scoped Drizzle queries (no RLS unless required later).
-3. Fail closed: no token → 401; no DB user → 404; wrong owner → 404.
+1. Clerk owns sessions; DB `session` table is legacy.
+2. Webhooks provision **`user`**; JWT verify does not insert.
+3. Fail closed: 401 / 404 / 404.
 
-### Reference paths
+### Acceptance
 
-- `apps/nest-clerk-api/src/database/schema.ts`
-- `apps/nest-clerk-api/src/database/drizzle.ts`
-- `apps/nest-clerk-api/src/auth/`
-- Drizzle setup: `apps/app/docs/context/features-spec/clerk-neon-auth/00-drizzle.md`
-- Spec pack: `apps/app/docs/context/features-spec/clerk-neon-auth/`
-
-### Final acceptance (backend slice)
-
-- [ ] Clerk `user.created` → `users` row in Neon.
-- [ ] `GET /me` with valid JWT returns DB user after webhook.
-- [ ] Valid JWT before webhook → 404 on `/me`.
-- [ ] Webhook unsigned/tampered → 400.
-- [ ] `user.deleted` removes user (cascade when child FKs exist).
-- [ ] No files changed under `apps/api/`.
-
-### Final acceptance (full product, later)
-
-- [ ] Sign up in `apps/app` → webhook → `/me` 200 → app shell loads (Stage 6).
-- [ ] User A cannot access User B’s user-owned data (404).
+- [ ] No `users` table created in Neon
+- [ ] Webhook creates `user` with `id = sub`
+- [ ] `GET /api/me` returns DB user
+- [ ] No files under `apps/api/`

@@ -8,6 +8,21 @@
 
 **Package name (pnpm filter):** `nest-clerk-api`
 
+## Shared database (important)
+
+`nest-clerk-api` typically uses the **same `DATABASE_URL`** as `apps/api`. The database already contains:
+
+- **`user`**, **`session`**, **`account`**, **`verification`** — Better Auth (not Neon-managed)
+- **Practice tables** — `problems`, `problem_progress`, `submissions`, etc.
+
+For this feature:
+
+- **Model only `user`** in `nest-clerk-api/src/database/schema.ts` (match existing DDL).
+- **Do not** add a `users` table or run `db:push` that creates duplicate identity tables.
+- **Do not** `drizzle-kit pull` the whole database into this app unless you intend to own every table here.
+
+See [README](./README.md) § Database model.
+
 ---
 
 ## Prerequisites
@@ -68,21 +83,24 @@ Runtime adapter: **`drizzle-orm/neon-http`** (not `node-postgres` / `pg` pool in
 
 ---
 
-## Initialize Drizzle (first time on a fresh DB)
+## Initialize Drizzle (existing CodeDrill DB)
 
 From **monorepo root**:
 
 ```bash
-# 1. Install workspace deps
 pnpm install
-
-# 2. Ensure DATABASE_URL is in apps/nest-clerk-api/.env
-
-# 3. Apply schema to Neon (development — no migration files yet)
-pnpm --filter nest-clerk-api db:push
+# DATABASE_URL in apps/nest-clerk-api/.env (usually same Neon DB as apps/api)
 ```
 
-**`db:push`** compares `src/database/schema.ts` to the live database and applies DDL. Use this while iterating on the auth slice before you commit to versioned migrations.
+**If `user` already exists** (Better Auth migrated):
+
+1. Define **`user`** in `schema.ts` to match live columns (see [01-foundation.md](./01-foundation.md)).
+2. Run `pnpm --filter nest-clerk-api db:push` only after reviewing the diff — expect **no-op** when definitions match.
+3. **Do not** push a new `users` / `clerk_user_id` schema.
+
+**If `user` does not exist** (empty branch): run `db:push` after adding the Better Auth–compatible `user` definition, or run `pnpm --filter neon-jwt-api auth:migrate` on that branch first.
+
+**`db:push`** only affects tables listed in this app’s `schema.ts`; other tables in the shared DB are untouched.
 
 ### Optional: versioned migrations (production-friendly)
 
@@ -172,7 +190,7 @@ pnpm --filter nest-clerk-api test:watch
 - Export a single **`schema`** object — required for relational queries and for `drizzle({ schema })`.
 
 ```ts
-export const schema = { users };
+export const schema = { user }; // pgTable("user", …) — Better Auth table name
 ```
 
 ### 2. `drizzle.ts`
@@ -200,21 +218,21 @@ export const schema = { users };
 import { Inject, Injectable } from "@nestjs/common";
 import { eq } from "drizzle-orm";
 import { DRIZZLE, type DrizzleDb } from "../database/drizzle";
-import { users } from "../database/schema";
+import { user } from "../database/schema";
 
 @Injectable()
 export class UsersService {
   constructor(@Inject(DRIZZLE) private readonly db: DrizzleDb) {}
 
-  findByClerkId(clerkUserId: string) {
-    return this.db.query.users.findFirst({
-      where: eq(users.clerkUserId, clerkUserId),
+  findById(id: string) {
+    return this.db.query.user.findFirst({
+      where: eq(user.id, id), // id = Clerk JWT sub
     });
   }
 }
 ```
 
-Requires `schema` to include `users` and `drizzle({ client, schema })` to be used when creating `db`.
+Requires `schema` to include `user` and `drizzle({ client, schema })` when creating `db`.
 
 ---
 
@@ -247,14 +265,13 @@ Kit loads `.env` from `apps/nest-clerk-api/` before running. If `DATABASE_URL` i
 pnpm --filter nest-clerk-api db:studio
 ```
 
-### Run API after schema is applied
+### Run API (schema already in Neon)
 
 ```bash
-pnpm --filter nest-clerk-api db:push
 pnpm --filter nest-clerk-api dev
 ```
 
-Hit `GET http://localhost:3031/health` (public route).
+Hit `GET http://localhost:3031/api/health` (public route).
 
 ---
 
@@ -268,24 +285,25 @@ Hit `GET http://localhost:3031/health` (public route).
 
 | App | Package name | Drizzle schema | Notes |
 |-----|--------------|----------------|--------|
-| **`apps/nest-clerk-api`** | `nest-clerk-api` | `users` (+ future auth tables) | **This feature** |
-| **`apps/api`** | `neon-jwt-api` | Full practice catalog | **Unchanged** by clerk-neon-auth; same script names (`db:push`, etc.) but **different filter** |
+| **`apps/nest-clerk-api`** | `nest-clerk-api` | **`user`** (auth profile only in Drizzle) | Clerk webhook + JWT; **same DB** typical |
+| **`apps/api`** | `neon-jwt-api` | Practice catalog (+ Better Auth via `auth:migrate`) | **Unchanged** source; may share `DATABASE_URL` |
 
 Do not mix filters:
 
 ```bash
-pnpm --filter nest-clerk-api db:push   # auth DB / schema
-pnpm --filter neon-jwt-api db:push     # practice catalog — separate app
+pnpm --filter nest-clerk-api db:push   # only tables in nest-clerk-api/schema.ts
+pnpm --filter neon-jwt-api db:push     # practice tables — different schema file
 ```
 
-Use the **same Neon project** or separate databases per environment — product decision; the specs do not require sharing one database.
+**Same Neon database is normal** — `nest-clerk-api` must not push a conflicting `users` table. Practice DDL is owned by `apps/api`’s schema.
 
 ---
 
 ## Acceptance criteria
 
 - [ ] `DATABASE_URL` set in `apps/nest-clerk-api/.env`.
-- [ ] `pnpm --filter nest-clerk-api db:push` succeeds and `users` exists in Neon.
+- [ ] `user` table exists in Neon (Better Auth); Drizzle `schema.ts` matches it.
+- [ ] `db:push` from `nest-clerk-api` does not create a duplicate `users` table.
 - [ ] `schema.ts` exports `schema`; `drizzle.ts` exports `DRIZZLE` / `DrizzleDb`.
 - [ ] `pnpm --filter nest-clerk-api dev` starts without DB connection errors.
 - [ ] Team knows when to use `db:push` vs `db:generate` + `db:migrate`.
