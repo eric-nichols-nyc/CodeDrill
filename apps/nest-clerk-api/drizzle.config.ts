@@ -13,7 +13,7 @@ config({
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
   throw new Error(
-    "DATABASE_URL is not set. Add it to apps/api/.env for drizzle-kit."
+    "DATABASE_URL is not set. Add it to apps/nest-clerk-api/.env for drizzle-kit."
   );
 }
 

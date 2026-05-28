@@ -1,6 +1,6 @@
-import { Global, Module } from "@nestjs/common";
-import { neon } from "@neondatabase/serverless";
 import type { NeonQueryFunction } from "@neondatabase/serverless";
+import { neon } from "@neondatabase/serverless";
+import { Global, Module } from "@nestjs/common";
 import { config } from "dotenv";
 import { drizzle } from "drizzle-orm/neon-http";
 import { DatabaseController } from "./database.controller";
