@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "context/features-spec/clerk-neon-auth/05-api-authorization.md",
+                "file": "context/features-spec/clerk-neon-auth/07-practice-bff-migration.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "05-api-authorization"
+              "title": "07-practice-bff-migration"
             }
           }
         ],
@@ -200,9 +200,9 @@
   },
   "active": "e60f4f2153d882ec",
   "lastOpenFiles": [
+    "context/features-spec/clerk-neon-auth/05-api-authorization.md",
     "context/features-spec/clerk-neon-auth/07-practice-bff-migration.md",
     "context/features-spec/clerk-neon-auth/04-api-authentication.md",
-    "context/features-spec/clerk-neon-auth/05-api-authorization.md",
     "context/features-spec/clerk-neon-auth/03-webhook-provisioning.md",
     "context/features-spec/clerk-neon-auth/02-clerk-frontend.md",
     "context/features-spec/clerk-neon-auth/01-foundation.md",

@@ -22,6 +22,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@clerk/backend": "^2.33.5",
     "@neondatabase/serverless": "^0.10.4",
     "@nestjs/common": "^11.1.6",
     "@nestjs/core": "^11.1.6",

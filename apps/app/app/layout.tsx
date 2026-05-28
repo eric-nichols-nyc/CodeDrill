@@ -1,8 +1,10 @@
 import { ClerkProvider } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { ClerkAuthProvider } from "@/features/auth/components/clerk-auth-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ThemeProvider } from "@repo/design-system/providers/theme";
 import "./styles.css";
@@ -60,11 +62,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { userId } = await auth();
+
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
@@ -72,7 +76,8 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <ThemeProvider defaultTheme="dark">
-            <QueryProvider>
+            <ClerkAuthProvider initialUserId={userId ?? null}>
+              <QueryProvider>
               {process.env.NODE_ENV === "development" ? (
                 <Link
                   className="fixed bottom-3 left-3 z-50 rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 font-mono text-amber-950 text-xs shadow-sm hover:bg-amber-500/20 dark:text-amber-100"
@@ -82,7 +87,8 @@ export default function RootLayout({
                 </Link>
               ) : null}
               {children}
-            </QueryProvider>
+              </QueryProvider>
+            </ClerkAuthProvider>
           </ThemeProvider>
           {process.env.NODE_ENV === "development" ? (
             <TanStackDevtools />

@@ -33,9 +33,11 @@ Create **`apps/api/.env`** (see comments in `src/database/database.module.ts` an
 | `BETTER_AUTH_URL` | Public base URL of **this API** (e.g. `http://localhost:3030`). Must match what browsers and `curl` use. |
 | `BETTER_AUTH_TRUSTED_ORIGINS` | Comma-separated origins for CORS/cookies (e.g. Next app `http://localhost:3010`) |
 | `INTERNAL_PROBLEMS_SECRET` | Optional; when set, `x-internal-problems-secret` authorizes **catalog** `/problems` routes for server-to-server BFF (admin). Not used for end-user identity. |
+| `CLERK_SECRET_KEY` | Clerk secret (same app as `apps/app` / Dashboard). Verifies `Authorization: Bearer` JWT on practice routes (`sub` → `user.id`). |
+| `CLERK_AUTHORIZED_PARTIES` | Optional; comma-separated origins for Clerk `verifyToken` (e.g. `http://localhost:3010`) |
 | `PORT` | Optional; defaults to **3030** |
 
-User session auth uses only the `BETTER_AUTH_*` and `DATABASE_URL` variables above. Clients send `Authorization: Bearer <token>` after sign-in (see [Bearer plugin](https://www.better-auth.com/docs/plugins/bearer)).
+User-scoped practice routes accept **Clerk Bearer** (Next app after Stage 7) or legacy **Better Auth** Bearer / session cookie. Catalog may use `x-internal-problems-secret` when configured.
 
 Generate a secret:
 

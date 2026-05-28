@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import type { IncomingHttpHeaders } from "node:http";
-import { getSessionFromHeaders } from "../../auth/session-from-headers";
+import { resolvePracticeUserId } from "../../auth/resolve-practice-user-id";
 
 export type RequestWithUserId = {
   headers: IncomingHttpHeaders;
@@ -13,8 +13,8 @@ export type RequestWithUserId = {
 };
 
 /**
- * Resolves the practice user id from a Better Auth session (session cookie or
- * `Authorization: Bearer` token from the bearer plugin).
+ * Resolves the practice user id from Clerk JWT (`sub`) or Better Auth session
+ * (Bearer token / session cookie).
  */
 @Injectable()
 export class ProblemsUserGuard implements CanActivate {
@@ -24,15 +24,15 @@ export class ProblemsUserGuard implements CanActivate {
       .getRequest<RequestWithUserId>();
     const headers = request.headers ?? {};
 
-    const session = await getSessionFromHeaders(headers);
+    const userId = await resolvePracticeUserId(headers);
 
-    if (session?.user?.id) {
-      request.userId = session.user.id;
+    if (userId) {
+      request.userId = userId;
       return true;
     }
 
     throw new UnauthorizedException(
-      "Sign in to the API (Bearer token or session cookie)."
+      "Sign in to the API (Clerk Bearer token or Better Auth session)."
     );
   }
 }

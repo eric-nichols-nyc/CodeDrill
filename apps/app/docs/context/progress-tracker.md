@@ -9,14 +9,15 @@ change.
 
 ## Current Goal
 
-- [Stage 7 — Practice BFF migration](../features-spec/clerk-neon-auth/07-practice-bff-migration.md) — `app/api/*` + chat actions off Better Auth cookie
+- Verify Stage 7 (Path A) in dev — tutor chat, progress, workspace save with Clerk only; `CLERK_SECRET_KEY` on `apps/api`
 
 ## Session Notes
 
-- **Clerk E2E verified:** `/account` loads Neon profile via `GET /api/me` (Clerk JWT + webhook-provisioned `user` row). Spec: `clerk-neon-auth/07-practice-bff-migration.md`.
+- **Clerk E2E verified:** `/account` → `GET /api/me`. Stage 7 Path A shipped: `resolvePracticeUserId` on `apps/api`, `apiAuthHeaders()` → Clerk, removed Better Auth proxy from app.
 
 ## Completed
 
+- Clerk Stage 7 (Path A) — `apps/api` accepts Clerk Bearer; `apps/app` BFF uses `getToken()`; removed `better-auth` client, `/api/auth/*` proxy
 - Clerk Stage 3 — `nest-clerk-api` `POST /api/webhooks/clerk` (`webhooks.service.ts`): upsert on `user.created` / `user.updated` / `session.created`, delete on `user.deleted`
 - Clerk Stage 2 — `@clerk/nextjs`, `(unauthenticated)` `/sign-in` + `/sign-up`, `proxy.ts` + `clerkMiddleware` (`/account`, `/admin`), `ClerkProvider`, `getNestClerkMe()` on `/account`, Option A hybrid (Better Auth BFF for `apps/api`)
 - Auth feature spec `14-auth.md` + tutor chat sign-in gate (`useApiAuth`, `TutorSignInPrompt`, `ChatShell` unsigned/pending states)

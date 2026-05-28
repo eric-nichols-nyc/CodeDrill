@@ -19,12 +19,10 @@ apps/app/
 │   │   ├── sign-in/[[...sign-in]]/page.tsx
 │   │   └── sign-up/[[...sign-up]]/page.tsx
 │   ├── account/page.tsx          # Clerk + GET /api/me
-│   └── api/auth/[...path]/       # Better Auth proxy → apps/api
 ├── lib/auth/
 │   ├── nest-clerk-api.ts         # Clerk Bearer → nest-clerk-api
 │   ├── clerk-server.ts
-│   ├── api-auth-headers.ts       # Better Auth Bearer → apps/api
-│   └── client.ts                 # better-auth/react (BFF only)
+│   └── api-auth-headers.ts       # Clerk Bearer → apps/api (practice BFF)
 └── proxy.ts                      # clerkMiddleware
 ```
 
@@ -96,9 +94,9 @@ import { getNestClerkMe } from "@/lib/auth/nest-clerk-api";
 const me = await getNestClerkMe(); // GET /api/me with Clerk Bearer
 ```
 
-**Practice BFF (`apps/api`, Better Auth):** Catalog, progress, chat, and admin BFF routes still proxy `/api/auth/*` and use `apiAuthHeaders()` from the `codedrill.auth_token` cookie until a deliberate migration. See **`docs/context/features-spec/clerk-neon-auth/02-clerk-frontend.md`** (Option A hybrid).
+**Practice BFF (`apps/api`):** User-scoped routes use Clerk Bearer via `apiAuthHeaders()`. Set **`CLERK_SECRET_KEY`** on **`apps/api`** as well as `apps/app`. Catalog may still use `INTERNAL_PROBLEMS_SECRET`. See **`docs/context/features-spec/clerk-neon-auth/07-practice-bff-migration.md`**.
 
-Env: copy **`apps/app/.env.example`** (Clerk keys, `NEST_CLERK_API_URL`, optional `NEON_JWT_API_URL`).
+Env: copy **`apps/app/.env.example`** (Clerk keys, `NEST_CLERK_API_URL`, optional `NEON_JWT_API_URL`). Add the same **`CLERK_SECRET_KEY`** to **`apps/api/.env`**.
 
 ### Client-side (UI session)
 
@@ -109,7 +107,6 @@ import { useApiAuth } from "@/features/auth/hooks/use-api-auth";
 ## Related Packages
 
 - `@clerk/nextjs` — sign-in UI and session
-- `better-auth` — practice BFF token client (proxied `/api/auth/*`)
 - `@repo/design-system` — Shared UI components
 
 ## Resources

@@ -29,9 +29,9 @@
 | -------- | ----------- |
 | Sign-in UI, session, route guard | **Clerk** (`useAuth`, `auth()`, `getToken()`) |
 | `nest-clerk-api` (`GET /api/me`, etc.) | Clerk Bearer via `lib/auth/nest-clerk-api.ts` |
-| Catalog / progress / chat / admin BFF → **`apps/api`** | **Unchanged** — `NEON_JWT_API_URL`, `/api/auth/*` proxy, `apiAuthHeaders()` from Better Auth Bearer cookie |
+| Catalog / progress / chat / admin BFF → **`apps/api`** | **Stage 7 (Path A)** — `apiAuthHeaders()` sends Clerk Bearer; `apps/api` verifies JWT (`resolvePracticeUserId`) |
 
-Clerk-only users may not have a Better Auth token; user-scoped **`apps/api`** routes can 401 until a later migration. That is expected for this slice.
+See [07-practice-bff-migration.md](./07-practice-bff-migration.md).
 
 ### Environment (`apps/app`)
 
@@ -59,7 +59,7 @@ const me = await getNestClerkMe(); // GET /api/me with Clerk Bearer
 ### `lib/auth` and `features/auth`
 
 - **Clerk:** `clerk-server.ts`, `nest-clerk-api.ts`, `nest-clerk-url.ts`.
-- **Keep (Option A):** `api-auth-headers.ts`, `token.ts`, `app/api/auth/[...path]/route.ts` for **`apps/api`** upstream.
+- **Practice upstream:** `api-auth-headers.ts` → Clerk Bearer to **`apps/api`** (Stage 7).
 - **Removed:** Custom sign-in/sign-up forms, `app/auth/`, `AuthSessionProvider`, `dev-auth-form-fill`, Better Auth cookie guard in `proxy.ts`.
 - **Client hook:** `useApiAuth` wraps Clerk `useAuth()` / `useUser()`.
 
@@ -91,4 +91,4 @@ const me = await getNestClerkMe(); // GET /api/me with Clerk Bearer
 ## Verified in dev
 
 - `/account` → `getNestClerkMe()` returns provisioned **`user`** row (Stages 2 + 3).
-- Tutor / progress / workspace / admin BFF still on Better Auth until Stage 7.
+- Practice BFF uses Clerk Bearer to `apps/api` (Stage 7 Path A) — verify tutor / progress / workspace in dev.

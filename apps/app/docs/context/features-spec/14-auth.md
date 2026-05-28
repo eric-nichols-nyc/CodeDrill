@@ -9,7 +9,7 @@ Document how **authentication** works in CodeDrill and enforce that **signed-in 
 | Layer | Authority | UI / session | Upstream token |
 | ----- | --------- | ------------ | -------------- |
 | **Identity** | Clerk + `nest-clerk-api` | `/sign-in`, `/sign-up`; `useApiAuth()` → Clerk | Clerk JWT → `GET /api/me` |
-| **Practice BFF** | `apps/api` Better Auth | Same Clerk sign-in for UI gate | `codedrill.auth_token` cookie via `/api/auth/*` (until migration) |
+| **Practice BFF** | `apps/api` (Clerk JWT + legacy Better Auth fallback) | Same Clerk sign-in | `apiAuthHeaders()` → Clerk `getToken()` |
 
 See [clerk-neon-auth/02-clerk-frontend.md](./clerk-neon-auth/02-clerk-frontend.md) (Stage 2 **done**) and [07-practice-bff-migration.md](./clerk-neon-auth/07-practice-bff-migration.md) (**next**). `/account` → `GET /api/me` verified in dev. Clerk-only users may 401 on progress/chat/workspace-code until Stage 7 migrates BFF call sites.
 

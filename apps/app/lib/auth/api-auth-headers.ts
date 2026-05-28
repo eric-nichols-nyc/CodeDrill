@@ -1,11 +1,10 @@
 import "server-only";
 
-import { cookies } from "next/headers";
-import { AUTH_TOKEN_COOKIE } from "./token";
+import { auth } from "@clerk/nextjs/server";
 
-/** Bearer headers for user-scoped Nest routes. Returns null when unsigned. */
+/** Bearer headers for user-scoped `apps/api` routes. Returns null when unsigned. */
 export async function apiAuthHeaders(): Promise<Record<string, string> | null> {
-  const token = (await cookies()).get(AUTH_TOKEN_COOKIE)?.value;
+  const token = await (await auth()).getToken();
   if (!token) {
     return null;
   }

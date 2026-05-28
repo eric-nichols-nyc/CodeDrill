@@ -1,6 +1,8 @@
 # Stage 7 (app): Practice BFF → Clerk Bearer
 
-**Status:** **Not started** — identity path is verified; practice routes still use Better Auth on `apps/api`.
+**Status:** **In progress** — **Path A** (Clerk JWT on `apps/api` + Clerk Bearer from `apps/app` BFF).
+
+**Chosen approach:** Path A — not Path B (`nest-clerk-api` proxy).
 
 **Goal:** After Clerk sign-in, **all user-scoped practice features** work without a separate Better Auth `codedrill.auth_token` cookie. UI already gates on Clerk (`useApiAuth`); server BFF/actions must send the same identity upstream.
 
@@ -76,14 +78,15 @@ Implementation: `apps/app/app/account/page.tsx`, `lib/auth/nest-clerk-api.ts`, `
 
 Pick one upstream strategy; the app changes are the same shape (`nestClerkAuthHeaders()` instead of `apiAuthHeaders()`).
 
-### Path A — `apps/api` verifies Clerk JWT
+### Path A — `apps/api` verifies Clerk JWT (**implemented**)
 
-1. Add Clerk JWT verification to `apps/api` guards (or shared middleware).
-2. Replace `apiAuthHeaders()` with Clerk Bearer from `auth().getToken()` in listed files.
-3. Keep `NEON_JWT_API_URL` and route paths unchanged.
-4. Remove `/api/auth/*` proxy and `lib/auth/client.ts` / `token.ts` when unused.
+1. [x] `resolvePracticeUserId()` — Clerk `verifyToken` then Better Auth fallback (`apps/api/src/auth/resolve-practice-user-id.ts`).
+2. [x] `ProblemsUserGuard` + `ProblemsAccessGuard` use resolver.
+3. [x] `apiAuthHeaders()` → Clerk `auth().getToken()` (`apps/app/lib/auth/api-auth-headers.ts`).
+4. [x] `getApiAuth()` → Clerk for admin BFF gates.
+5. [x] Removed `/api/auth/*` proxy, `client.ts`, `token.ts`.
 
-**Touches:** `apps/api` source (explicitly out of scope for Stages 0–3; required here).
+**Requires:** `CLERK_SECRET_KEY` (and optional `CLERK_AUTHORIZED_PARTIES`) on **`apps/api`** `.env` — same Clerk app as `apps/app`.
 
 ### Path B — User-scoped routes move to `nest-clerk-api`
 
@@ -112,13 +115,13 @@ Issue Better Auth session after Clerk sign-in server-side. Not recommended.
 
 ## Acceptance criteria
 
-- [ ] Signed-in Clerk user can save/load **workspace code** without `codedrill.auth_token`.
-- [ ] Signed-in Clerk user can read/write **problem progress**.
-- [ ] Signed-in Clerk user can use **tutor chat** (send + stream) without Better Auth sign-in.
-- [ ] **Admin** BFF routes work with Clerk session only (or documented internal-secret-only paths).
-- [ ] Unsigned user still gets `401` / `NOT_SIGNED_IN` on user-scoped BFF (no regression).
-- [ ] `/account` → `GET /api/me` still passes (regression check for Stages 2–3).
-- [ ] Better Auth proxy removed or documented as dev-only legacy.
+- [ ] Signed-in Clerk user can save/load **workspace code** (manual verify).
+- [ ] Signed-in Clerk user can read/write **problem progress** (manual verify).
+- [ ] Signed-in Clerk user can use **tutor chat** (send + stream) (manual verify).
+- [ ] **Admin** BFF routes work with Clerk session only (manual verify).
+- [x] Unsigned user still gets `401` / `NOT_SIGNED_IN` on user-scoped BFF (unchanged BFF logic).
+- [x] `/account` → `GET /api/me` still passes.
+- [x] Better Auth proxy removed from `apps/app`; `apiAuthHeaders()` uses Clerk.
 
 ---
 
