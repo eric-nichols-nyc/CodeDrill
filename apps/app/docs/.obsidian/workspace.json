@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "context/features-spec/clerk-neon-auth/05-api-authorization.md",
+                "file": "context/features-spec/clerk-neon-auth/04-api-authentication.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "05-api-authorization"
+              "title": "04-api-authentication"
             }
           }
         ],
@@ -200,6 +200,7 @@
   },
   "active": "e60f4f2153d882ec",
   "lastOpenFiles": [
+    "context/features-spec/clerk-neon-auth/05-api-authorization.md",
     "context/features-spec/clerk-neon-auth/04-api-authentication.md",
     "context/features-spec/clerk-neon-auth/03-webhook-provisioning.md",
     "context/features-spec/clerk-neon-auth/02-clerk-frontend.md",
@@ -209,7 +210,6 @@
     "context/features-spec/12-ai-problem-form-generation.md",
     "context/features-spec/clerk-neon-auth/IMPLEMENTATION-PROMPT.md",
     "context/features-spec/clerk-neon-auth/06-provisioning-ux.md",
-    "context/features-spec/clerk-neon-auth/05-api-authorization.md",
     "context/features-spec/clerk-neon-auth",
     "context/features-spec/13-problem-chat-starter-suggestions.md",
     "context/features-spec/14-auth.md",
