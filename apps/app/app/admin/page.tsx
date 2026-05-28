@@ -1,10 +1,8 @@
-import { redirect } from "next/navigation";
 import { AdminPageShell } from "@/features/admin/components/admin-page-shell";
 import {
   type AdminProblemListItem,
   parseAdminProblemListItem,
 } from "@/features/admin/lib/problem-form-values";
-import { getApiAuth } from "@/lib/auth/server";
 import { fetchProblemsList } from "@/lib/problems/fetch-problems-list";
 
 type AdminPageProps = {
@@ -12,12 +10,6 @@ type AdminPageProps = {
 };
 
 export default async function AdminPage({ searchParams }: AdminPageProps) {
-  const { session } = await getApiAuth();
-
-  if (!session) {
-    redirect("/auth/sign-in?next=/admin");
-  }
-
   const { id: initialSelectedId } = await searchParams;
 
   const result = await fetchProblemsList();

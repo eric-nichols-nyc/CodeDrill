@@ -1,5 +1,6 @@
 "use client";
 
+import { useClerk } from "@clerk/nextjs";
 import { Button } from "@repo/design-system/components/ui/button";
 import {
   DropdownMenu,
@@ -12,7 +13,6 @@ import { CircleUser } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useApiAuth } from "@/features/auth/hooks/use-api-auth";
-import { signOutAndClearToken } from "@/lib/auth/client";
 
 const iconTriggerClassName =
   "flex h-8 w-8 items-center justify-center rounded transition-colors duration-150 text-[var(--nav-icon)] hover:bg-white/5 hover:text-[var(--nav-icon-hover)]";
@@ -24,6 +24,7 @@ type UserMenuProps = {
 
 export function UserMenu({ variant = "default" }: UserMenuProps) {
   const router = useRouter();
+  const { signOut } = useClerk();
   const { isPending, isSignedIn, user } = useApiAuth();
 
   if (isPending) {
@@ -47,7 +48,7 @@ export function UserMenu({ variant = "default" }: UserMenuProps) {
   if (!isSignedIn) {
     return (
       <Button asChild size="sm" variant="outline">
-        <Link href="/auth/sign-in">Sign in</Link>
+        <Link href="/sign-in">Sign in</Link>
       </Button>
     );
   }
@@ -56,7 +57,7 @@ export function UserMenu({ variant = "default" }: UserMenuProps) {
     user && typeof user.email === "string" ? user.email : "Account";
 
   async function onSignOut() {
-    await signOutAndClearToken();
+    await signOut();
     router.push("/");
     router.refresh();
   }

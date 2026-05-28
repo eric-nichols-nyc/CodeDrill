@@ -1,11 +1,10 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import { AuthSessionProvider } from "@/features/auth/components/auth-session-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ThemeProvider } from "@repo/design-system/providers/theme";
-import { getApiAuth } from "@/lib/auth/server";
 import "./styles.css";
 
 const geistSans = Geist({
@@ -61,20 +60,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const initialAuth = await getApiAuth();
-
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider defaultTheme="dark">
-          <AuthSessionProvider initialAuth={initialAuth}>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <ThemeProvider defaultTheme="dark">
             <QueryProvider>
               {process.env.NODE_ENV === "development" ? (
                 <Link
@@ -86,10 +83,12 @@ export default async function RootLayout({
               ) : null}
               {children}
             </QueryProvider>
-          </AuthSessionProvider>
-        </ThemeProvider>
-        {process.env.NODE_ENV === "development" ? <TanStackDevtools /> : null}
-      </body>
-    </html>
+          </ThemeProvider>
+          {process.env.NODE_ENV === "development" ? (
+            <TanStackDevtools />
+          ) : null}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

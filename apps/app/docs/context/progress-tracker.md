@@ -9,10 +9,11 @@ change.
 
 ## Current Goal
 
-- AI problem form generation Stage 5 — unit tests for client/server helpers
+- Clerk Stage 2 — verify Clerk env + `nest-clerk-api` `/api/me` in dev; catalog BFF still on Better Auth (Option A)
 
 ## Completed
 
+- Clerk Stage 2 (partial) — `@clerk/nextjs`, `(unauthenticated)` `/sign-in` + `/sign-up`, `proxy.ts` + `clerkMiddleware` for `/account` + `/admin`; `ClerkProvider`; `lib/auth/nest-clerk-api.ts`; removed `app/auth/` and Better Auth forms
 - Auth feature spec `14-auth.md` + tutor chat sign-in gate (`useApiAuth`, `TutorSignInPrompt`, `ChatShell` unsigned/pending states)
 - Admin AI problem form generation Stage 4 — success message, dirty overwrite confirm (`AlertDialog`), prompt max length + counter; `isProblemFormDirty`; server prompt length guard
 - Admin AI problem form generation — moved OpenAI to Nest `POST /problems/generate`; Next BFF proxies; `OPENAI_API_KEY` only on `apps/api`

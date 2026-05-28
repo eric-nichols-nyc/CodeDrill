@@ -20,7 +20,7 @@ export function HeroSection() {
             <Link href="/problems">Browse problems</Link>
           </Button>
           <Button asChild size="lg" variant="outline">
-            <Link href="/auth/sign-up">Create account</Link>
+            <Link href="/sign-up">Create account</Link>
           </Button>
         </div>
       </div>

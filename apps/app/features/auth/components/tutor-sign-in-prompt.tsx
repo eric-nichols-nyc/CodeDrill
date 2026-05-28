@@ -10,8 +10,8 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
 function signInHref(pathname: string, search: string): string {
-  const next = `${pathname}${search}`;
-  return `/auth/sign-in?next=${encodeURIComponent(next)}`;
+  const returnTo = `${pathname}${search}`;
+  return `/sign-in?redirect_url=${encodeURIComponent(returnTo)}`;
 }
 
 export function TutorSignInPrompt() {
