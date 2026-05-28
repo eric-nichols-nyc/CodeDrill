@@ -9,11 +9,16 @@ change.
 
 ## Current Goal
 
-- Clerk Stage 2 — verify Clerk env + `nest-clerk-api` `/api/me` in dev; catalog BFF still on Better Auth (Option A)
+- [Stage 7 — Practice BFF migration](../features-spec/clerk-neon-auth/07-practice-bff-migration.md) — `app/api/*` + chat actions off Better Auth cookie
+
+## Session Notes
+
+- **Clerk E2E verified:** `/account` loads Neon profile via `GET /api/me` (Clerk JWT + webhook-provisioned `user` row). Spec: `clerk-neon-auth/07-practice-bff-migration.md`.
 
 ## Completed
 
-- Clerk Stage 2 (partial) — `@clerk/nextjs`, `(unauthenticated)` `/sign-in` + `/sign-up`, `proxy.ts` + `clerkMiddleware` for `/account` + `/admin`; `ClerkProvider`; `lib/auth/nest-clerk-api.ts`; removed `app/auth/` and Better Auth forms
+- Clerk Stage 3 — `nest-clerk-api` `POST /api/webhooks/clerk` (`webhooks.service.ts`): upsert on `user.created` / `user.updated` / `session.created`, delete on `user.deleted`
+- Clerk Stage 2 — `@clerk/nextjs`, `(unauthenticated)` `/sign-in` + `/sign-up`, `proxy.ts` + `clerkMiddleware` (`/account`, `/admin`), `ClerkProvider`, `getNestClerkMe()` on `/account`, Option A hybrid (Better Auth BFF for `apps/api`)
 - Auth feature spec `14-auth.md` + tutor chat sign-in gate (`useApiAuth`, `TutorSignInPrompt`, `ChatShell` unsigned/pending states)
 - Admin AI problem form generation Stage 4 — success message, dirty overwrite confirm (`AlertDialog`), prompt max length + counter; `isProblemFormDirty`; server prompt length guard
 - Admin AI problem form generation — moved OpenAI to Nest `POST /problems/generate`; Next BFF proxies; `OPENAI_API_KEY` only on `apps/api`

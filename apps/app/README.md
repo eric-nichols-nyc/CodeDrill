@@ -1,47 +1,31 @@
-# Neon Auth - Next.js Application with Neon Database
+# CodeDrill — Next.js app (`apps/app`)
 
-A Next.js 16 application demonstrating authentication with Neon database integration using Neon Auth.
+Next.js 16 UI for CodeDrill: problems workspace, admin, Clerk sign-in, and BFF routes to `apps/api` / `nest-clerk-api`.
 
 ## Features
 
-- **Neon Auth Integration** - Complete authentication system powered by Neon Auth
-- **Auth UI** - Sign-in, sign-up, and other flows via Neon `AuthView` at `/auth/[path]`
-- **Neon Database Integration** - Serverless PostgreSQL via `@repo/prisma-neon`
-- **Prisma ORM** - Type-safe database access via `@repo/database` package
-- **Theme Support** - Light/dark mode with `@repo/design-system`
-- **Modern UI** - Built with Tailwind CSS, shadcn/ui components, and Neon Auth UI
-- **Email OTP** - Email-based one-time password authentication
-- **Protected Routes** - Server-side session management and route protection
+- **Clerk auth** — Sign-in / sign-up at `/sign-in`, `/sign-up`; `proxy.ts` protects `/account` and `/admin`
+- **Neon profile** — `GET /api/me` via `nest-clerk-api` with Clerk Bearer (`/account`)
+- **Practice API (hybrid)** — Catalog and user-scoped BFF still use Better Auth on `apps/api` until migration
+- **Theme** — Light/dark via `@repo/design-system`
+- **Problem workspace** — Monaco, run, AI tutor chat (see `docs/`)
 
-## Project Structure
+## Project Structure (auth)
 
 ```
-apps/neon-auth/
+apps/app/
 ├── app/
-│   ├── api/
-│   │   └── auth/
-│   │       └── [...path]/
-│   │           └── route.ts  # Auth API route handler
-│   ├── auth/
-│   │   └── [path]/
-│   │       └── page.tsx      # Auth pages (sign-in, sign-up, etc.)
-│   ├── account/
-│   │   └── [path]/
-│   │       └── page.tsx      # Account management pages
-│   ├── dashboard/
-│   │   └── page.tsx         # Protected dashboard page
-│   ├── layout.tsx           # Root layout with NeonAuthUIProvider
-│   ├── page.tsx             # Home page
-│   └── styles.css           # Global styles
-├── lib/
-│   └── auth/
-│       ├── client.ts        # Client-side auth client
-│       ├── keys.ts          # Env validation (NEON_AUTH_BASE_URL, etc.)
-│       ├── server.ts        # getNeonAuth / getSession for RSC
-│       └── session-cookie.ts # Cookie check for proxy.ts
-├── next.config.ts           # Next.js configuration
-├── package.json             # Dependencies and scripts
-└── tsconfig.json            # TypeScript configuration
+│   ├── (unauthenticated)/
+│   │   ├── sign-in/[[...sign-in]]/page.tsx
+│   │   └── sign-up/[[...sign-up]]/page.tsx
+│   ├── account/page.tsx          # Clerk + GET /api/me
+│   └── api/auth/[...path]/       # Better Auth proxy → apps/api
+├── lib/auth/
+│   ├── nest-clerk-api.ts         # Clerk Bearer → nest-clerk-api
+│   ├── clerk-server.ts
+│   ├── api-auth-headers.ts       # Better Auth Bearer → apps/api
+│   └── client.ts                 # better-auth/react (BFF only)
+└── proxy.ts                      # clerkMiddleware
 ```
 
 ## Getting Started
@@ -104,42 +88,34 @@ pnpm clean
 
 ## Authentication
 
-Auth is owned by the **Nest API** (`apps/api`, Better Auth). The Next app proxies `/api/auth/*` to the API and stores a Bearer token in the `codedrill.auth_token` cookie after sign-in.
-
-- **`/auth/sign-in`**, **`/auth/sign-up`** — email/password forms (`features/auth/`)
-- **`/account`** — signed-in profile summary
-- **`proxy.ts`** — redirects unsigned users from `/dashboard` and `/account`
-
-### Server-side session
+**Identity (Clerk):** Sign-in and sign-up at **`/sign-in`** and **`/sign-up`** (Clerk prebuilt UI under `app/(unauthenticated)/`). Session and route guards use **`proxy.ts`** + `clerkMiddleware` (protects `/account`, `/admin`). Profile from Neon via **`nest-clerk-api`**:
 
 ```typescript
-import { getApiAuth } from "@/lib/auth/server";
-import { apiAuthHeaders } from "@/lib/auth/api-auth-headers";
+import { getNestClerkMe } from "@/lib/auth/nest-clerk-api";
 
-const { session, user } = await getApiAuth();
-const headers = await apiAuthHeaders(); // Authorization: Bearer … for Nest upstream
+const me = await getNestClerkMe(); // GET /api/me with Clerk Bearer
 ```
 
-See **`apps/api/README.md`** for curl sign-up/sign-in examples and **`docs/context/features-spec/08-api-auth-consolidation.md`** for the full auth model.
+**Practice BFF (`apps/api`, Better Auth):** Catalog, progress, chat, and admin BFF routes still proxy `/api/auth/*` and use `apiAuthHeaders()` from the `codedrill.auth_token` cookie until a deliberate migration. See **`docs/context/features-spec/clerk-neon-auth/02-clerk-frontend.md`** (Option A hybrid).
 
-### Client-side
+Env: copy **`apps/app/.env.example`** (Clerk keys, `NEST_CLERK_API_URL`, optional `NEON_JWT_API_URL`).
+
+### Client-side (UI session)
 
 ```typescript
-import { authClient, signOutAndClearToken } from "@/lib/auth/client";
+import { useApiAuth } from "@/features/auth/hooks/use-api-auth";
 ```
 
 ## Related Packages
 
-- `better-auth` — auth client (sign-in/up against proxied API routes)
+- `@clerk/nextjs` — sign-in UI and session
+- `better-auth` — practice BFF token client (proxied `/api/auth/*`)
 - `@repo/design-system` — Shared UI components
-- `@repo/database` — Prisma database client
-- `@repo/prisma-neon` — Neon database adapter
-- `@repo/typescript-config` — TypeScript configuration
 
 ## Resources
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Better Auth Documentation](https://www.better-auth.com/docs)
+- [Clerk Next.js](https://clerk.com/docs/quickstarts/nextjs)
+- [Better Auth](https://www.better-auth.com/docs) — `apps/api` practice routes
 - [Nest API README](../api/README.md)
-- [Prisma Documentation](https://www.prisma.io/docs)
+- Feature specs: `docs/context/features-spec/clerk-neon-auth/`
 

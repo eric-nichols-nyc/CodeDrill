@@ -2,15 +2,25 @@
 
 ## Goal
 
-Document how **authentication** works in CodeDrill and enforce that **signed-in users only** can use the problem workspace **AI tutor chat**. The Nest API is the single source of truth for accounts and sessions; the Next app stores a Bearer token and forwards it on protected calls.
+Document how **authentication** works in CodeDrill and enforce that **signed-in users only** can use the problem workspace **AI tutor chat**.
+
+## Current model (hybrid — Clerk + Better Auth BFF)
+
+| Layer | Authority | UI / session | Upstream token |
+| ----- | --------- | ------------ | -------------- |
+| **Identity** | Clerk + `nest-clerk-api` | `/sign-in`, `/sign-up`; `useApiAuth()` → Clerk | Clerk JWT → `GET /api/me` |
+| **Practice BFF** | `apps/api` Better Auth | Same Clerk sign-in for UI gate | `codedrill.auth_token` cookie via `/api/auth/*` (until migration) |
+
+See [clerk-neon-auth/02-clerk-frontend.md](./clerk-neon-auth/02-clerk-frontend.md) (Stage 2 **done**) and [07-practice-bff-migration.md](./clerk-neon-auth/07-practice-bff-migration.md) (**next**). `/account` → `GET /api/me` verified in dev. Clerk-only users may 401 on progress/chat/workspace-code until Stage 7 migrates BFF call sites.
 
 ## Reference
 
 - [01-design-system.md](./01-design-system.md) — feature UI layout.
 - [00-index.md](./00-index.md) — feature registry.
-- [08-api-auth-consolidation.md](./08-api-auth-consolidation.md) — migration / consolidation history (shipped).
+- [08-api-auth-consolidation.md](./08-api-auth-consolidation.md) — Better Auth BFF history (shipped).
+- [clerk-neon-auth/02-clerk-frontend.md](./clerk-neon-auth/02-clerk-frontend.md) — Clerk UI + `nest-clerk-api`.
 - [07-problem-chat-ui.md](./ai/problem-chat/07-problem-chat-ui.md) — tutor chat (requires auth).
-- `apps/app/README.md` — env and curl examples.
+- `apps/app/README.md` — env setup.
 
 ## User story
 
@@ -22,49 +32,48 @@ As a product owner, I want chat and other user-scoped APIs to reject anonymous u
 
 ## How auth works (overview)
 
+**Clerk (identity UI + `nest-clerk-api`):**
+
 ```
-┌─────────────┐     POST /api/auth/sign-in/email      ┌──────────────────┐
-│  Browser    │ ────────────────────────────────────► │  Next app BFF    │
-│  (forms)    │     (proxied to Nest Better Auth)     │  app/api/auth/*  │
-└─────────────┘                                       └────────┬─────────┘
-       │                                                         │
-       │  set-auth-token header + persistAuthToken()             ▼
-       │  (cookie codedrill.auth_token + localStorage)   ┌──────────────────┐
-       │                                                  │  Nest API        │
-       │  Authorization: Bearer <token>                   │  Better Auth     │
-       └────────────────────────────────────────────────► │  user + session  │
-                                                          └──────────────────┘
+Browser → Clerk (/sign-in, /sign-up) → session JWT
+       → nest-clerk-api GET /api/me (Bearer from auth().getToken())
+       → Neon user row (id = Clerk sub), when Stage 3 webhook has run
+```
+
+**Better Auth (practice BFF — until migration):**
+
+```
+Browser → /api/auth/* proxy → apps/api Better Auth → set-auth-token → codedrill.auth_token cookie
+       → apiAuthHeaders() on BFF/actions → apps/api user-scoped routes
 ```
 
 | Step | What happens |
 | ---- | -------------- |
-| Sign up / sign in | `features/auth` forms call `authClient` → Next proxies to API Better Auth → response includes **`set-auth-token`** |
-| Token storage | `lib/auth/token.ts` writes cookie (for middleware + server) and **localStorage** (for client Better Auth fetches) |
-| Server Components / actions | `apiAuthHeaders()` reads cookie → `Authorization: Bearer …` on upstream Nest calls |
-| Client session | `authClient.useSession()` hits `/api/auth/get-session` with Bearer from storage |
-| Route guard | `proxy.ts` redirects `/problems/*` and `/account/*` to `/auth/sign-in?next=…` when auth cookie is missing |
-
-**Authority:** `apps/api/src/auth.ts` (Better Auth + `bearer()` plugin). **Not** a separate Neon or frontend-only user table.
+| Sign up / sign in | Clerk prebuilt UI at `/sign-up`, `/sign-in` |
+| Client session (UI) | `useApiAuth()` wraps Clerk `useAuth()` / `useUser()` |
+| Route guard | `proxy.ts` — `clerkMiddleware`; `auth.protect()` on `/account`, `/admin` |
+| Neon profile | `getNestClerkMe()` on `/account` (server Bearer to `nest-clerk-api`) |
+| Practice BFF | `apiAuthHeaders()` from Better Auth cookie → `apps/api` (unchanged) |
 
 ---
 
 ## Requirements
 
-### Auth UI (`features/auth/`)
+### Auth UI (`features/auth/` + `(unauthenticated)/`)
 
-- [x] Sign-in and sign-up forms at `/auth/sign-in`, `/auth/sign-up`.
-- [x] After success, redirect to `next` query param (default `/problems`).
-- [x] `useApiAuth()` hook wraps `authClient.useSession()` for feature code.
+- [x] Clerk sign-in and sign-up at `/sign-in`, `/sign-up` (`app/(unauthenticated)/`).
+- [x] After sign-in, redirect via `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` (default `/problems`).
+- [x] `useApiAuth()` hook wraps Clerk for feature code.
 
 ### Protected routes (app)
 
-- [x] `proxy.ts` requires `codedrill.auth_token` cookie for `/problems/:path*` and `/account/:path*`.
-- [x] Unsigned BFF/chat/actions return `401` with code `NOT_SIGNED_IN`.
+- [x] `proxy.ts` — Clerk protects `/account/:path*` and `/admin/:path*`.
+- [x] Unsigned BFF/chat/actions return `401` with code `NOT_SIGNED_IN` (Better Auth Bearer on `apps/api`).
 
 ### AI tutor chat (must be signed in)
 
 - [x] Chat panel checks client session before enabling send, suggestions, and thread controls.
-- [x] Unsigned users see a **Sign in to use the tutor** empty state with link to `/auth/sign-in?next=<current path>`.
+- [x] Unsigned users see a **Sign in to use the tutor** empty state with link to `/sign-in?redirect_url=<current path>`.
 - [x] Stream BFF `POST /api/problems/:id/chat/stream` returns 401 when cookie/token missing (already enforced).
 
 ### User-scoped features (same token model)
@@ -77,13 +86,14 @@ As a product owner, I want chat and other user-scoped APIs to reject anonymous u
 
 | Layer | Path | Notes |
 | ----- | ---- | ----- |
-| Auth config | `apps/api/src/auth.ts` | Better Auth + bearer plugin |
-| Auth UI | `apps/app/features/auth/` | Forms, chat sign-in prompt, `useApiAuth` |
-| Auth lib | `apps/app/lib/auth/` | Client, server session, token cookie, `apiAuthHeaders` |
-| Auth routes | `apps/app/app/auth/[path]/page.tsx` | Thin pages composing auth forms |
-| Auth proxy | `apps/app/app/api/auth/[...path]/route.ts` | Proxies Better Auth to API |
-| Route guard | `apps/app/proxy.ts` | Cookie check for problems/account |
-| Tutor chat | `features/problem-workspace/chat-panel/` | UI gate + existing server/BFF auth |
+| Clerk UI | `apps/app/app/(unauthenticated)/` | `<SignIn />`, `<SignUp />` |
+| Identity API | `apps/nest-clerk-api/` | JWT guard, `GET /me` |
+| Practice auth config | `apps/api/src/auth.ts` | Better Auth + bearer (BFF until migration) |
+| Auth UI helpers | `apps/app/features/auth/` | `TutorSignInPrompt`, `useApiAuth` |
+| Auth lib | `apps/app/lib/auth/` | Clerk + `nest-clerk-api.ts`; `apiAuthHeaders` for `apps/api` |
+| Better Auth proxy | `apps/app/app/api/auth/[...path]/route.ts` | Proxies to `apps/api` |
+| Route guard | `apps/app/proxy.ts` | `clerkMiddleware` — `/account`, `/admin` |
+| Tutor chat | `features/problem-workspace/chat-panel/` | UI gate (Clerk) + BFF (Better Auth Bearer) |
 
 ---
 
@@ -101,23 +111,27 @@ User-scoped practice routes (`/problems/:id/chat/*`, workspace-code, progress) r
 
 ---
 
-## Proposed file structure
+## File structure
 
 ```txt
+apps/app/app/(unauthenticated)/
+  layout.tsx
+  sign-in/[[...sign-in]]/page.tsx
+  sign-up/[[...sign-up]]/page.tsx
+
 apps/app/features/auth/
   components/
-    sign-in-form.tsx
-    sign-up-form.tsx
-    tutor-sign-in-prompt.tsx   # chat empty state when unsigned
+    tutor-sign-in-prompt.tsx
   hooks/
-    use-api-auth.ts            # isSignedIn, isPending, session, user
+    use-api-auth.ts            # Clerk useAuth / useUser
 
 apps/app/lib/auth/
-  client.ts                    # better-auth/react client
-  server.ts                    # getApiAuth() for RSC
-  token.ts                     # cookie + localStorage
-  api-auth-headers.ts          # server Bearer headers
-  session-cookie.ts            # proxy guard helper
+  clerk-server.ts              # auth(), currentUser()
+  nest-clerk-api.ts            # getNestClerkMe(), fetchNestClerkApi()
+  client.ts                    # better-auth/react (apps/api BFF only)
+  server.ts                    # getApiAuth() for apps/api session
+  token.ts                     # codedrill.auth_token cookie
+  api-auth-headers.ts          # Bearer for apps/api upstream
 ```
 
 ---
@@ -126,13 +140,13 @@ apps/app/lib/auth/
 
 ### `useApiAuth`
 
-- Exposes `isSignedIn`, `isPending`, `session`, `user` from `authClient.useSession()`.
+- Exposes `isSignedIn`, `isPending`, `session`, `user` from Clerk.
 - Use in client features that need gating (chat, optional banners).
 
 ### `TutorSignInPrompt`
 
 - Shown in chat message area when `!isSignedIn`.
-- Link: `/auth/sign-in?next=${encodeURIComponent(pathname + search)}`.
+- Link: `/sign-in?redirect_url=${encodeURIComponent(pathname + search)}`.
 
 ### `ChatShell`
 
@@ -161,4 +175,4 @@ apps/app/lib/auth/
 
 ## Implementation prompt for agents
 
-Read this spec before changing auth or tutor chat. Do not reintroduce Neon Auth or `x-user-id` BFF impersonation. For new user-scoped features, use `apiAuthHeaders()` on the server and `useApiAuth()` or `authClient.useSession()` on the client. Chat must remain signed-in only at UI and BFF/API layers.
+Read this spec before changing auth or tutor chat. Do not reintroduce Neon Auth or `x-user-id` BFF impersonation. For **identity** and `nest-clerk-api`, use Clerk + `getNestClerkMe()` / `nestClerkAuthHeaders()`. For **practice BFF** (`apps/api`), use `apiAuthHeaders()` until migration. UI gates use `useApiAuth()` (Clerk). Chat must remain signed-in only at UI and BFF/API layers.

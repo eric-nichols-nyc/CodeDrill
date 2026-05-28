@@ -1,6 +1,6 @@
 # Stage 2: Clerk frontend
 
-**Status:** **In progress** — branch `nest-clerk-stage2` in `apps/app`. `@repo/clerk` shared package is **out of scope** (separate feature).
+**Status:** **Done** — shipped on branch `nest-clerk-stage2` in `apps/app`. `@repo/clerk` shared package is **out of scope** (separate feature).
 
 **Goal:** Users sign up/sign in via Clerk in **`apps/app`**; the app sends Bearer JWTs to **`apps/nest-clerk-api`** (not `apps/api` for identity). Practice catalog and user-scoped **`apps/api`** calls keep the existing Better Auth proxy and Bearer cookie until a deliberate migration.
 
@@ -20,15 +20,15 @@
   - `sign-in/[[...sign-in]]/page.tsx` — prebuilt `<SignIn />`.
   - `sign-up/[[...sign-up]]/page.tsx` — prebuilt `<SignUp />`.
 - **Remove** legacy `app/auth/` (Better Auth form pages). Do not add routes under `/auth/*`.
-- **`proxy.ts`** (Next.js 16 — not `middleware.ts`): extend the existing root `apps/app/proxy.ts` with `clerkMiddleware` from `@clerk/nextjs/server`. Export **`proxy`**, not `middleware`. Public: marketing + `/sign-in`, `/sign-up`; **`auth.protect()`** on `/account(.*)` and `/admin(.*)`.
-- After sign-in/sign-up, default landing is **`/problems`** via Clerk env (`NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` / `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL`). When the proxy redirects an anonymous user to sign-in, Clerk returns them to the URL they tried to open (Clerk `redirect_url` / session redirect — no custom `?next=` query on our forms).
+- **`proxy.ts`** (Next.js 16): `clerkMiddleware` + `createRouteMatcher`; **`auth.protect()`** on `/account(.*)` and `/admin(.*)`.
+- After sign-in/sign-up, default landing is **`/problems`** via Clerk env (`NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` / `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL`). When the proxy redirects an anonymous user to sign-in, Clerk returns them to the URL they tried to open (`redirect_url`).
 
 ### Hybrid auth (Option A — this stage)
 
 | Concern | Mechanism |
 | -------- | ----------- |
 | Sign-in UI, session, route guard | **Clerk** (`useAuth`, `auth()`, `getToken()`) |
-| `nest-clerk-api` (`GET /api/me`, etc.) | Clerk Bearer via `lib/auth/nest-clerk-api.ts` (or equivalent) |
+| `nest-clerk-api` (`GET /api/me`, etc.) | Clerk Bearer via `lib/auth/nest-clerk-api.ts` |
 | Catalog / progress / chat / admin BFF → **`apps/api`** | **Unchanged** — `NEON_JWT_API_URL`, `/api/auth/*` proxy, `apiAuthHeaders()` from Better Auth Bearer cookie |
 
 Clerk-only users may not have a Better Auth token; user-scoped **`apps/api`** routes can 401 until a later migration. That is expected for this slice.
@@ -46,30 +46,22 @@ Clerk-only users may not have a Better Auth token; user-scoped **`apps/api`** ro
 | `NEST_CLERK_API_URL` | Server → `nest-clerk-api` (default `http://localhost:3031`) |
 | `NEON_JWT_API_URL` | Unchanged — catalog / practice API (`apps/api`) |
 
-Remove dev-only `AUTH_TEST_*` from new Clerk flows (Clerk dev instance instead).
-
 ### API client pattern (`nest-clerk-api`)
 
 ```ts
-const { getToken } = await auth();
-const token = await getToken();
-if (!token) throw new Error("Not authenticated");
+import { getNestClerkMe } from "@/lib/auth/nest-clerk-api";
 
-await fetch(`${process.env.NEST_CLERK_API_URL}/api/me`, {
-  headers: { Authorization: `Bearer ${token}` },
-  cache: "no-store",
-});
+const me = await getNestClerkMe(); // GET /api/me with Clerk Bearer
 ```
 
 **Do not** send `userId` from the browser for authorization; identity comes from the JWT on the server.
 
 ### `lib/auth` and `features/auth`
 
-- **Add / update:** Clerk server helpers, `nest-clerk-api` fetch helper, env in `keys.ts`.
+- **Clerk:** `clerk-server.ts`, `nest-clerk-api.ts`, `nest-clerk-url.ts`.
 - **Keep (Option A):** `api-auth-headers.ts`, `token.ts`, `app/api/auth/[...path]/route.ts` for **`apps/api`** upstream.
-- **Remove:** Custom sign-in/sign-up forms, `app/auth/`, `AuthSessionProvider`, `dev-auth-form-fill`, Better Auth cookie guard in `proxy.ts` (`hasApiAuthTokenCookie` / `session-cookie.ts` once Clerk owns `/account` + `/admin`).
-- **Update:** `proxy.ts` — replace cookie check with `clerkMiddleware` + `createRouteMatcher`; keep `export const config.matcher` for protected paths.
-- **Client hook:** `useApiAuth` wraps Clerk `useAuth()` / `useUser()` for feature code.
+- **Removed:** Custom sign-in/sign-up forms, `app/auth/`, `AuthSessionProvider`, `dev-auth-form-fill`, Better Auth cookie guard in `proxy.ts`.
+- **Client hook:** `useApiAuth` wraps Clerk `useAuth()` / `useUser()`.
 
 ### Unchanged in this stage
 
@@ -81,18 +73,22 @@ await fetch(`${process.env.NEST_CLERK_API_URL}/api/me`, {
 
 ## Acceptance criteria
 
-- [ ] Unauthenticated user can complete Clerk sign-up on `/sign-up`.
-- [ ] After sign-in, redirect matches `NEXT_PUBLIC_CLERK_AFTER_*` (default `/problems`).
-- [ ] Anonymous user hitting `/account` or `/admin` is redirected to Clerk sign-in and can return to the original URL after auth.
-- [ ] Server `getToken()` returns a token when signed in.
-- [ ] Sample fetch to `nest-clerk-api` includes `Authorization: Bearer …`.
-- [ ] Legacy `app/auth/` removed; routes live under `app/(unauthenticated)/`.
+- [x] Unauthenticated user can complete Clerk sign-up on `/sign-up`.
+- [x] After sign-in, redirect matches `NEXT_PUBLIC_CLERK_AFTER_*` (default `/problems`).
+- [x] Anonymous user hitting `/account` or `/admin` is redirected to Clerk sign-in and can return to the original URL after auth.
+- [x] Server `getToken()` returns a token when signed in.
+- [x] Sample fetch to `nest-clerk-api` includes `Authorization: Bearer …` (`/account` → `getNestClerkMe()`).
+- [x] Legacy `app/auth/` removed; routes live under `app/(unauthenticated)/`.
 
 ---
 
-## Out of scope
+## Out of scope (follow-up spec)
 
-- Neon `users` row creation (Stage 3 webhook).
-- Replacing Better Auth on **`apps/api`** BFF routes (progress, chat, workspace-code).
+- Replacing Better Auth on **`apps/api`** BFF routes — see **[07-practice-bff-migration.md](./07-practice-bff-migration.md)**.
 - Provisioning gate UI (Stage 6).
 - `@repo/clerk` package.
+
+## Verified in dev
+
+- `/account` → `getNestClerkMe()` returns provisioned **`user`** row (Stages 2 + 3).
+- Tutor / progress / workspace / admin BFF still on Better Auth until Stage 7.

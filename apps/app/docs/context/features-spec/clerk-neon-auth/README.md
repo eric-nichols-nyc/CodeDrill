@@ -3,7 +3,7 @@
 Identity and user provisioning for CodeDrill: **Clerk** (sessions + JWT) → **`apps/nest-clerk-api`** (verify JWT, Drizzle/Neon) → existing **`user`** table (Better Auth shape). Practice catalog APIs remain in **`apps/api`** until a later migration; this feature does **not** modify `apps/api` source.
 
 **Spec location:** `apps/app/docs/context/features-spec/clerk-neon-auth/`  
-**Implementation target:** `apps/nest-clerk-api/` only  
+**Implementation target:** `apps/nest-clerk-api/` (backend) + `apps/app/` (Stage 2 Clerk UI)  
 **Database:** Typically the **same Neon database** as `apps/api` (`DATABASE_URL`)
 
 ## Architecture
@@ -11,7 +11,7 @@ Identity and user provisioning for CodeDrill: **Clerk** (sessions + JWT) → **`
 ```mermaid
 sequenceDiagram
   participant User
-  participant Next as Next.js (later)
+  participant Next as Next.js apps/app
   participant Clerk
   participant API as nest-clerk-api
   participant DB as Neon
@@ -51,8 +51,10 @@ Clerk **`sub`** maps directly to **`user.id`** (text primary key).
 
 | Phase | Stages | Status |
 |-------|--------|--------|
-| **Backend now** | 0, 1, 3, 4, 5 (auth slice only) | Active |
-| **Frontend later** | 2, 6 | Deferred (`@repo/clerk` is a separate feature) |
+| **Backend** | 0, 1, 3, 4, 5 (auth slice) | 3 **done**; 4–5 per `nest-clerk-api` |
+| **Frontend** | 2 (Clerk UI) | **Done** |
+| **App BFF migration** | 7 | [07-practice-bff-migration.md](./07-practice-bff-migration.md) — **next** |
+| **Frontend later** | 6 | Deferred |
 
 ## Stages
 
@@ -60,11 +62,19 @@ Clerk **`sub`** maps directly to **`user.id`** (text primary key).
 |---|--------|---------|
 | [0](./00-drizzle.md) | Drizzle + Neon | Shared DB rules, scripts, `DRIZZLE` wiring |
 | [1](./01-foundation.md) | Foundation | Drizzle model for **`user`**, env validation |
-| [2](./02-clerk-frontend.md) | Clerk frontend | *Deferred* — Next.js Clerk UI + Bearer calls |
-| [3](./03-webhook-provisioning.md) | Webhook provisioning | Upsert **`user`** from Clerk events |
+| [2](./02-clerk-frontend.md) | Clerk frontend | **Done** — `(unauthenticated)` `/sign-in`, `/sign-up`, `proxy.ts`, `/account` → `GET /api/me` |
+| [3](./03-webhook-provisioning.md) | Webhook provisioning | **Done** — `POST /api/webhooks/clerk`, upsert/delete **`user`** |
 | [4](./04-api-authentication.md) | API authentication | Global guard, `GET /me` → **`user`** row |
 | [5](./05-api-authorization.md) | API authorization | `*ForUser` scoping on `user_id` |
 | [6](./06-provisioning-ux.md) | Provisioning UX | *Deferred* — wait for `GET /me` after sign-in |
+| [7](./07-practice-bff-migration.md) | Practice BFF (app) | **Not started** — migrate `app/api/*` + chat actions from Better Auth cookie to Clerk Bearer |
+
+### Verified in dev (Stages 2 + 3)
+
+- Clerk sign-in → **`/account`** shows Neon profile from **`GET /api/me`** (`getNestClerkMe()`).
+- Webhook: `apps/nest-clerk-api/src/webhooks/webhooks.service.ts`.
+
+Practice features (chat, progress, workspace save) still require [Stage 7](./07-practice-bff-migration.md).
 
 ## Reference implementation (this repo)
 
@@ -76,8 +86,10 @@ Clerk **`sub`** maps directly to **`user.id`** (text primary key).
 | Practice domain (read-only) | `apps/api/src/database/schema.ts` |
 | JWT / Clerk client | `apps/nest-clerk-api/src/auth/clerk.service.ts` |
 | Global guard | `apps/nest-clerk-api/src/auth/clerk-auth.guard.ts` |
-| Webhook (to add) | `apps/nest-clerk-api/src/webhooks/` |
-| User service (to add) | `apps/nest-clerk-api/src/users/` — `findById(sub)` |
+| Webhook | `apps/nest-clerk-api/src/webhooks/` |
+| User service | `apps/nest-clerk-api/src/users/` — `findById(sub)` |
+| App identity client | `apps/app/lib/auth/nest-clerk-api.ts` — `getNestClerkMe()` |
+| Practice BFF (legacy) | [07-practice-bff-migration.md](./07-practice-bff-migration.md) — `apiAuthHeaders()` → `apps/api` |
 
 ## Environment (`apps/nest-clerk-api/.env`)
 

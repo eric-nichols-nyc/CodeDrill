@@ -49,7 +49,7 @@ The BFF returns JSON `{ error, code, hint? }`. The workspace shows a red alert a
 
 | `code` | Meaning |
 |--------|---------|
-| `NOT_SIGNED_IN` | No API auth session — use **Sign in** at `/auth/sign-in` |
+| `NOT_SIGNED_IN` | No API auth session — use **Sign in** at `/sign-in` (Clerk); practice BFF still uses Better Auth token until migration |
 | `UPSTREAM_UNAUTHORIZED` | Token expired or invalid — sign in again |
 
 ## Export diagram as image
