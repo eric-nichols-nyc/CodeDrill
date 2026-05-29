@@ -17,6 +17,8 @@ change.
 
 ## Completed
 
+- problem-visualizer — SOLID split under `visualizer/` + `spiral-matrix/`; registry gate; `has_visualizer` API column + migration `0002`; wired to Solutions tab
+- problem-visualizer — `SpiralMatrixVisualizer` adapted to design system: `@repo/design-system` `Card`/`Button`/`Badge`, `cn()`, semantic tokens (no hardcoded slate/blue/emerald palette), `"use client"`, removed full-screen page wrapper/heading so it embeds in the Solutions panel
 - Clerk Stage 7 (Path A) — `apps/api` accepts Clerk Bearer; `apps/app` BFF uses `getToken()`; removed `better-auth` client, `/api/auth/*` proxy
 - Clerk Stage 3 — `nest-clerk-api` `POST /api/webhooks/clerk` (`webhooks.service.ts`): upsert on `user.created` / `user.updated` / `session.created`, delete on `user.deleted`
 - Clerk Stage 2 — `@clerk/nextjs`, `(unauthenticated)` `/sign-in` + `/sign-up`, `proxy.ts` + `clerkMiddleware` (`/account`, `/admin`), `ClerkProvider`, `getNestClerkMe()` on `/account`, Option A hybrid (Better Auth BFF for `apps/api`)

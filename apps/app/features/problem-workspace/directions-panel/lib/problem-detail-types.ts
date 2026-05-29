@@ -18,6 +18,8 @@ export type ProblemRow = {
   constraints?: string | null;
   difficulty?: string;
   editorial?: ProblemEditorial;
+  slug?: string;
+  hasVisualizer?: boolean;
 };
 
 /** Serialized `problem_solutions` row from the problems API (Drizzle / Nest JSON). */

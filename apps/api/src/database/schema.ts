@@ -32,6 +32,7 @@ export const problems = pgTable(
     tutorLevel: text("tutor_level"),
     visualizationNotes: text("visualization_notes"),
     editorial: text("editorial"),
+    hasVisualizer: boolean("has_visualizer").notNull().default(false),
     createdAt: timestamptz("created_at").notNull().defaultNow(),
     updatedAt: timestamptz("updated_at").notNull().defaultNow(),
   },

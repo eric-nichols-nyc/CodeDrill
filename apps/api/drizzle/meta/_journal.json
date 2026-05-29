@@ -8,6 +8,13 @@
       "when": 1748217600000,
       "tag": "0001_problem_chat_thread_multi",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1748304000000,
+      "tag": "0002_problems_has_visualizer",
+      "breakpoints": true
     }
   ]
 }

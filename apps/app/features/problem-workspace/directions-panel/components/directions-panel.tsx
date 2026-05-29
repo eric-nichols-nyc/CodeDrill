@@ -29,6 +29,10 @@ function problemRow(problem: unknown): ProblemRow {
     return {};
   }
   const editorialParsed = parseProblemEditorial(o.editorial);
+  const hasVisualizer =
+    o.hasVisualizer === true ||
+    o.has_visualizer === true;
+
   return {
     title: typeof o.title === "string" ? o.title : undefined,
     description: typeof o.description === "string" ? o.description : undefined,
@@ -37,6 +41,8 @@ function problemRow(problem: unknown): ProblemRow {
     editorial: isProblemEditorialEmpty(editorialParsed)
       ? undefined
       : editorialParsed,
+    slug: typeof o.slug === "string" ? o.slug : undefined,
+    hasVisualizer: hasVisualizer ? true : undefined,
   };
 }
 

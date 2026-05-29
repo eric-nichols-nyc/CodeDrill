@@ -178,6 +178,11 @@ export class CreateProblemDto {
   isPublished?: boolean;
 
   @IsOptional()
+  @Transform(({ value }) => value === true || value === "true")
+  @IsBoolean()
+  hasVisualizer?: boolean;
+
+  @IsOptional()
   @IsString()
   @MaxLength(200)
   patternSlug?: string;

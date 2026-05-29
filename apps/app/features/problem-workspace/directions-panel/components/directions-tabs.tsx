@@ -8,6 +8,7 @@ import {
 } from "@repo/design-system/components/ui/tabs";
 import { cn } from "@repo/design-system/lib/utils";
 import type { ReactNode } from "react";
+import { ProblemVisualizer } from "@/features/problem-workspace/visualizer/components/problem-visualizer";
 import { ProblemSolution } from "./problem-solution";
 import type { ProblemSolutionRow } from "../lib/problem-detail-types";
 
@@ -15,6 +16,8 @@ export type DirectionsTabsProps = {
   description: ReactNode;
   solutions: ProblemSolutionRow[];
   editorial: ReactNode;
+  slug: string;
+  hasVisualizer: boolean;
   className?: string;
 };
 
@@ -25,8 +28,13 @@ export function DirectionsTabs({
   description,
   solutions,
   editorial,
+  slug,
+  hasVisualizer,
   className,
 }: DirectionsTabsProps) {
+  const visualizer = (
+    <ProblemVisualizer hasVisualizer={hasVisualizer} slug={slug} />
+  );
   return (
     <Tabs
       className={cn(
@@ -50,7 +58,7 @@ export function DirectionsTabs({
         {description}
       </TabsContent>
       <TabsContent className={panelClass} value="solutions">
-        <ProblemSolution data={solutions} />
+        <ProblemSolution data={solutions} visualizer={visualizer} />
       </TabsContent>
       <TabsContent className={panelClass} value="editorial">
         {editorial}

@@ -105,6 +105,8 @@ export function DirectionsLeftPane({
           />
         }
         editorial={editorialTab}
+        hasVisualizer={p.hasVisualizer === true}
+        slug={p.slug ?? ""}
         solutions={solutions}
       />
     </div>

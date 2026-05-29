@@ -3,7 +3,7 @@ import {
   CodeBlockCopyButton,
 } from "@repo/design-system/components/ai-elements/code-block";
 import { Badge } from "@repo/design-system/components/ui/badge";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import type { ProblemSolutionRow } from "../lib/problem-detail-types";
 
 type ShikiLanguage = ComponentProps<typeof CodeBlock>["language"];
@@ -52,7 +52,13 @@ function solutionHighlightLanguage(lang: string): ShikiLanguage {
   }
 }
 
-export function ProblemSolution({ data }: { data: ProblemSolutionRow[] }) {
+export function ProblemSolution({
+  data,
+  visualizer,
+}: {
+  data: ProblemSolutionRow[];
+  visualizer?: ReactNode;
+}) {
   if (data.length === 0) {
     return (
       <div className="space-y-4">
@@ -64,6 +70,9 @@ export function ProblemSolution({ data }: { data: ProblemSolutionRow[] }) {
             No reference solutions are published for this problem yet.
           </p>
         </section>
+        {visualizer ? (
+          <section className="border-border border-t pt-6">{visualizer}</section>
+        ) : null}
       </div>
     );
   }
@@ -128,6 +137,9 @@ export function ProblemSolution({ data }: { data: ProblemSolutionRow[] }) {
           })}
         </ul>
       </section>
+      {visualizer ? (
+        <section className="border-border border-t pt-6">{visualizer}</section>
+      ) : null}
     </div>
   );
 }
