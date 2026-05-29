@@ -16,7 +16,7 @@ services:
     healthCheckPath: /
     envVars:
       - key: NODE_VERSION
-        value: "22"
+        value: "24"
       - key: DATABASE_URL
         sync: false
       - key: BETTER_AUTH_SECRET
