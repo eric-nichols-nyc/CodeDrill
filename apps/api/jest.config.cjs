@@ -3,10 +3,6 @@
 module.exports = {
   moduleFileExtensions: ["js", "json", "ts"],
   rootDir: "src",
-  moduleNameMapper: {
-    "^@thallesp/nestjs-better-auth$":
-      "<rootDir>/../test/mocks/nestjs-better-auth.ts",
-  },
   testRegex: ".*\\.spec\\.ts$",
   transform: {
     "^.+\\.(t|j)s$": [

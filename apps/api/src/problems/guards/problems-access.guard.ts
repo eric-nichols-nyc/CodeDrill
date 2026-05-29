@@ -22,9 +22,7 @@ function timingSafeStringEqual(a: string, b: string): boolean {
  * Allows `/problems` when either:
  * - `INTERNAL_PROBLEMS_SECRET` is set and `x-internal-problems-secret` matches
  *   (server-to-server catalog/admin BFF — not end-user identity), or
- * - A valid Clerk JWT or Better Auth session is present.
- *
- * Used with `@AllowAnonymous()` so the global guard skips this controller; this guard enforces access.
+ * - A valid Clerk JWT is present.
  */
 @Injectable()
 export class ProblemsAccessGuard implements CanActivate {
@@ -46,7 +44,7 @@ export class ProblemsAccessGuard implements CanActivate {
     }
 
     throw new UnauthorizedException(
-      "Sign in to the API (Clerk Bearer or Better Auth session) or use x-internal-problems-secret for server-to-server catalog access."
+      "Sign in to the API (Clerk Bearer token) or use x-internal-problems-secret for server-to-server catalog access."
     );
   }
 }

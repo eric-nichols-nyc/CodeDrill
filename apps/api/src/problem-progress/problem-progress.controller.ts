@@ -9,7 +9,6 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { AllowAnonymous } from "@thallesp/nestjs-better-auth";
 // biome-ignore lint/style/useImportType: Nest ValidationPipe needs the runtime class
 import { PatchProblemProgressDto } from "./dto/patch-problem-progress.dto";
 import {
@@ -22,10 +21,9 @@ import { ProblemProgressService } from "./problem-progress.service";
 /**
  * Per-user progress for a problem (status, favorite, …).
  *
- * Access: Better Auth session via Bearer token or session cookie.
+ * Access: Clerk Bearer JWT (resolved by `ProblemsUserGuard`).
  * Lives under `/problems/:problemId/progress`, not `PUT /problems/:id` (admin catalog).
  */
-@AllowAnonymous()
 @Controller("problems")
 @UseGuards(ProblemsUserGuard)
 export class ProblemProgressController {

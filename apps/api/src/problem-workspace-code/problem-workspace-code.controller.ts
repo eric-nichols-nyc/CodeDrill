@@ -9,7 +9,6 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { AllowAnonymous } from "@thallesp/nestjs-better-auth";
 // biome-ignore lint/style/useImportType: Nest uses emitted constructor param metadata
 import { UpsertWorkspaceCodeDto } from "./dto/upsert-workspace-code.dto";
 import {
@@ -22,10 +21,8 @@ import { ProblemWorkspaceCodeService } from "./problem-workspace-code.service";
 /**
  * Per-user saved editor code (e.g. persisted when the user clicks Run).
  *
- * Access: Better Auth session via Bearer token or session cookie.
- * `@AllowAnonymous()` skips the global guard so `ProblemsUserGuard` enforces auth.
+ * Access: Clerk Bearer JWT (resolved by `ProblemsUserGuard`).
  */
-@AllowAnonymous()
 @Controller("problems")
 @UseGuards(ProblemsUserGuard)
 export class ProblemWorkspaceCodeController {

@@ -12,10 +12,7 @@ export type RequestWithUserId = {
   userId?: string;
 };
 
-/**
- * Resolves the practice user id from Clerk JWT (`sub`) or Better Auth session
- * (Bearer token / session cookie).
- */
+/** Resolves the practice user id from the Clerk JWT (`sub`) Bearer token. */
 @Injectable()
 export class ProblemsUserGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -31,8 +28,6 @@ export class ProblemsUserGuard implements CanActivate {
       return true;
     }
 
-    throw new UnauthorizedException(
-      "Sign in to the API (Clerk Bearer token or Better Auth session)."
-    );
+    throw new UnauthorizedException("Sign in to the API (Clerk Bearer token).");
   }
 }

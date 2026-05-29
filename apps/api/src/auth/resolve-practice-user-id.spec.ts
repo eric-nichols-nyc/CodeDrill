@@ -1,17 +1,19 @@
+import { verifyToken } from "@clerk/backend";
 import type { IncomingHttpHeaders } from "node:http";
 import { resolvePracticeUserId } from "./resolve-practice-user-id";
-import { getSessionFromHeaders } from "./session-from-headers";
 
-jest.mock("./session-from-headers", () => ({
-  getSessionFromHeaders: jest.fn(),
+jest.mock("@clerk/backend", () => ({
+  verifyToken: jest.fn(),
 }));
 
-const getSessionFromHeadersMock = getSessionFromHeaders as jest.MockedFunction<
-  typeof getSessionFromHeaders
->;
+const verifyTokenMock = verifyToken as jest.MockedFunction<typeof verifyToken>;
 
 describe("resolvePracticeUserId", () => {
   const originalClerkSecret = process.env.CLERK_SECRET_KEY;
+
+  beforeEach(() => {
+    process.env.CLERK_SECRET_KEY = "sk_test_123";
+  });
 
   afterEach(() => {
     jest.resetAllMocks();
@@ -22,26 +24,41 @@ describe("resolvePracticeUserId", () => {
     }
   });
 
-  it("returns Better Auth user id when Clerk is not configured", async () => {
-    delete process.env.CLERK_SECRET_KEY;
-    getSessionFromHeadersMock.mockResolvedValue({
-      session: { id: "s1", userId: "ba-user", expiresAt: new Date() },
-      user: { id: "ba-user", email: "a@b.com", name: "A" },
-    } as never);
+  it("returns the Clerk JWT sub for a valid Bearer token", async () => {
+    verifyTokenMock.mockResolvedValue({ sub: "clerk-user" } as never);
 
     const id = await resolvePracticeUserId({
-      authorization: "Bearer legacy",
+      authorization: "Bearer good-token",
     } as IncomingHttpHeaders);
 
-    expect(id).toBe("ba-user");
+    expect(id).toBe("clerk-user");
   });
 
-  it("returns null when neither Clerk nor session resolves", async () => {
-    delete process.env.CLERK_SECRET_KEY;
-    getSessionFromHeadersMock.mockResolvedValue(null);
+  it("returns null when Clerk verification throws", async () => {
+    verifyTokenMock.mockRejectedValue(new Error("invalid token"));
 
+    const id = await resolvePracticeUserId({
+      authorization: "Bearer bad-token",
+    } as IncomingHttpHeaders);
+
+    expect(id).toBeNull();
+  });
+
+  it("returns null when no Authorization header is present", async () => {
     const id = await resolvePracticeUserId({} as IncomingHttpHeaders);
 
     expect(id).toBeNull();
+    expect(verifyTokenMock).not.toHaveBeenCalled();
+  });
+
+  it("returns null when CLERK_SECRET_KEY is not configured", async () => {
+    delete process.env.CLERK_SECRET_KEY;
+
+    const id = await resolvePracticeUserId({
+      authorization: "Bearer good-token",
+    } as IncomingHttpHeaders);
+
+    expect(id).toBeNull();
+    expect(verifyTokenMock).not.toHaveBeenCalled();
   });
 });

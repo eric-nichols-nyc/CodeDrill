@@ -1,6 +1,4 @@
 import { Module } from "@nestjs/common";
-import { AuthModule } from "@thallesp/nestjs-better-auth";
-import { auth } from "./auth";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { DatabaseModule } from "./database/database.module";
@@ -17,13 +15,6 @@ import { SessionController } from "./session.controller";
     ProblemProgressModule,
     ProblemWorkspaceCodeModule,
     ProblemsModule,
-    AuthModule.forRoot({
-      auth,
-      bodyParser: {
-        json: { limit: "2mb" },
-        urlencoded: { limit: "2mb", extended: true },
-      },
-    }),
   ],
   controllers: [AppController, SessionController],
   providers: [AppService],

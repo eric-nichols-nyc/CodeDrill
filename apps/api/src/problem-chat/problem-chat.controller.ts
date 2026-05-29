@@ -11,7 +11,6 @@ import {
   Res,
   UseGuards,
 } from "@nestjs/common";
-import { AllowAnonymous } from "@thallesp/nestjs-better-auth";
 import type { Response } from "express";
 // biome-ignore lint/style/useImportType: Nest uses emitted constructor param metadata
 import { PostProblemChatMessageDto } from "./dto/post-problem-chat-message.dto";
@@ -25,9 +24,8 @@ import {
 /**
  * Per-user problem tutor chat history.
  *
- * Access: Better Auth session via Bearer token or session cookie.
+ * Access: Clerk Bearer JWT (resolved by `ProblemsUserGuard`).
  */
-@AllowAnonymous()
 @Controller("problems")
 @UseGuards(ProblemsUserGuard)
 export class ProblemChatController {
