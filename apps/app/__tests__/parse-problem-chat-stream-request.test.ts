@@ -3,7 +3,7 @@ import {
   mergeDefaultChatTransportBody,
   parseChatStreamRequestBody,
   parseProblemChatStreamEventLine,
-} from "@/features/problem-workspace/chat-panel/lib/parse-problem-chat-stream-request";
+} from "@/features/problem-workspace/components/chat-panel/lib/parse-problem-chat-stream-request";
 
 describe("parse-problem-chat-stream-request", () => {
   describe("parseChatStreamRequestBody", () => {

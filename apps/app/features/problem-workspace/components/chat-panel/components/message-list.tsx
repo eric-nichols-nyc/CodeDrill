@@ -13,7 +13,7 @@ import {
   shouldShowMessageThinking,
   visibleChatMessages,
   type ChatSubmitStatus,
-} from "@/features/problem-workspace/chat-panel/lib/message-list-utils";
+} from "@/features/problem-workspace/components/chat-panel/lib/message-list-utils";
 import type { MessageVote } from "./message-actions";
 import { ChatMessage } from "./message";
 import { MessageThinking } from "./message-thinking";

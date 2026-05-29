@@ -6,7 +6,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/design-system/components/ui/tabs";
-import { ProblemVisualizer } from "@/features/problem-workspace/visualizer/components/problem-visualizer";
+import { ProblemVisualizer } from "@/features/problem-workspace/components/visualizer/components/problem-visualizer";
 import { DescriptionTab } from "./description-tab";
 import { EditorialTab } from "./editorial-tab";
 import { ProblemSolutionTab } from "./problem-solution-tab";

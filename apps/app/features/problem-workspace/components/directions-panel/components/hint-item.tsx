@@ -1,4 +1,4 @@
-import { JsonFallback } from "@/features/problem-workspace/editor-panel/components/json-fallback";
+import { JsonFallback } from "@/features/problem-workspace/components/editor-panel/components/json-fallback";
 import {
   asRecord,
   strField,

@@ -3,14 +3,14 @@
 import {
   isProblemEditorialEmpty,
   parseProblemEditorial,
-} from "@/features/problem-workspace/directions-panel/lib/parse-editorial";
+} from "@/features/problem-workspace/components/directions-panel/lib/parse-editorial";
 import {
   asRecord,
   parseProblemTags,
-} from "@/features/problem-workspace/directions-panel/lib/problem-detail-helpers";
-import type { ProblemRow } from "@/features/problem-workspace/directions-panel/lib/problem-detail-types";
-import { ShellPanel } from "@/features/problem-workspace/shell/shell-panel";
-import { useWorkspace } from "@/features/problem-workspace/shell/workspace-provider";
+} from "@/features/problem-workspace/components/directions-panel/lib/problem-detail-helpers";
+import type { ProblemRow } from "@/features/problem-workspace/components/directions-panel/lib/problem-detail-types";
+import { ShellPanel } from "@/features/problem-workspace/components/shell/shell-panel";
+import { useWorkspace } from "@/features/problem-workspace/components/shell/workspace-provider";
 import { DirectionsContent } from "./directions-content";
 
 function pickConstraints(raw: unknown): string | null | undefined {

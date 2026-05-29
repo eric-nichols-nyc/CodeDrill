@@ -10,11 +10,11 @@ import {
 } from "@repo/design-system/components/ui/select";
 import { Play, RotateCcw, Send } from "lucide-react";
 import { useApiAuth } from "@/features/auth/hooks/use-api-auth";
-import { EditorRunSubmitAuthPrompt } from "@/features/problem-workspace/editor-panel/components/editor-run-submit-auth-prompt";
-import { JsonFallback } from "@/features/problem-workspace/editor-panel/components/json-fallback";
-import { MonacoEditor } from "@/features/problem-workspace/editor-panel/components/monaco-editor";
-import { ShellPanel } from "@/features/problem-workspace/shell/shell-panel";
-import { useWorkspace } from "@/features/problem-workspace/shell/workspace-provider";
+import { EditorRunSubmitAuthPrompt } from "@/features/problem-workspace/components/editor-panel/components/editor-run-submit-auth-prompt";
+import { JsonFallback } from "@/features/problem-workspace/components/editor-panel/components/json-fallback";
+import { MonacoEditor } from "@/features/problem-workspace/components/editor-panel/components/monaco-editor";
+import { ShellPanel } from "@/features/problem-workspace/components/shell/shell-panel";
+import { useWorkspace } from "@/features/problem-workspace/components/shell/workspace-provider";
 
 export function EditorPanel() {
   const { data, workspace } = useWorkspace();

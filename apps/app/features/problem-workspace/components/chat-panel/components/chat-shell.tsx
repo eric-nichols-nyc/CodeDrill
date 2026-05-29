@@ -9,10 +9,10 @@ import type { PromptInputMessage } from "@repo/design-system/components/ai-eleme
 import { useCallback, useState } from "react";
 import { TutorSignInPrompt } from "@/features/auth/components/tutor-sign-in-prompt";
 import { useApiAuth } from "@/features/auth/hooks/use-api-auth";
-import { useChatSessions } from "@/features/problem-workspace/chat-panel/hooks/use-chat-sessions";
-import { useProblemChat } from "@/features/problem-workspace/chat-panel/hooks/use-problem-chat";
-import type { GetProblemChatMessagesResponse } from "@/features/problem-workspace/chat-panel/lib/problem-chat-types";
-import { problemChatStarterSuggestions } from "@/features/problem-workspace/chat-panel/lib/problem-chat-starter-suggestions";
+import { useChatSessions } from "@/features/problem-workspace/components/chat-panel/hooks/use-chat-sessions";
+import { useProblemChat } from "@/features/problem-workspace/components/chat-panel/hooks/use-problem-chat";
+import type { GetProblemChatMessagesResponse } from "@/features/problem-workspace/components/chat-panel/lib/problem-chat-types";
+import { problemChatStarterSuggestions } from "@/features/problem-workspace/components/chat-panel/lib/problem-chat-starter-suggestions";
 import { ChatHeader } from "./chat-header";
 import { ChatInput } from "./chat-input";
 import { ChatSuggestions } from "./chat-suggestions";

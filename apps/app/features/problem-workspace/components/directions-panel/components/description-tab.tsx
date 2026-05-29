@@ -9,7 +9,7 @@ import {
 import { Badge } from "@repo/design-system/components/ui/badge";
 import { cn } from "@repo/design-system/lib/utils";
 import { Lightbulb } from "lucide-react";
-import { JsonFallback } from "@/features/problem-workspace/editor-panel/components/json-fallback";
+import { JsonFallback } from "@/features/problem-workspace/components/editor-panel/components/json-fallback";
 import {
   asRecord,
   normalizeDifficultyForDisplay,

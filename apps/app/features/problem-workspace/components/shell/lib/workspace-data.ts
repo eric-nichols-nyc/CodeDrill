@@ -1,4 +1,4 @@
-import type { ProblemSolutionRow } from "@/features/problem-workspace/directions-panel/lib/problem-detail-types";
+import type { ProblemSolutionRow } from "@/features/problem-workspace/components/directions-panel/lib/problem-detail-types";
 
 /** Server-fetched problem bundle passed into `WorkspaceProvider`. */
 export type WorkspaceData = {

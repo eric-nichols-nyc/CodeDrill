@@ -9,7 +9,11 @@ change.
 
 ## Current Goal
 
-- Verify Stage 7 (Path A) in dev — tutor chat, progress, workspace save with Clerk only; `CLERK_SECRET_KEY` on `apps/api`
+- Workspace state management slice 2 — `useDirectionsData()` + flatten directions panel (spec `16-workspace-state-management.md`)
+
+## In Progress
+
+- `problem-workspace` state management — slice 1 shipped; slice 2 (directions) next on branch `state-management`
 
 ## Session Notes
 
@@ -17,7 +21,7 @@ change.
 
 ## Completed
 
-- problem-visualizer — SOLID split under `visualizer/` + `spiral-matrix/`; registry gate; `has_visualizer` API column + migration `0002`; wired to Solutions tab
+- problem-workspace state management slice 1 — panel folders moved under `components/`; `ProblemOutputPanel` reads `useWorkspace()` directly; `OutputPanel` is shell-only
 - problem-visualizer — `SpiralMatrixVisualizer` adapted to design system: `@repo/design-system` `Card`/`Button`/`Badge`, `cn()`, semantic tokens (no hardcoded slate/blue/emerald palette), `"use client"`, removed full-screen page wrapper/heading so it embeds in the Solutions panel
 - Clerk Stage 7 (Path A) — `apps/api` accepts Clerk Bearer; `apps/app` BFF uses `getToken()`; removed `better-auth` client, `/api/auth/*` proxy
 - Clerk Stage 3 — `nest-clerk-api` `POST /api/webhooks/clerk` (`webhooks.service.ts`): upsert on `user.created` / `user.updated` / `session.created`, delete on `user.deleted`

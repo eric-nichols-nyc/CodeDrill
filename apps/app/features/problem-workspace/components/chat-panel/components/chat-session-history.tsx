@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { ProblemChatSessionSummary } from "@/features/problem-workspace/chat-panel/lib/chat-session-types";
+import type { ProblemChatSessionSummary } from "@/features/problem-workspace/components/chat-panel/lib/chat-session-types";
 import { ChatSessionHistoryItem } from "./chat-session-history-item";
 
 export type ChatSessionHistoryProps = {

@@ -1,4 +1,4 @@
-import type { ProblemEditorial } from "@/features/problem-workspace/directions-panel/lib/problem-detail-types";
+import type { ProblemEditorial } from "@/features/problem-workspace/components/directions-panel/lib/problem-detail-types";
 
 const YOUTUBE_WATCH_RE =
   /^https?:\/\/(?:www\.)?youtube\.com\/watch\?(?:[^&\s]+&)*v=([a-zA-Z0-9_-]{6,})/i;

@@ -8,7 +8,7 @@ import {
 } from "@repo/design-system/components/ui/popover";
 import { cn } from "@repo/design-system/lib/utils";
 import { ChevronLeft, History, Plus, Sparkles } from "lucide-react";
-import type { ProblemChatSessionSummary } from "@/features/problem-workspace/chat-panel/lib/chat-session-types";
+import type { ProblemChatSessionSummary } from "@/features/problem-workspace/components/chat-panel/lib/chat-session-types";
 import { ChatSessionHistory } from "./chat-session-history";
 
 export type ChatHeaderProps = {

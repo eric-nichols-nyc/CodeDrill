@@ -13,7 +13,7 @@ import {
 } from "@repo/design-system/components/ui/tabs";
 import { CheckSquare, Terminal } from "lucide-react";
 import { useMemo } from "react";
-import type { RunClientTestsOutcome } from "@/features/problem-workspace/lib/client-test-run";
+import { useWorkspace } from "@/features/problem-workspace/components/shell/workspace-provider";
 import { normalizeProblemTestCases } from "@/features/problem-workspace/lib/client-test-run";
 
 import { TestcasePanel } from "./testcase-panel";
@@ -39,29 +39,25 @@ function ResultsPlaceholder({
 }
 
 /** Right-hand Output column: Testcase / Test Result tabs. */
-export function ProblemOutputPanel({
-  activeTab,
-  lastAction,
-  lastRunOutcome = null,
-  onTabChange,
-  testCases,
-}: {
-  activeTab: string;
-  lastAction: "run" | "submit" | null;
-  lastRunOutcome?: RunClientTestsOutcome | null;
-  onTabChange: (value: string) => void;
-  testCases?: unknown;
-}) {
+export function ProblemOutputPanel() {
+  const { data, workspace } = useWorkspace();
+  const {
+    activeTab,
+    lastAction,
+    lastRunOutcome,
+    setActiveTab,
+  } = workspace;
+
   const testCaseRows = useMemo(
-    () => normalizeProblemTestCases(testCases ?? null),
-    [testCases]
+    () => normalizeProblemTestCases(data.testCases ?? null),
+    [data.testCases]
   );
 
   return (
     <div className="flex h-full min-h-0 flex-col p-2">
       <Tabs
         className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-border bg-muted/20"
-        onValueChange={onTabChange}
+        onValueChange={setActiveTab}
         value={activeTab}
       >
         <div className="shrink-0 border-border/60 border-b px-2 pt-1">

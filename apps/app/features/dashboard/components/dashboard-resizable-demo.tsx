@@ -1,6 +1,6 @@
 "use client";
 
-import { WorkspaceShell } from "@/features/problem-workspace/shell/workspace-shell";
+import { WorkspaceShell } from "@/features/problem-workspace/components/shell/workspace-shell";
 
 export function DashboardResizableDemo() {
   return (

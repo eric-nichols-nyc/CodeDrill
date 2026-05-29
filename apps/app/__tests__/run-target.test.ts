@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import type { StarterCodeRow } from "@/features/problem-workspace/editor-panel/lib/types";
+import type { StarterCodeRow } from "@/features/problem-workspace/components/editor-panel/lib/types";
 import {
   entryFunctionNameForRun,
   resolveRunStarterRow,
   runSourceForStarterRow,
-} from "@/features/problem-workspace/editor-panel/utils/run-target";
+} from "@/features/problem-workspace/components/editor-panel/utils/run-target";
 
 function starter(partial: Partial<StarterCodeRow> & Pick<StarterCodeRow, "key">): StarterCodeRow {
   return {

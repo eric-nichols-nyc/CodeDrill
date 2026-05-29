@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@repo/design-system/lib/utils";
-import type { ProblemChatSessionSummary } from "@/features/problem-workspace/chat-panel/lib/chat-session-types";
+import type { ProblemChatSessionSummary } from "@/features/problem-workspace/components/chat-panel/lib/chat-session-types";
 
 function formatSessionDate(iso: string): string {
   const date = new Date(iso);

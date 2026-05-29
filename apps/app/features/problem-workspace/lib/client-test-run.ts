@@ -1,4 +1,4 @@
-import { asRecord, strField } from "@/features/problem-workspace/directions-panel/lib/problem-detail-helpers";
+import { asRecord, strField } from "@/features/problem-workspace/components/directions-panel/lib/problem-detail-helpers";
 
 export type ClientTestCaseResult = {
   index: number;
