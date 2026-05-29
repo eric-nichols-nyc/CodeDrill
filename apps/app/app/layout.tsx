@@ -67,7 +67,15 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { userId } = await auth();
+  // The root layout also renders for 404s/static-asset misses that the proxy
+  // matcher intentionally excludes, so `auth()` can run on a request that never
+  // hit clerkMiddleware(). Fall back to null instead of crashing the render.
+  let userId: string | null = null;
+  try {
+    userId = (await auth()).userId;
+  } catch {
+    userId = null;
+  }
 
   return (
     <ClerkProvider>
