@@ -1,12 +1,24 @@
+"use client";
+
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@repo/design-system/components/ui/tabs";
+import { ProblemVisualizer } from "@/features/problem-workspace/visualizer/components/problem-visualizer";
 import { DescriptionTab } from "./description-tab";
-import { DirectionsTabs } from "./directions-tabs";
 import { EditorialTab } from "./editorial-tab";
+import { ProblemSolutionTab } from "./problem-solution-tab";
 import type {
   ProblemEditorial,
   ProblemRow,
   ProblemSolutionRow,
   ProblemTag,
 } from "../lib/problem-detail-types";
+
+const panelClass =
+  "min-h-0 min-w-0 w-full flex-1 overflow-y-auto pr-4 pt-1 outline-none ring-offset-background focus-visible:outline-none";
 
 export function DirectionsContent({
   p,
@@ -35,11 +47,31 @@ export function DirectionsContent({
   editorial: ProblemEditorial | null;
   tags?: ProblemTag[];
 }) {
+  const visualizer = (
+    <ProblemVisualizer
+      hasVisualizer={p.hasVisualizer === true}
+      slug={p.slug ?? ""}
+    />
+  );
+
   return (
     <div className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden p-2">
-      <DirectionsTabs
-        className="min-h-0 flex-1"
-        description={
+      <Tabs
+        className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 overflow-hidden"
+        defaultValue="description"
+      >
+        <TabsList className="h-auto w-full min-w-0 shrink-0 flex-wrap justify-start gap-1 sm:flex-nowrap">
+          <TabsTrigger className="shrink-0" value="description">
+            Description
+          </TabsTrigger>
+          <TabsTrigger className="shrink-0" value="solutions">
+            Solutions
+          </TabsTrigger>
+          <TabsTrigger className="shrink-0" value="editorial">
+            Editorial
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent className={panelClass} value="description">
           <DescriptionTab
             exampleList={exampleList}
             examples={examples}
@@ -52,12 +84,14 @@ export function DirectionsContent({
             showDifficulty={showDifficulty}
             tags={tags}
           />
-        }
-        editorial={<EditorialTab editorial={editorial} />}
-        hasVisualizer={p.hasVisualizer === true}
-        slug={p.slug ?? ""}
-        solutions={solutions}
-      />
+        </TabsContent>
+        <TabsContent className={panelClass} value="solutions">
+          <ProblemSolutionTab data={solutions} visualizer={visualizer} />
+        </TabsContent>
+        <TabsContent className={panelClass} value="editorial">
+          <EditorialTab editorial={editorial} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

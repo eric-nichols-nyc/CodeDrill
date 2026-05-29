@@ -70,8 +70,7 @@ apps/app/features/problem-workspace/
   directions-panel/
     components/
       directions-panel.tsx          # Root — data from useWorkspace(); wraps ShellPanel
-      directions-content.tsx        # Tab layout + editorial panel (replaces directions-left-pane)
-      directions-tabs.tsx           # ← problem-tabs.tsx (rename)
+      directions-content.tsx        # Tabs shell + description / solutions / editorial
       description-tab.tsx           # ← problem-description-tab.tsx (rename)
       editorial-tab.tsx             # Editorial HTML + YouTube embeds
       example-item.tsx              # ← components/example-item.tsx
@@ -160,7 +159,7 @@ apps/app/features/problem-workspace/
 | `components/workspace-shell.tsx` | `shell/workspace-shell.tsx` | Wire real panel roots |
 | *(new)* | `shell/shell-panel.tsx` | `children` wrapper |
 | `components/problem-detail-left-pane.tsx` | `directions-panel/components/directions-content.tsx` | Renamed; orchestration split from `directions-panel.tsx` |
-| `components/problem-tabs.tsx` | `directions-panel/components/directions-tabs.tsx` | Description / Solutions / Editorial |
+| `components/problem-tabs.tsx` | `directions-panel/components/directions-content.tsx` | Tabs + tab panels (folded from `directions-tabs`) |
 | `components/problem-description-tab.tsx` | `directions-panel/components/description-tab.tsx` | Export `DescriptionTab` |
 | `components/example-item.tsx` | `directions-panel/components/example-item.tsx` | |
 | `components/hint-item.tsx` | `directions-panel/components/hint-item.tsx` | |
@@ -253,27 +252,24 @@ app/problems/[slug]/page.tsx
                       └─ DirectionsPanel (directions-panel.tsx)
                            ├─ lib: problemRow(), parseProblemTags(), parseProblemEditorial()
                            └─ DirectionsContent (directions-content.tsx)
-                                ├─ DirectionsTabs (directions-tabs.tsx)
-                                │    ├─ (@repo/design-system) Tabs / TabsList / TabsTrigger / TabsContent
-                                │    ├─ [tab: description] → DescriptionTab
-                                │    ├─ [tab: solutions]  → ProblemSolutionTab
-                                │    │                         └─ optional footer: ProblemVisualizer (visualizer/)
-                                │    └─ [tab: editorial]  → EditorialTab
-                                │                              ├─ HTML prose (dangerouslySetInnerHTML)
-                                │                              └─ YoutubeEmbed per editorial.embeds[]
-                                └─ DescriptionTab (description-tab.tsx)
-                                     ├─ header: title, difficulty, tags (Badge)
-                                     ├─ description + constraints (or JsonFallback from editor-panel)
-                                     ├─ Examples → ExampleItem × N
-                                     └─ Hints → Accordion → HintItem × N
+                                ├─ (@repo/design-system) Tabs / TabsList / TabsTrigger / TabsContent
+                                ├─ [tab: description] → DescriptionTab
+                                │    ├─ header: title, difficulty, tags (Badge)
+                                │    ├─ description + constraints (or JsonFallback from editor-panel)
+                                │    ├─ Examples → ExampleItem × N
+                                │    └─ Hints → Accordion → HintItem × N
+                                ├─ [tab: solutions]  → ProblemSolutionTab
+                                │                         └─ optional footer: ProblemVisualizer (visualizer/)
+                                └─ [tab: editorial]  → EditorialTab
+                                                          ├─ HTML prose (dangerouslySetInnerHTML)
+                                                          └─ YoutubeEmbed per editorial.embeds[]
 ```
 
 | Component | File | Role |
 | --------- | ---- | ---- |
 | `DirectionsPanel` | `directions-panel.tsx` | Workspace data → `ProblemRow`; shell chrome |
-| `DirectionsContent` | `directions-content.tsx` | Composes tab slot nodes for `DirectionsTabs` |
+| `DirectionsContent` | `directions-content.tsx` | Tabs shell; renders description / solutions / editorial panels |
 | `EditorialTab` | `editorial-tab.tsx` | Editorial HTML, YouTube embeds, empty state |
-| `DirectionsTabs` | `directions-tabs.tsx` | Description / Solutions / Editorial tabs; wires visualizer into solutions tab |
 | `DescriptionTab` | `description-tab.tsx` | Statement body, examples, hints |
 | `ProblemSolutionTab` | `problem-solution-tab.tsx` | Reference solutions list + Shiki `CodeBlock`; visualizer slot |
 | `ExampleItem` | `example-item.tsx` | Single example I/O block |
