@@ -9,11 +9,11 @@ change.
 
 ## Current Goal
 
-- Workspace state management slice 2 — `useDirectionsData()` + flatten directions panel (spec `16-workspace-state-management.md`)
+- _(none — workspace state management slices 1–3 complete on branch `state-management-slice-3-chat`)_
 
 ## In Progress
 
-- `problem-workspace` state management — slice 1 shipped; slice 2 (directions) next on branch `state-management`
+- _(none)_
 
 ## Session Notes
 
@@ -21,6 +21,8 @@ change.
 
 ## Completed
 
+- problem-workspace state management slice 3 — `ChatShell` + `ProblemNotes` read `useWorkspace()`; `ChatPanel` is tab shell only
+- problem-workspace state management slice 2 — `useDirectionsData()` + `buildDirectionsViewModel()`; directions tabs read context via hook; no prop drilling in directions subtree
 - problem-workspace state management slice 1 — panel folders moved under `components/`; `ProblemOutputPanel` reads `useWorkspace()` directly; `OutputPanel` is shell-only
 - problem-visualizer — `SpiralMatrixVisualizer` adapted to design system: `@repo/design-system` `Card`/`Button`/`Badge`, `cn()`, semantic tokens (no hardcoded slate/blue/emerald palette), `"use client"`, removed full-screen page wrapper/heading so it embeds in the Solutions panel
 - Clerk Stage 7 (Path A) — `apps/api` accepts Clerk Bearer; `apps/app` BFF uses `getToken()`; removed `better-auth` client, `/api/auth/*` proxy

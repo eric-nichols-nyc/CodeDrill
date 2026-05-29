@@ -11,14 +11,11 @@ import { Sparkles, StickyNote } from "lucide-react";
 import { ChatShell } from "@/features/problem-workspace/components/chat-panel/components/chat-shell";
 import { ProblemNotes } from "@/features/problem-workspace/components/chat-panel/components/problem-notes";
 import { ShellPanel } from "@/features/problem-workspace/components/shell/shell-panel";
-import { useWorkspace } from "@/features/problem-workspace/components/shell/workspace-provider";
 
 const panelClass =
   "min-h-0 flex-1 overflow-y-auto pr-1 pt-1 outline-none ring-offset-background focus-visible:outline-none";
 
 export function ChatPanel() {
-  const { data } = useWorkspace();
-
   return (
     <ShellPanel>
       <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
@@ -40,10 +37,10 @@ export function ChatPanel() {
             className={cn(panelClass, "flex min-h-0 flex-col")}
             value="chat"
           >
-            <ChatShell problemId={data.problemId} />
+            <ChatShell />
           </TabsContent>
           <TabsContent className={panelClass} value="notes">
-            <ProblemNotes learningNotes={data.learningNotes} />
+            <ProblemNotes />
           </TabsContent>
         </Tabs>
       </div>

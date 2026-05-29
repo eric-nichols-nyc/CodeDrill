@@ -1,4 +1,7 @@
+"use client";
+
 import type { ProblemEditorial } from "../lib/problem-detail-types";
+import { useDirectionsData } from "../hooks/use-directions-data";
 
 function YoutubeEmbed({ videoId }: { videoId: string }) {
   const src = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`;
@@ -44,11 +47,9 @@ function EditorialPanel({ editorial }: { editorial: ProblemEditorial }) {
   );
 }
 
-export function EditorialTab({
-  editorial,
-}: {
-  editorial: ProblemEditorial | null;
-}) {
+export function EditorialTab() {
+  const { editorial } = useDirectionsData();
+
   if (!editorial) {
     return (
       <p className="text-muted-foreground text-sm">

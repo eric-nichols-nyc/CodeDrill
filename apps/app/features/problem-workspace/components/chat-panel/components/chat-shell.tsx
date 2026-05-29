@@ -9,6 +9,7 @@ import type { PromptInputMessage } from "@repo/design-system/components/ai-eleme
 import { useCallback, useState } from "react";
 import { TutorSignInPrompt } from "@/features/auth/components/tutor-sign-in-prompt";
 import { useApiAuth } from "@/features/auth/hooks/use-api-auth";
+import { useWorkspace } from "@/features/problem-workspace/components/shell/workspace-provider";
 import { useChatSessions } from "@/features/problem-workspace/components/chat-panel/hooks/use-chat-sessions";
 import { useProblemChat } from "@/features/problem-workspace/components/chat-panel/hooks/use-problem-chat";
 import type { GetProblemChatMessagesResponse } from "@/features/problem-workspace/components/chat-panel/lib/problem-chat-types";
@@ -207,12 +208,12 @@ function SignedInChatShell({
 }
 
 export function ChatShell({
-  problemId,
   initialChatData,
 }: {
-  problemId?: string;
   initialChatData?: GetProblemChatMessagesResponse;
-}) {
+} = {}) {
+  const { data } = useWorkspace();
+  const problemId = data.problemId;
   const { isPending: isAuthPending, isSignedIn } = useApiAuth();
 
   if (isAuthPending) {

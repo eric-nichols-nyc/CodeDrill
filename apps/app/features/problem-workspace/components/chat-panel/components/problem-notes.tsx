@@ -3,6 +3,7 @@
 import { Button } from "@repo/design-system/components/ui/button";
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
+import { useWorkspace } from "@/features/problem-workspace/components/shell/workspace-provider";
 
 const ReactQuill = dynamic(() => import("react-quill-new"), {
   ssr: false,
@@ -47,10 +48,11 @@ const modules = {
   ],
 };
 
-export function ProblemNotes({ learningNotes }: { learningNotes?: unknown }) {
+export function ProblemNotes() {
+  const { data } = useWorkspace();
   const initialValue = useMemo(
-    () => initialNotesValue(learningNotes),
-    [learningNotes]
+    () => initialNotesValue(data.learningNotes),
+    [data.learningNotes]
   );
   const [value, setValue] = useState(initialValue);
   const [status, setStatus] = useState<"idle" | "saved">("idle");

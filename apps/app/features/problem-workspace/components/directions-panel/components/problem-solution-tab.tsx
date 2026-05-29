@@ -1,10 +1,13 @@
+"use client";
+
 import {
   CodeBlock,
   CodeBlockCopyButton,
 } from "@repo/design-system/components/ai-elements/code-block";
 import { Badge } from "@repo/design-system/components/ui/badge";
-import type { ComponentProps, ReactNode } from "react";
-import type { ProblemSolutionRow } from "../lib/problem-detail-types";
+import type { ComponentProps } from "react";
+import { ProblemVisualizer } from "@/features/problem-workspace/components/visualizer/components/problem-visualizer";
+import { useDirectionsData } from "../hooks/use-directions-data";
 
 type ShikiLanguage = ComponentProps<typeof CodeBlock>["language"];
 
@@ -52,14 +55,16 @@ function solutionHighlightLanguage(lang: string): ShikiLanguage {
   }
 }
 
-export function ProblemSolutionTab({
-  data,
-  visualizer,
-}: {
-  data: ProblemSolutionRow[];
-  visualizer?: ReactNode;
-}) {
-  if (data.length === 0) {
+export function ProblemSolutionTab() {
+  const { p, solutions } = useDirectionsData();
+  const visualizer = (
+    <ProblemVisualizer
+      hasVisualizer={p.hasVisualizer === true}
+      slug={p.slug ?? ""}
+    />
+  );
+
+  if (solutions.length === 0) {
     return (
       <div className="space-y-4">
         <section className="space-y-2">
@@ -82,7 +87,7 @@ export function ProblemSolutionTab({
       <section className="space-y-2">
         <h2 className="font-medium text-muted-foreground text-sm">Solutions</h2>
         <ul className="space-y-4">
-          {data.map((row) => {
+          {solutions.map((row) => {
             const showComplexity =
               (row.timeComplexity !== null && row.timeComplexity.length > 0) ||
               (row.spaceComplexity !== null && row.spaceComplexity.length > 0);

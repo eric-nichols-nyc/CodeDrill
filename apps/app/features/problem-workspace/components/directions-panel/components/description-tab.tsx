@@ -15,37 +15,24 @@ import {
   normalizeDifficultyForDisplay,
   rowKey,
 } from "../lib/problem-detail-helpers";
-import type {
-  ProblemRow,
-  ProblemTag,
-} from "../lib/problem-detail-types";
 import { difficultyTextClass } from "@/features/problems-page/problems-list/utils/difficulty-text-class";
+import { useDirectionsData } from "../hooks/use-directions-data";
 import { ExampleItem } from "./example-item";
 import { HintItem } from "./hint-item";
 
-export function DescriptionTab({
-  problem,
-  p,
-  examples,
-  hints,
-  exampleList,
-  hintList,
-  showDescription,
-  showConstraints,
-  showDifficulty,
-  tags = [],
-}: {
-  problem: unknown;
-  p: ProblemRow;
-  examples: unknown;
-  hints: unknown;
-  exampleList: unknown[];
-  hintList: unknown[];
-  showDescription: boolean;
-  showConstraints: boolean;
-  showDifficulty: boolean;
-  tags?: ProblemTag[];
-}) {
+export function DescriptionTab() {
+  const {
+    problem,
+    p,
+    examples,
+    hints,
+    exampleList,
+    hintList,
+    showDescription,
+    showConstraints,
+    showDifficulty,
+    tags,
+  } = useDirectionsData();
   const tagList = tags ?? [];
   const showMeta = showDifficulty || tagList.length > 0;
   const difficulty = normalizeDifficultyForDisplay(p.difficulty);
