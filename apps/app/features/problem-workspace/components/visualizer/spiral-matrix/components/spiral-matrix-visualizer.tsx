@@ -26,64 +26,62 @@ export function SpiralMatrixVisualizer() {
 
   return (
     <div className="space-y-6 text-foreground">
-      <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
-        <Card>
-          <CardContent className="space-y-6">
-            <div className="flex justify-center">
-              <MatrixGrid
-                currentCol={step.col}
-                currentRow={step.row}
-                matrix={SPIRAL_MATRIX}
-                visited={step.visited}
-              />
+      <Card>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-bold text-xl">Code Trace</h2>
+              <p className="text-muted-foreground text-sm">
+                The highlighted line matches the current visual step.
+              </p>
             </div>
+            <Badge variant="secondary">Direction: {step.direction}</Badge>
+          </div>
+          <CodePanel activeLine={step.activeLine} lines={SPIRAL_CODE_LINES} />
+        </CardContent>
+      </Card>
 
-            <VisualizerControls
-              onNext={goNext}
-              onPrev={goPrev}
-              onReset={reset}
-              stepIndex={stepIndex}
-              totalSteps={totalSteps}
+      <Card>
+        <CardContent className="space-y-6">
+          <div className="flex justify-center">
+            <MatrixGrid
+              currentCol={step.col}
+              currentRow={step.row}
+              matrix={SPIRAL_MATRIX}
+              visited={step.visited}
             />
+          </div>
 
-            <div className="rounded-xl border border-border bg-muted/40 p-4">
-              <div className="mb-2 font-semibold text-muted-foreground text-sm">
-                Step {stepIndex + 1} of {totalSteps}
-              </div>
-              <p className="font-medium text-lg">{step.explanation}</p>
-            </div>
+          <VisualizerControls
+            onNext={goNext}
+            onPrev={goPrev}
+            onReset={reset}
+            stepIndex={stepIndex}
+            totalSteps={totalSteps}
+          />
 
-            <div>
-              <h2 className="mb-3 font-bold text-muted-foreground text-sm uppercase tracking-wide">
-                Result
-              </h2>
-              <ResultArray result={step.result} />
+          <div className="rounded-xl border border-border bg-muted/40 p-4">
+            <div className="mb-2 font-semibold text-muted-foreground text-sm">
+              Step {stepIndex + 1} of {totalSteps}
             </div>
+            <p className="font-medium text-lg">{step.explanation}</p>
+          </div>
 
-            <div>
-              <h2 className="mb-3 font-bold text-muted-foreground text-sm uppercase tracking-wide">
-                Current Bounds
-              </h2>
-              <BoundsPanel bounds={step.bounds} />
-            </div>
-          </CardContent>
-        </Card>
+          <div>
+            <h2 className="mb-3 font-bold text-muted-foreground text-sm uppercase tracking-wide">
+              Result
+            </h2>
+            <ResultArray result={step.result} />
+          </div>
 
-        <Card>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="font-bold text-xl">Code Trace</h2>
-                <p className="text-muted-foreground text-sm">
-                  The highlighted line matches the current visual step.
-                </p>
-              </div>
-              <Badge variant="secondary">Direction: {step.direction}</Badge>
-            </div>
-            <CodePanel activeLine={step.activeLine} lines={SPIRAL_CODE_LINES} />
-          </CardContent>
-        </Card>
-      </div>
+          <div>
+            <h2 className="mb-3 font-bold text-muted-foreground text-sm uppercase tracking-wide">
+              Current Bounds
+            </h2>
+            <BoundsPanel bounds={step.bounds} />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
