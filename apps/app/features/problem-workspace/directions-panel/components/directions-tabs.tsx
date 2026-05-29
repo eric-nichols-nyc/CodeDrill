@@ -9,7 +9,7 @@ import {
 import { cn } from "@repo/design-system/lib/utils";
 import type { ReactNode } from "react";
 import { ProblemVisualizer } from "@/features/problem-workspace/visualizer/components/problem-visualizer";
-import { ProblemSolution } from "./problem-solution";
+import { ProblemSolutionTab } from "./problem-solution-tab";
 import type { ProblemSolutionRow } from "../lib/problem-detail-types";
 
 export type DirectionsTabsProps = {
@@ -58,7 +58,7 @@ export function DirectionsTabs({
         {description}
       </TabsContent>
       <TabsContent className={panelClass} value="solutions">
-        <ProblemSolution data={solutions} visualizer={visualizer} />
+        <ProblemSolutionTab data={solutions} visualizer={visualizer} />
       </TabsContent>
       <TabsContent className={panelClass} value="editorial">
         {editorial}

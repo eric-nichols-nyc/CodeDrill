@@ -53,7 +53,7 @@ benefit from step-by-step animation.
 | ----- | ---- | ----- |
 | Feature UI — shared | `apps/app/features/problem-workspace/visualizer/` | Gate, registry, shared types |
 | Feature UI — spiral matrix | `apps/app/features/problem-workspace/visualizer/spiral-matrix/` | Full SOLID sub-folder |
-| Directions panel | `apps/app/features/problem-workspace/directions-panel/` | Threads `slug` + `hasVisualizer`; renders gate at bottom of `ProblemSolution` |
+| Directions panel | `apps/app/features/problem-workspace/directions-panel/` | Threads `slug` + `hasVisualizer`; renders gate at bottom of `ProblemSolutionTab` |
 | BFF | — | None — reuses existing problem detail fetch |
 | API | `apps/api/src/problems/` | DTO + service mapping only |
 | Database | `apps/api/src/database/schema.ts` | `problems.has_visualizer` boolean |
@@ -212,7 +212,7 @@ export type UseSpiralStepperReturn = {
 - **[D]** Depends on the hook's return type, not on `useState` directly.
 - **[S]** Contains no algorithm, no style decisions, no state beyond what the hook exposes.
 
-### `ProblemSolution` (existing — minor update)
+### `ProblemSolutionTab` (existing — minor update)
 
 - Accepts an optional `visualizer?: ReactNode` slot and renders it at the bottom.
 
@@ -265,7 +265,7 @@ Implement feature `problem-visualizer` per this spec and `01-design-system.md`.
    Register the slug in the registry.
 
 4. **Wire** — Pass `slug` and `hasVisualizer` from `ProblemWorkspace` down to the directions
-   panel; add `visualizer` slot to `ProblemSolution`; render `<ProblemVisualizer>` there.
+   panel; add `visualizer` slot to `ProblemSolutionTab`; render `<ProblemVisualizer>` there.
 
 5. **Annotate** — Add block comments naming the SOLID principle(s) at every module boundary
    and inline comments on non-obvious decisions. Do not add trivial narration comments.

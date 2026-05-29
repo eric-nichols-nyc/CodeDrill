@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "context/features-spec/10-problem-chat-message-ui.md",
+                "file": "context/features-spec/11-workspace-refactor.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "10-problem-chat-message-ui"
+              "title": "11-workspace-refactor"
             }
           }
         ]
@@ -78,7 +78,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 353.5
+    "width": 353.5,
+    "collapsed": true
   },
   "right": {
     "id": "61713a34d7165da1",
@@ -185,6 +186,8 @@
   },
   "active": "23f0ef6ec3a5f5df",
   "lastOpenFiles": [
+    "context/features-spec/15-problem-visualizer.md",
+    "context/features-spec/10-problem-chat-message-ui.md",
     "context/features-spec/clerk-neon-auth/IMPLEMENTATION-PROMPT.md",
     "context/features-spec/clerk-neon-auth/README.md",
     "context/features-spec/clerk-neon-auth/07-practice-bff-migration.md",
@@ -208,7 +211,6 @@
     "context/features-spec/12-problem-chat-session-header.md",
     "context/features-spec/12-nav-drawer-list-ui.md",
     "context/features-spec/12-problem-notes.md",
-    "Untitled.md",
-    "context/features-spec/10-problem-chat-message-ui.md"
+    "Untitled.md"
   ]
 }

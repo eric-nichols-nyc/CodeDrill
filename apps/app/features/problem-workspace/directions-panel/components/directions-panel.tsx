@@ -11,7 +11,7 @@ import {
 import type { ProblemRow } from "@/features/problem-workspace/directions-panel/lib/problem-detail-types";
 import { ShellPanel } from "@/features/problem-workspace/shell/shell-panel";
 import { useWorkspace } from "@/features/problem-workspace/shell/workspace-provider";
-import { DirectionsLeftPane } from "./directions-left-pane";
+import { DirectionsContent } from "./directions-content";
 
 function pickConstraints(raw: unknown): string | null | undefined {
   if (typeof raw === "string") {
@@ -63,7 +63,7 @@ export function DirectionsPanel() {
 
   return (
     <ShellPanel>
-      <DirectionsLeftPane
+      <DirectionsContent
         editorial={editorial}
         exampleList={exampleList}
         examples={data.examples}

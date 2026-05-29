@@ -69,13 +69,14 @@ apps/app/features/problem-workspace/
 
   directions-panel/
     components/
-      directions-panel.tsx          # NEW root — replaces ProblemDetail left orchestration
+      directions-panel.tsx          # Root — data from useWorkspace(); wraps ShellPanel
+      directions-content.tsx        # Tab layout + editorial panel (replaces directions-left-pane)
       directions-tabs.tsx           # ← problem-tabs.tsx (rename)
-      directions-description-tab.tsx # ← problem-description-tab.tsx (rename)
-      directions-left-pane.tsx      # ← problem-detail-left-pane.tsx (rename; or fold into directions-panel.tsx)
+      description-tab.tsx           # ← problem-description-tab.tsx (rename)
+      editorial-tab.tsx             # Editorial HTML + YouTube embeds
       example-item.tsx              # ← components/example-item.tsx
       hint-item.tsx                 # ← components/hint-item.tsx
-      problem-solution.tsx          # ← components/problem-solution.tsx (or directions-solution.tsx)
+      problem-solution-tab.tsx      # ← components/problem-solution.tsx
     lib/
       parse-editorial.ts            # ← parse-editorial.ts (feature root)
       problem-detail-helpers.ts     # ← problem-detail-helpers.ts (shared parsers; or lift to feature lib/)
@@ -158,12 +159,12 @@ apps/app/features/problem-workspace/
 | ------------ | ----------- | ----- |
 | `components/workspace-shell.tsx` | `shell/workspace-shell.tsx` | Wire real panel roots |
 | *(new)* | `shell/shell-panel.tsx` | `children` wrapper |
-| `components/problem-detail-left-pane.tsx` | `directions-panel/components/directions-left-pane.tsx` | |
+| `components/problem-detail-left-pane.tsx` | `directions-panel/components/directions-content.tsx` | Renamed; orchestration split from `directions-panel.tsx` |
 | `components/problem-tabs.tsx` | `directions-panel/components/directions-tabs.tsx` | Description / Solutions / Editorial |
-| `components/problem-description-tab.tsx` | `directions-panel/components/directions-description-tab.tsx` | |
+| `components/problem-description-tab.tsx` | `directions-panel/components/description-tab.tsx` | Export `DescriptionTab` |
 | `components/example-item.tsx` | `directions-panel/components/example-item.tsx` | |
 | `components/hint-item.tsx` | `directions-panel/components/hint-item.tsx` | |
-| `components/problem-solution.tsx` | `directions-panel/components/problem-solution.tsx` | |
+| `components/problem-solution.tsx` | `directions-panel/components/problem-solution-tab.tsx` | Export `ProblemSolutionTab` |
 | `parse-editorial.ts` | `directions-panel/lib/parse-editorial.ts` | |
 | `problem-detail-helpers.ts` | `directions-panel/lib/problem-detail-helpers.ts` | shared parsers |
 | `problem-detail-types.ts` | `directions-panel/lib/problem-detail-types.ts` | |
@@ -235,9 +236,50 @@ type WorkspaceShellProps = {
 
 ### `DirectionsPanel`
 
-- Props: `problem`, `examples`, `hints`, `solutions`, `tags` (same as today’s `ProblemDetail` left side).
-- Renders `DirectionsTabs` → description / solutions / editorial.
-- Parsing (`problemRow`, tags) moves here or into `directions-panel/lib/`.
+- No props — reads `WorkspaceData` from `useWorkspace()` (`shell/workspace-provider.tsx`).
+- Normalizes the problem row (`problemRow`), tags, examples, hints, and editorial via `directions-panel/lib/`.
+- Wraps content in `ShellPanel` and passes derived props to `DirectionsContent`.
+
+#### Directions panel — component tree
+
+How the left workspace column composes from the route down to leaf UI. External dependencies are noted in parentheses.
+
+```txt
+app/problems/[slug]/page.tsx
+  └─ ProblemWorkspace (problem-workspace.tsx)
+       └─ WorkspaceProvider
+            └─ WorkspaceShell
+                 └─ ShellPanel
+                      └─ DirectionsPanel (directions-panel.tsx)
+                           ├─ lib: problemRow(), parseProblemTags(), parseProblemEditorial()
+                           └─ DirectionsContent (directions-content.tsx)
+                                ├─ DirectionsTabs (directions-tabs.tsx)
+                                │    ├─ (@repo/design-system) Tabs / TabsList / TabsTrigger / TabsContent
+                                │    ├─ [tab: description] → DescriptionTab
+                                │    ├─ [tab: solutions]  → ProblemSolutionTab
+                                │    │                         └─ optional footer: ProblemVisualizer (visualizer/)
+                                │    └─ [tab: editorial]  → EditorialTab
+                                │                              ├─ HTML prose (dangerouslySetInnerHTML)
+                                │                              └─ YoutubeEmbed per editorial.embeds[]
+                                └─ DescriptionTab (description-tab.tsx)
+                                     ├─ header: title, difficulty, tags (Badge)
+                                     ├─ description + constraints (or JsonFallback from editor-panel)
+                                     ├─ Examples → ExampleItem × N
+                                     └─ Hints → Accordion → HintItem × N
+```
+
+| Component | File | Role |
+| --------- | ---- | ---- |
+| `DirectionsPanel` | `directions-panel.tsx` | Workspace data → `ProblemRow`; shell chrome |
+| `DirectionsContent` | `directions-content.tsx` | Composes tab slot nodes for `DirectionsTabs` |
+| `EditorialTab` | `editorial-tab.tsx` | Editorial HTML, YouTube embeds, empty state |
+| `DirectionsTabs` | `directions-tabs.tsx` | Description / Solutions / Editorial tabs; wires visualizer into solutions tab |
+| `DescriptionTab` | `description-tab.tsx` | Statement body, examples, hints |
+| `ProblemSolutionTab` | `problem-solution-tab.tsx` | Reference solutions list + Shiki `CodeBlock`; visualizer slot |
+| `ExampleItem` | `example-item.tsx` | Single example I/O block |
+| `HintItem` | `hint-item.tsx` | Hint title/body (accordion or list variant) |
+
+**Data flow:** `[slug]/page.tsx` fetches `WorkspaceData` → `WorkspaceProvider` → `DirectionsPanel` reads `data.problem`, `data.examples`, `data.hints`, `data.solutions`, `data.tags` and passes normalized props into `DirectionsContent` → tab children render read-only problem content (no run/submit state).
 
 ### `EditorPanel`
 

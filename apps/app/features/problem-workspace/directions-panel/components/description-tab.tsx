@@ -23,7 +23,7 @@ import { difficultyTextClass } from "@/features/problems-page/problems-list/util
 import { ExampleItem } from "./example-item";
 import { HintItem } from "./hint-item";
 
-export function DirectionsDescriptionTab({
+export function DescriptionTab({
   problem,
   p,
   examples,

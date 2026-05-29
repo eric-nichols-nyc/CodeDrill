@@ -1,11 +1,4 @@
-import { DirectionsDescriptionTab } from "./directions-description-tab";
-import { DirectionsTabs } from "./directions-tabs";
-import type {
-  ProblemEditorial,
-  ProblemRow,
-  ProblemSolutionRow,
-  ProblemTag,
-} from "../lib/problem-detail-types";
+import type { ProblemEditorial } from "../lib/problem-detail-types";
 
 function YoutubeEmbed({ videoId }: { videoId: string }) {
   const src = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`;
@@ -51,64 +44,18 @@ function EditorialPanel({ editorial }: { editorial: ProblemEditorial }) {
   );
 }
 
-export function DirectionsLeftPane({
-  p,
-  problem,
-  examples,
-  hints,
-  solutions,
-  exampleList,
-  hintList,
-  showDescription,
-  showConstraints,
-  showDifficulty,
+export function EditorialTab({
   editorial,
-  tags = [],
 }: {
-  p: ProblemRow;
-  problem: unknown;
-  examples: unknown;
-  hints: unknown;
-  solutions: ProblemSolutionRow[];
-  exampleList: unknown[];
-  hintList: unknown[];
-  showDescription: boolean;
-  showConstraints: boolean;
-  showDifficulty: boolean;
   editorial: ProblemEditorial | null;
-  tags?: ProblemTag[];
 }) {
-  const editorialTab = editorial ? (
-    <EditorialPanel editorial={editorial} />
-  ) : (
-    <p className="text-muted-foreground text-sm">
-      No editorial has been added for this problem yet.
-    </p>
-  );
+  if (!editorial) {
+    return (
+      <p className="text-muted-foreground text-sm">
+        No editorial has been added for this problem yet.
+      </p>
+    );
+  }
 
-  return (
-    <div className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden p-2">
-      <DirectionsTabs
-        className="min-h-0 flex-1"
-        description={
-          <DirectionsDescriptionTab
-            exampleList={exampleList}
-            examples={examples}
-            hintList={hintList}
-            hints={hints}
-            p={p}
-            problem={problem}
-            showConstraints={showConstraints}
-            showDescription={showDescription}
-            showDifficulty={showDifficulty}
-            tags={tags}
-          />
-        }
-        editorial={editorialTab}
-        hasVisualizer={p.hasVisualizer === true}
-        slug={p.slug ?? ""}
-        solutions={solutions}
-      />
-    </div>
-  );
+  return <EditorialPanel editorial={editorial} />;
 }

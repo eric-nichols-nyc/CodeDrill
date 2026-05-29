@@ -52,7 +52,7 @@ function solutionHighlightLanguage(lang: string): ShikiLanguage {
   }
 }
 
-export function ProblemSolution({
+export function ProblemSolutionTab({
   data,
   visualizer,
 }: {
