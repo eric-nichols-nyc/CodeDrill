@@ -92,6 +92,7 @@ apps/app/
     AGENTS.md       # Full agent entry point (this file)
     prd.md          # Full product requirements
     context/        # Spec pack (overview, architecture, UI, standards, tracker)
+    reference/      # Human learn-by-reading notes (optional; not product specs)
   AGENTS.md         # Cursor stub → points here (auto-loaded under apps/app/)
 ```
 
