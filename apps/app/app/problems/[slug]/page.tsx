@@ -106,11 +106,7 @@ export default async function ProblemBySlugPage({
       <div className="shrink-0 border-border border-b p-4">
         <p className="text-destructive text-sm">
           Could not load problem (HTTP {result.status}). Ensure the Nest API is
-          running, sign in, or set optional{" "}
-          <code className="rounded bg-muted px-1 py-0.5 text-xs">
-            INTERNAL_PROBLEMS_SECRET
-          </code>{" "}
-          for server-side catalog access.
+          running and reachable from the Next app.
         </p>
       </div>
     );

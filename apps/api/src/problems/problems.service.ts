@@ -21,6 +21,7 @@ import {
 import type { CreateProblemDto } from "./dto/create-problem.dto";
 import type { ListProblemsQueryDto } from "./dto/list-problems-query.dto";
 import { editorialDtoToDbText } from "./editorial-db";
+import type { CatalogAccess } from "./resolve-catalog-access";
 
 type AppDb = NeonHttpDatabase<typeof schema>;
 
@@ -99,14 +100,17 @@ export class ProblemsService {
     return updatedProblem;
   }
 
-  async findAll(query: ListProblemsQueryDto) {
+  async findAll(query: ListProblemsQueryDto, access: CatalogAccess = "public") {
+    const publishedFilter =
+      access === "public" ? true : query.published;
+
     const rows =
-      query.published === undefined
+      publishedFilter === undefined
         ? await this.db.select().from(problems)
         : await this.db
             .select()
             .from(problems)
-            .where(eq(problems.isPublished, query.published));
+            .where(eq(problems.isPublished, publishedFilter));
 
     if (rows.length === 0) {
       return [];
@@ -142,7 +146,7 @@ export class ProblemsService {
     }));
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, access: CatalogAccess = "public") {
     const [row] = await this.db
       .select()
       .from(problems)
@@ -153,10 +157,15 @@ export class ProblemsService {
       throw new NotFoundException(`Problem not found: ${id}`);
     }
 
+    this.assertCatalogReadable(row, access, id);
+
     return row;
   }
 
-  async findBySlugWithDetails(slug: string) {
+  async findBySlugWithDetails(
+    slug: string,
+    access: CatalogAccess = "public"
+  ) {
     const [problem] = await this.db
       .select()
       .from(problems)
@@ -167,10 +176,15 @@ export class ProblemsService {
       throw new NotFoundException(`Problem not found: ${slug}`);
     }
 
+    this.assertCatalogReadable(problem, access, slug);
+
     return this.buildProblemDetails(problem);
   }
 
-  async findByIdWithDetails(id: string) {
+  async findByIdWithDetails(
+    id: string,
+    access: CatalogAccess = "privileged"
+  ) {
     const [problem] = await this.db
       .select()
       .from(problems)
@@ -181,7 +195,19 @@ export class ProblemsService {
       throw new NotFoundException(`Problem not found: ${id}`);
     }
 
+    this.assertCatalogReadable(problem, access, id);
+
     return this.buildProblemDetails(problem);
+  }
+
+  private assertCatalogReadable(
+    problem: typeof problems.$inferSelect,
+    access: CatalogAccess,
+    label: string
+  ): void {
+    if (access === "public" && !problem.isPublished) {
+      throw new NotFoundException(`Problem not found: ${label}`);
+    }
   }
 
   private async buildProblemDetails(problem: typeof problems.$inferSelect) {

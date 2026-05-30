@@ -231,11 +231,7 @@ export function ProblemsPageView({
                     ) : (
                       <>
                         Could not load problems (HTTP {fetchStatus}). Ensure the
-                        Nest API is running and set optional{" "}
-                        <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                          INTERNAL_PROBLEMS_SECRET
-                        </code>{" "}
-                        for server-side catalog access, or sign in for Bearer auth.
+                        Nest API is running and reachable from the Next app.
                       </>
                     )}
                   </p>

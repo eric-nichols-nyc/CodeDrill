@@ -19,10 +19,12 @@ function timingSafeStringEqual(a: string, b: string): boolean {
 }
 
 /**
- * Allows `/problems` when either:
+ * Allows mutating `/problems` when either:
  * - `INTERNAL_PROBLEMS_SECRET` is set and `x-internal-problems-secret` matches
- *   (server-to-server catalog/admin BFF — not end-user identity), or
+ *   (server-to-server admin BFF — not end-user identity), or
  * - A valid Clerk JWT is present.
+ *
+ * GET catalog routes are public; see `resolveCatalogAccess`.
  */
 @Injectable()
 export class ProblemsAccessGuard implements CanActivate {
@@ -44,7 +46,7 @@ export class ProblemsAccessGuard implements CanActivate {
     }
 
     throw new UnauthorizedException(
-      "Sign in to the API (Clerk Bearer token) or use x-internal-problems-secret for server-to-server catalog access."
+      "Sign in (Clerk Bearer token) or use x-internal-problems-secret for admin writes."
     );
   }
 }

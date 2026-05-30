@@ -76,7 +76,7 @@ Default URL: `http://localhost:3030` (or your `PORT`).
 
 ### Problems catalog (`ProblemsController`)
 
-Base path: **`/problems`**. Access: **Clerk Bearer JWT** or **`x-internal-problems-secret`** when `INTERNAL_PROBLEMS_SECRET` is set for server-to-server catalog calls (see `ProblemsAccessGuard`).
+Base path: **`/problems`**. **GET** (list, by slug, details) is **public** — returns published problems only unless the caller sends a Clerk Bearer JWT or matching `x-internal-problems-secret` (drafts / admin). **POST/PUT/generate** require auth (`ProblemsAccessGuard`).
 
 Examples: `GET /problems`, `GET /problems/by-slug/:slug`, `GET /problems/:id/details`, `POST /problems`, `PUT /problems/:id`.
 
