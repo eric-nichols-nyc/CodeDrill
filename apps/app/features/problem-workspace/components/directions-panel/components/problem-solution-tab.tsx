@@ -112,7 +112,7 @@ export function ProblemSolutionTab() {
                     language={solutionHighlightLanguage(row.language)}
                   >
                     <CodeBlockCopyButton
-                      className="size-11 shrink-0 rounded-md border border-white/25 bg-zinc-900/90 text-white shadow-md hover:bg-zinc-800 hover:text-white"
+                      className="size-8 shrink-0 rounded-md border border-white/25 bg-zinc-900/90 text-white shadow-md hover:bg-zinc-800 hover:text-white"
                       iconSize={22}
                     />
                   </CodeBlock>
