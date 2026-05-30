@@ -104,7 +104,7 @@ export function ProblemNotes() {
         saveMutation.mutate(draft);
       }}
     >
-      <div className="flex-1 overflow-hidden bg-background">
+      <div className="problem-notes-quill flex flex-1 flex-col overflow-hidden bg-background [&_.ql-editor]:text-foreground [&_.ql-toolbar]:border-border">
         <ReactQuill
           modules={modules}
           onChange={(nextValue) => {
