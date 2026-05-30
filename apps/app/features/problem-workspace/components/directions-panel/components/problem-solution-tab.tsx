@@ -101,7 +101,7 @@ export function ProblemSolutionTab() {
                   <Badge variant="outline">{row.language}</Badge>
                 </div>
                 {row.explanation ? (
-                  <p className="whitespace-pre-wrap border-border border-b px-3 py-2 text-lg text-white-foreground leading-relaxed">
+                  <p className="whitespace-pre-wrap border-border border-b px-3 py-2 text-sm text-white-foreground leading-relaxed">
                     {row.explanation}
                   </p>
                 ) : null}

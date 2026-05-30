@@ -28,8 +28,11 @@ export function VisualizerControls({
       <Button disabled={isFirst} onClick={onPrev} variant="outline">
         <ChevronLeft className="mr-2 h-4 w-4" />
       </Button>
+      <span className="min-w-12 text-center font-medium text-muted-foreground text-xs tabular-nums">
+        {stepIndex + 1}/{totalSteps}
+      </span>
       <Button disabled={isLast} onClick={onNext}>
-         <ChevronRight className="ml-2 h-4 w-4" />
+        <ChevronRight className="ml-2 h-4 w-4" />
       </Button>
       <Button onClick={onReset} variant="ghost">
         <RotateCcw className="mr-2 h-4 w-4" />

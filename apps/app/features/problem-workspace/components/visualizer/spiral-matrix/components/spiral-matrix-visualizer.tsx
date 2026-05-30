@@ -31,7 +31,7 @@ export function SpiralMatrixVisualizer() {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-bold text-xl">Code Trace</h2>
+              <h2 className="font-bold text-xl">Code Visualization</h2>
               <p className="text-muted-foreground text-sm">
                 The highlighted line matches the current visual step.
               </p>
