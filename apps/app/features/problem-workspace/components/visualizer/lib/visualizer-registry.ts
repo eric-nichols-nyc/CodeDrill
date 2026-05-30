@@ -13,9 +13,22 @@ const spiralMatrixVisualizer = dynamic(
   { ssr: false }
 );
 
+const longestSubstringVisualizer = dynamic(
+  () =>
+    import(
+      "../longest-substring/components/longest-substring-visualizer"
+    ).then((mod) => mod.LongestSubstringVisualizer),
+  { ssr: false }
+);
+
 /** Prefix match supports admin slugs like `spiral-matrix-1730000000`. */
 const prefixRegistry: { prefix: string; component: VisualizerComponent }[] = [
   { prefix: "spiral-matrix", component: spiralMatrixVisualizer },
+  {
+    prefix: "longest-unique-substring",
+    component: longestSubstringVisualizer,
+  },
+  { prefix: "longest-substring", component: longestSubstringVisualizer },
 ];
 
 export function getVisualizer(slug: string): VisualizerComponent | null {

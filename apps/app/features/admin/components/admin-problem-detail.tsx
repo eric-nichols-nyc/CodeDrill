@@ -54,6 +54,11 @@ export function AdminProblemDetail({
           <Badge variant="outline">
             {problem?.isPublished === true ? "published" : "draft"}
           </Badge>
+          <Badge variant="outline">
+            {problem?.hasVisualizer === true || problem?.has_visualizer === true
+              ? "visualizer"
+              : "no visualizer"}
+          </Badge>
           <Badge variant="outline">{textValue(problem?.slug)}</Badge>
         </div>
         <div>

@@ -68,6 +68,7 @@ export function normalizeCreateProblemBody(
     description: value?.description ?? "",
     constraints: value?.constraints ?? "",
     isPublished: value?.isPublished ?? false,
+    hasVisualizer: value?.hasVisualizer ?? false,
     patternSlug: value?.patternSlug ?? "",
     loopStructure: value?.loopStructure ?? "",
     skillFocus: value?.skillFocus ?? "",
@@ -115,6 +116,9 @@ export function detailToFormValues(
     description: stringField(problem?.description),
     constraints: stringField(problem?.constraints),
     isPublished: booleanField(problem?.isPublished),
+    hasVisualizer:
+      booleanField(problem?.hasVisualizer) ||
+      booleanField(problem?.has_visualizer),
     patternSlug: stringField(problem?.patternSlug),
     loopStructure: stringField(problem?.loopStructure),
     skillFocus: stringField(problem?.skillFocus),

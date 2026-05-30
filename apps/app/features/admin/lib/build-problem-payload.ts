@@ -14,6 +14,7 @@ export function buildProblemPayload(
     difficulty: values.difficulty,
     description: trim(values.description),
     isPublished: values.isPublished,
+    hasVisualizer: values.hasVisualizer ?? false,
     starterCode: values.starterCode.map((row) => ({
       language: trim(row.language),
       code: row.code,

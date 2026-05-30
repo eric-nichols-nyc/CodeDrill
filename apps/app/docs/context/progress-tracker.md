@@ -21,6 +21,7 @@ change.
 
 ## Completed
 
+- problem-visualizer — `LongestSubstringVisualizer` under `visualizer/longest-substring/` (step generator, string window, seen set, registry prefixes `longest-unique-substring` + `longest-substring`)
 - problem-example-images MVP — optional `imageUrl` / `imageAlt` on statement examples; public-folder paths (`/images/…`); admin form preview in `NewProblemForm`; workspace `ExampleItem` display; migration `0003`; S3 upload deferred
 - problem-workspace state management slice 3 — `ChatShell` + `ProblemNotes` read `useWorkspace()`; `ChatPanel` is tab shell only
 - problem-workspace state management slice 2 — `useDirectionsData()` + `buildDirectionsViewModel()`; directions tabs read context via hook; no prop drilling in directions subtree

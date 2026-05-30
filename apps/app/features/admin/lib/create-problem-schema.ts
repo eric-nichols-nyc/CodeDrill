@@ -71,6 +71,7 @@ export const createProblemBodySchema = z.object({
   description: z.string().min(1),
   constraints: z.string().max(50_000).optional(),
   isPublished: z.boolean().optional(),
+  hasVisualizer: z.boolean().optional(),
   patternSlug: z.string().max(200).optional(),
   loopStructure: z.string().max(200).optional(),
   skillFocus: z.string().max(200).optional(),

@@ -665,18 +665,36 @@ export function NewProblemForm({
                 value={values.constraints ?? ""}
               />
             </div>
-            <div className="flex items-center gap-2 sm:col-span-2">
-              <input
-                checked={Boolean(values.isPublished)}
-                className="size-4 rounded border"
-                id="isPublished"
-                onChange={(e) => set("isPublished")(e.target.checked)}
-                type="checkbox"
-              />
-              <Label className="font-normal" htmlFor="isPublished">
-                Published
-              </Label>
+            <div className="flex flex-wrap items-center gap-6 sm:col-span-2">
+              <div className="flex items-center gap-2">
+                <input
+                  checked={Boolean(values.isPublished)}
+                  className="size-4 rounded border"
+                  id="isPublished"
+                  onChange={(e) => set("isPublished")(e.target.checked)}
+                  type="checkbox"
+                />
+                <Label className="font-normal" htmlFor="isPublished">
+                  Published
+                </Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  checked={Boolean(values.hasVisualizer)}
+                  className="size-4 rounded border"
+                  id="hasVisualizer"
+                  onChange={(e) => set("hasVisualizer")(e.target.checked)}
+                  type="checkbox"
+                />
+                <Label className="font-normal" htmlFor="hasVisualizer">
+                  Step visualizer
+                </Label>
+              </div>
             </div>
+            <p className="text-muted-foreground text-xs sm:col-span-2">
+              When enabled, the Solutions tab shows a registered visualizer for
+              this slug (e.g. spiral-matrix, longest-unique-substring).
+            </p>
             <div className="space-y-2">
               <Label htmlFor="patternSlug">Pattern slug (optional)</Label>
               <Input
