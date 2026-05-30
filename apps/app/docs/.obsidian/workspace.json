@@ -185,6 +185,7 @@
   },
   "active": "23f0ef6ec3a5f5df",
   "lastOpenFiles": [
+    "context/features-spec/18-tanstack-query-devtools.md",
     "context/features-spec/11-workspace-refactor.md",
     "context/features-spec/16-workspace-state-management.md",
     "context/features-spec/15-problem-visualizer.md",
@@ -210,7 +211,6 @@
     "context/features-spec/07-problem-chat-ui.md",
     "context/features-spec/12-problem-chat-session-header.md",
     "context/features-spec/12-nav-drawer-list-ui.md",
-    "context/features-spec/12-problem-notes.md",
-    "Untitled.md"
+    "context/features-spec/12-problem-notes.md"
   ]
 }

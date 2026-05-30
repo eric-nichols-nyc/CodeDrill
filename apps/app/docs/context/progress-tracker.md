@@ -9,7 +9,7 @@ change.
 
 ## Current Goal
 
-- _(none — workspace state management slices 1–3 complete on branch `state-management-slice-3-chat`)_
+- _(none — TanStack Query devtools wired on branch `feat/tanstack-query-devtools`)_
 
 ## In Progress
 
@@ -17,10 +17,12 @@ change.
 
 ## Session Notes
 
+- **TanStack Query devtools:** `ReactQueryDevtoolsPanel` registered on `TanStackDevtools` via `components/devtools/tanstack-devtools.tsx`; dev-only in root layout.
 - **Clerk E2E verified:** `/account` → `GET /api/me`. Stage 7 Path A shipped: `resolvePracticeUserId` on `apps/api`, `apiAuthHeaders()` → Clerk, removed Better Auth proxy from app.
 
 ## Completed
 
+- TanStack Query devtools — Query plugin on `@tanstack/react-devtools` shell; `components/devtools/tanstack-devtools.tsx`; spec `18-tanstack-query-devtools.md`
 - problem-visualizer — `LongestSubstringVisualizer` under `visualizer/longest-substring/` (step generator, string window, seen set, registry prefixes `longest-unique-substring` + `longest-substring`)
 - problem-example-images MVP — optional `imageUrl` / `imageAlt` on statement examples; public-folder paths (`/images/…`); admin form preview in `NewProblemForm`; workspace `ExampleItem` display; migration `0003`; S3 upload deferred
 - problem-workspace state management slice 3 — `ChatShell` + `ProblemNotes` read `useWorkspace()`; `ChatPanel` is tab shell only
@@ -55,10 +57,6 @@ change.
 - Admin route wraps `AdminPageShell` in `AdminChatLayout`
 - Feature spec `05-admin-problem-filter.md` (catalog registry, added status, filters)
 - Admin catalog tab on `/admin`: template registry, added/not-added badges, search + difficulty + status filters, `/admin/add?catalogKey=` prefill with stable slug
-
-## In Progress
-
-- None.
 
 ## Next Up
 

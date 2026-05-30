@@ -48,6 +48,7 @@ Every **product feature** under `apps/app/features/<name>/` should have a spec i
 | `auth` | [14-auth.md](./14-auth.md) (Clerk UI + hybrid session model) | `features/auth/`, `app/(unauthenticated)/`, `lib/auth/` | Clerk + `nest-clerk-api`; Better Auth BFF for `apps/api` | **Shipped** (hybrid) |
 | `clerk-neon-auth` | [clerk-neon-auth/](./clerk-neon-auth/README.md) — Stages [2](./clerk-neon-auth/02-clerk-frontend.md), [3](./clerk-neon-auth/03-webhook-provisioning.md) done; [07 BFF migration](./clerk-neon-auth/07-practice-bff-migration.md) next | `apps/app` Clerk UI + `nest-clerk-api` client | **`apps/nest-clerk-api/`** — webhook, `GET /me`; **`apps/api`** practice until Stage 7 | **In progress** — `/account` verified; Stage 7 not started |
 | `problems-page` | [04-problems-page-list-ui.md](./04-problems-page-list-ui.md) (list UI delta) | `features/problems-page/` | catalog + tags + `patternSlug` sections | Shipped |
+| Dev tooling | [18-tanstack-query-devtools.md](./18-tanstack-query-devtools.md) | `components/devtools/` | None | **Shipped** |
 | `landing` | — | `features/landing/` | — | **Spec TODO** |
 | `docs` | — | `features/docs/` | — | **Spec TODO** |
 
