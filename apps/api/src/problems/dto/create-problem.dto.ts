@@ -9,6 +9,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   MaxLength,
   MinLength,
   ValidateNested,
@@ -31,6 +32,21 @@ export class ProblemExampleDto {
   @IsString()
   @MaxLength(50_000)
   explanation?: string;
+
+  /** Public asset path under `apps/app/public`, e.g. `/images/examples/diagram.png` */
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  @Matches(/^\/[^/].*/, {
+    message:
+      "imageUrl must be a public path starting with / (e.g. /images/examples/diagram.png)",
+  })
+  imageUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  imageAlt?: string;
 
   @IsOptional()
   @Type(() => Number)

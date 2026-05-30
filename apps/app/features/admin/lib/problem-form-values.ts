@@ -132,6 +132,8 @@ export function detailToFormValues(
         input: stringField(row?.input),
         output: stringField(row?.output),
         explanation: stringField(row?.explanation),
+        imageUrl: stringField(row?.imageUrl),
+        imageAlt: stringField(row?.imageAlt),
       };
     }),
     starterCode: starterCode.map((entry) => {

@@ -2,10 +2,27 @@ import { z } from "zod";
 
 export const difficultySchema = z.enum(["easy", "medium", "hard"]);
 
+const publicImagePathSchema = z
+  .string()
+  .max(500)
+  .optional()
+  .refine(
+    (value) =>
+      value === undefined ||
+      value.trim() === "" ||
+      (value.startsWith("/") && !value.startsWith("//")),
+    {
+      message:
+        "Image path must start with / (public folder, e.g. /images/examples/diagram.png)",
+    }
+  );
+
 export const problemExampleSchema = z.object({
   input: z.string().min(1).max(50_000),
   output: z.string().min(1).max(50_000),
   explanation: z.string().max(50_000).optional(),
+  imageUrl: publicImagePathSchema,
+  imageAlt: z.string().max(500).optional(),
   sortOrder: z.number().int().optional(),
 });
 

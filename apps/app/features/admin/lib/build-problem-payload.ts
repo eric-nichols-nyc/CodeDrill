@@ -65,6 +65,8 @@ export function buildProblemPayload(
       ...(trim(row.explanation ?? "")
         ? { explanation: trim(row.explanation ?? "") }
         : {}),
+      ...(trim(row.imageUrl ?? "") ? { imageUrl: trim(row.imageUrl ?? "") } : {}),
+      ...(trim(row.imageAlt ?? "") ? { imageAlt: trim(row.imageAlt ?? "") } : {}),
       ...(row.sortOrder !== undefined ? { sortOrder: row.sortOrder } : {}),
     }))
     .filter((row) => row.input && row.output);

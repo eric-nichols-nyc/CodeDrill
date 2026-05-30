@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AdminEditorialQuill } from "@/features/admin/components/admin-editorial-quill";
 import { DevAdminProblemFill } from "@/features/admin/components/dev-admin-problem-fill";
+import { ExampleImagePreview } from "@/features/admin/components/example-image-preview";
 import { GenerateProblemFromPrompt } from "@/features/admin/components/generate-problem-from-prompt";
 import {
   buildProblemPayload,
@@ -52,6 +53,8 @@ function createExampleRow(): ExampleRow {
     input: "",
     output: "",
     explanation: "",
+    imageUrl: "",
+    imageAlt: "",
   };
 }
 
@@ -986,6 +989,44 @@ export function NewProblemForm({
                           )(e.target.value)
                         }
                         value={row.explanation ?? ""}
+                      />
+                    </div>
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor={`example-image-path-${index}`}>
+                        Image path (optional)
+                      </Label>
+                      <Input
+                        className="font-mono text-sm"
+                        id={`example-image-path-${index}`}
+                        onChange={(e) =>
+                          updateExampleField(index, "imageUrl")(e.target.value)
+                        }
+                        placeholder="/images/examples/diagram.png"
+                        value={row.imageUrl ?? ""}
+                      />
+                      <p className="text-muted-foreground text-xs">
+                        Path under{" "}
+                        <code className="text-xs">apps/app/public</code> — add
+                        the file to the repo, then reference it here.
+                      </p>
+                      {row.imageUrl?.trim() ? (
+                        <ExampleImagePreview
+                          alt={row.imageAlt}
+                          src={row.imageUrl}
+                        />
+                      ) : null}
+                    </div>
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor={`example-image-alt-${index}`}>
+                        Image alt text (optional)
+                      </Label>
+                      <Input
+                        id={`example-image-alt-${index}`}
+                        onChange={(e) =>
+                          updateExampleField(index, "imageAlt")(e.target.value)
+                        }
+                        placeholder="Spiral traversal on a 3×3 matrix"
+                        value={row.imageAlt ?? ""}
                       />
                     </div>
                   </div>

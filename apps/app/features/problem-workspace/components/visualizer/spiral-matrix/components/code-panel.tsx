@@ -11,7 +11,7 @@ type CodePanelProps = {
  */
 export function CodePanel({ lines, activeLine }: CodePanelProps) {
   return (
-    <pre className="overflow-x-auto rounded-xl bg-muted p-4 font-mono text-foreground text-sm shadow-inner">
+    <pre className="overflow-x-auto rounded-xl bg-muted p-4 font-mono text-foreground text-xs leading-tight shadow-inner">
       {lines.map((line, index) => {
         const lineNumber = index + 1;
         const isActive = lineNumber === activeLine;
@@ -19,7 +19,7 @@ export function CodePanel({ lines, activeLine }: CodePanelProps) {
         return (
           <div
             className={cn(
-              "px-2 py-1",
+              "px-2 py-0",
               isActive ? "rounded bg-primary text-primary-foreground" : ""
             )}
             key={`line-${lineNumber}`}

@@ -62,6 +62,8 @@ export const problemExamples = pgTable(
     input: text("input").notNull(),
     output: text("output").notNull(),
     explanation: text("explanation"),
+    imageUrl: text("image_url"),
+    imageAlt: text("image_alt"),
     sortOrder: integer("sort_order").notNull().default(0),
   },
   (t) => ({

@@ -31,7 +31,7 @@ export function MatrixGrid({
 
   return (
     <div
-      className="grid gap-3"
+      className="grid gap-2.5"
       style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
     >
       {matrix.flatMap((row, rowIndex) =>
@@ -43,7 +43,7 @@ export function MatrixGrid({
           return (
             <div
               className={cn(
-                "flex h-20 w-20 items-center justify-center rounded-xl border font-bold text-2xl transition-all",
+                "flex h-16 w-16 items-center justify-center rounded-xl border font-bold text-xl transition-all",
                 cellClassName(isCurrent, isVisited)
               )}
               key={`cell-${rowIndex}-${colIndex}`}

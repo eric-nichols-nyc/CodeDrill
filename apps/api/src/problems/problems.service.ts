@@ -315,6 +315,8 @@ export class ProblemsService {
           input: example.input,
           output: example.output,
           explanation: trimToUndefined(example.explanation),
+          imageUrl: trimToUndefined(example.imageUrl),
+          imageAlt: trimToUndefined(example.imageAlt),
           sortOrder: example.sortOrder ?? index,
         }))
       );

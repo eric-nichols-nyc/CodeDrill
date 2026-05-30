@@ -8,6 +8,7 @@ import { BoundsPanel } from "./bounds-panel";
 import { CodePanel } from "./code-panel";
 import { MatrixGrid } from "./matrix-grid";
 import { ResultArray } from "./result-array";
+import { StepExplanationPanel } from "./step-explanation-panel";
 import { VisualizerControls } from "./visualizer-controls";
 
 /**
@@ -38,6 +39,12 @@ export function SpiralMatrixVisualizer() {
             <Badge variant="secondary">Direction: {step.direction}</Badge>
           </div>
           <CodePanel activeLine={step.activeLine} lines={SPIRAL_CODE_LINES} />
+
+          <StepExplanationPanel
+            explanation={step.explanation}
+            stepIndex={stepIndex}
+            totalSteps={totalSteps}
+          />
         </CardContent>
       </Card>
 
@@ -59,13 +66,6 @@ export function SpiralMatrixVisualizer() {
             stepIndex={stepIndex}
             totalSteps={totalSteps}
           />
-
-          <div className="rounded-xl border border-border bg-muted/40 p-4">
-            <div className="mb-2 font-semibold text-muted-foreground text-sm">
-              Step {stepIndex + 1} of {totalSteps}
-            </div>
-            <p className="font-medium text-lg">{step.explanation}</p>
-          </div>
 
           <div>
             <h2 className="mb-3 font-bold text-muted-foreground text-sm uppercase tracking-wide">

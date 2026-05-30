@@ -26,13 +26,13 @@ export function VisualizerControls({
   return (
     <div className="flex items-center justify-center gap-3">
       <Button disabled={isFirst} onClick={onPrev} variant="outline">
-        <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+        <ChevronLeft className="mr-2 h-4 w-4" />
       </Button>
       <Button disabled={isLast} onClick={onNext}>
-        Next <ChevronRight className="ml-2 h-4 w-4" />
+         <ChevronRight className="ml-2 h-4 w-4" />
       </Button>
       <Button onClick={onReset} variant="ghost">
-        <RotateCcw className="mr-2 h-4 w-4" /> Reset
+        <RotateCcw className="mr-2 h-4 w-4" />
       </Button>
     </div>
   );

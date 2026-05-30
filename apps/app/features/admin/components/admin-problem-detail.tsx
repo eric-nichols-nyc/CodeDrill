@@ -8,6 +8,7 @@ import {
 } from "@repo/design-system/components/ui/accordion";
 import { Badge } from "@repo/design-system/components/ui/badge";
 import type { AdminProblemDetail as AdminProblemDetailData } from "@/features/admin/lib/problem-form-values";
+import { ExampleImagePreview } from "@/features/admin/components/example-image-preview";
 import {
   isProblemEditorialEmpty,
   parseProblemEditorial,
@@ -230,6 +231,27 @@ export function AdminProblemDetail({
                     key={`example-${index}`}
                   >
                     <p className="font-medium text-sm">Example {index + 1}</p>
+                    {typeof row?.imageUrl === "string" && row.imageUrl.length > 0 ? (
+                      <div className="mt-3 space-y-1">
+                        <p className="font-medium text-xs uppercase tracking-wide">
+                          Illustration
+                        </p>
+                        <ExampleImagePreview
+                          alt={
+                            typeof row.imageAlt === "string"
+                              ? row.imageAlt
+                              : undefined
+                          }
+                          src={row.imageUrl}
+                        />
+                        {typeof row.imageAlt === "string" &&
+                        row.imageAlt.length > 0 ? (
+                          <p className="text-muted-foreground text-xs">
+                            Alt: {row.imageAlt}
+                          </p>
+                        ) : null}
+                      </div>
+                    ) : null}
                     <p className="mt-3 font-medium text-xs uppercase tracking-wide">
                       Input
                     </p>
