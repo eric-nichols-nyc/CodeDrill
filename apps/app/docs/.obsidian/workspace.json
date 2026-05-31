@@ -11,14 +11,10 @@
             "id": "23f0ef6ec3a5f5df",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "context/features-spec/17-problem-example-images.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "17-problem-example-images"
+              "title": "New tab"
             }
           }
         ]
@@ -185,6 +181,16 @@
   },
   "active": "23f0ef6ec3a5f5df",
   "lastOpenFiles": [
+    "context/features-spec/learning-visualizer/00-overview.md",
+    "context/features-spec/learning-visualizer/00.overview",
+    "context/features-spec/learning-visualizer",
+    "reference/react-context.md",
+    "reference/tanstack-query.md",
+    "context/features-spec/17-problem-example-images.md",
+    "reference/00-index.md",
+    "reference/README.md",
+    "reference",
+    "context/features-spec/18-tanstack-query-devtools.md",
     "context/features-spec/11-workspace-refactor.md",
     "context/features-spec/16-workspace-state-management.md",
     "context/features-spec/15-problem-visualizer.md",
@@ -204,13 +210,6 @@
     "context/features-spec/13-problem-chat-starter-suggestions.md",
     "context/features-spec/14-auth.md",
     "context/features-spec/ai/problem-chat/12-problem-chat-session-header.md",
-    "context/features-spec/ai/problem-chat/09-problem-chat-streaming.md",
-    "context/features-spec/ai/problem-chat/07-problem-chat-ui.md",
-    "context/features-spec/09-problem-chat-streaming.md",
-    "context/features-spec/07-problem-chat-ui.md",
-    "context/features-spec/12-problem-chat-session-header.md",
-    "context/features-spec/12-nav-drawer-list-ui.md",
-    "context/features-spec/12-problem-notes.md",
-    "Untitled.md"
+    "context/features-spec/ai/problem-chat/09-problem-chat-streaming.md"
   ]
 }
