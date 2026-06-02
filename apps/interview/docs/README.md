@@ -8,13 +8,9 @@ Developer notes for **`apps/interview`** (AI Interview Coach zone).
 | [AGENTS.md](./AGENTS.md) | Agent entry point and read order |
 | [context/progress-tracker.md](./context/progress-tracker.md) | Current phase and session notes |
 
-Static prototype routes (dev: `http://localhost:3012/interview`):
+Static prototype — single flow at `/interview` (create → overview → question → feedback → report).
 
 | Route | Screen |
 |-------|--------|
-| `/` | Landing + screen index |
-| `/create` | Create Interview |
-| `/overview` | Interview Overview |
-| `/session` | Question Player |
-| `/feedback` | Per-question Feedback |
-| `/report` | Final Report |
+| `/` | Landing |
+| `/interview` | Full prototype flow (`InterviewCoach`) |

@@ -15,7 +15,7 @@ Follow **[context/ai-workflow-rules.md](./context/ai-workflow-rules.md)** for sc
 
 | Area | Path | Role |
 |------|------|------|
-| **This app** | `apps/interview` | Interview UI zone (`basePath: /interview`), static prototype → MVP |
+| **This app** | `apps/interview` | Interview UI (`/` landing, `/interview` prototype flow) |
 | **Host app** | `apps/app` | CodeDrill main app; links here via `NEXT_PUBLIC_INTERVIEW_URL` |
 | **Design system** | `packages/design-system` | shadcn/ui primitives — do not fork under `apps/interview` |
 
@@ -29,7 +29,7 @@ Follow **[context/ai-workflow-rules.md](./context/ai-workflow-rules.md)** for sc
 ## Commands (`apps/interview`)
 
 ```sh
-pnpm dev          # http://localhost:3012/interview
+pnpm dev          # http://localhost:3012
 pnpm build
 pnpm typecheck
 ```
@@ -45,7 +45,7 @@ pnpm dev:interview
 - **Spec-driven:** Do not invent behavior missing from `prd.md`. Ambiguity → note in `context/progress-tracker.md`.
 - **UI:** `@repo/design-system/components/ui/*`; colocate features under `apps/interview/features/<area>/`.
 - **Next.js:** Prefer Server Components; add `"use client"` only for browser APIs and interactivity.
-- **Multi-zone:** This app uses `basePath: /interview`. Cross-zone links from `apps/app` must use plain `<a href="...">`, not `next/link`, when targeting another zone.
+- **Cross-app links:** From `apps/app`, link to this app with plain `<a href="...">` and `NEXT_PUBLIC_INTERVIEW_URL` (separate origin in dev).
 - **Routes:** Keep `app/` routes thin; page composition in `features/`.
 
 ## Protected (unless explicitly asked)

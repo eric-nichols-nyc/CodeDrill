@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  "http://localhost:3012/interview";
+  "http://localhost:3012";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

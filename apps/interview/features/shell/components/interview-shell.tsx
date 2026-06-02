@@ -21,9 +21,9 @@ export function InterviewShell({ children, className }: InterviewShellProps) {
           <nav className="flex items-center gap-4 text-sm">
             <Link
               className="text-muted-foreground transition-colors hover:text-foreground"
-              href="/create"
+              href="/interview"
             >
-              Create
+              Interview
             </Link>
             <a
               className="text-muted-foreground transition-colors hover:text-foreground"

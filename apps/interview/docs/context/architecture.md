@@ -4,8 +4,8 @@
 
 | Environment | Interview zone (`apps/interview`) | Host (`apps/app`) |
 | ----------- | --------------------------------- | ----------------- |
-| Local dev   | `http://localhost:3012/interview` | `http://localhost:3010` |
-| Production  | TBD — multi-zone rewrite to `/interview` on host | CodeDrill primary |
+| Local dev   | `http://localhost:3012` (`/` landing, `/interview` flow) | `http://localhost:3010` |
+| Production  | TBD — subdomain or path rewrite on host | CodeDrill primary |
 
 ## Stack (current / planned)
 
@@ -25,11 +25,12 @@
 - `apps/app/` — Host app; nav link to interview zone
 - `apps/api` / new services — Future API for persistence and AI (not chosen yet)
 
-## Multi-zone
+## Routing
 
-- **`basePath`:** `/interview` in `apps/interview/next.config.ts`
-- **Host rewrites:** Not configured yet on `apps/app` — dev uses separate port
-- **Cross-zone links:** Plain `<a>` from host; `next/link` is fine within the zone
+- **`/`** — landing page
+- **`/interview`** — prototype flow (`InterviewCoach`)
+- **Host integration:** Not configured yet on `apps/app` — dev uses separate port (`3012`)
+- **Cross-app links:** Plain `<a>` from CodeDrill with `NEXT_PUBLIC_INTERVIEW_URL`
 
 ## Invariants
 

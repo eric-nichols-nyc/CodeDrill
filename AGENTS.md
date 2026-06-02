@@ -24,7 +24,7 @@ This repo is a **pnpm + Turborepo** monorepo. Shared workspace packages are impo
 | Path | Role |
 |------|------|
 | `apps/app` | Next.js UI (marketing, problems, workspace, admin) — multi-zone host |
-| `apps/interview` | AI Interview Coach zone (`basePath: /interview`, port 3012 in dev) |
+| `apps/interview` | AI Interview Coach app (port 3012 in dev; `/` landing, `/interview` flow) |
 | `apps/api` | NestJS practice API (catalog, auth, Drizzle/Postgres) |
 | `packages/design-system` | shadcn/ui primitives for `@repo/design-system` |
 

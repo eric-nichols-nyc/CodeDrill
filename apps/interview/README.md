@@ -1,19 +1,19 @@
 # AI Interview Coach (`apps/interview`)
 
-Next.js zone app for personalized mock interviews. Mounted at **`/interview`** (`basePath`).
+Next.js app for personalized mock interviews. Dev server on port **3012**.
 
 ## Quick start
 
 ```sh
 # From repo root
 pnpm install
-pnpm dev:interview   # apps/app (:3010) + apps/interview (:3012/interview)
+pnpm dev:interview   # apps/app (:3010) + apps/interview (:3012)
 
 # Or interview app only
 cd apps/interview && pnpm dev
 ```
 
-Open [http://localhost:3012/interview](http://localhost:3012/interview).
+Open [http://localhost:3012](http://localhost:3012) (landing) or [http://localhost:3012/interview](http://localhost:3012/interview) (prototype flow).
 
 ## Docs
 
