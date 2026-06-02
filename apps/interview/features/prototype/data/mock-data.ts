@@ -29,6 +29,94 @@ export const mockInterview = {
   ],
 } as const;
 
+export const mockCandidateProfile = {
+  name: "Alex Chen",
+  summary:
+    "Frontend engineer with ~6 years building product UI at high-traffic SaaS companies.",
+  skills: [
+    "React",
+    "TypeScript",
+    "Next.js",
+    "Performance",
+    "Testing",
+    "Design systems",
+  ],
+  highlights: [
+    "Led dashboard performance initiative (LCP improvements in production)",
+    "Built and maintained shared component libraries",
+    "Mentored junior engineers on React patterns and code review",
+  ],
+  claimsToVerify: [
+    "Deep React hooks knowledge (useEffect vs useLayoutEffect)",
+    "Real-time / collaborative UI experience",
+    "Production performance debugging workflow",
+  ],
+  potentialGaps: [
+    "Advanced TypeScript generic patterns",
+    "Large-scale system design vocabulary",
+    "Browser rendering internals at depth",
+  ],
+} as const;
+
+export const mockJobAnalysis = {
+  company: mockInterview.company,
+  role: mockInterview.jobTitle,
+  seniority: "Senior",
+  requiredSkills: [
+    "React",
+    "TypeScript",
+    "Accessibility",
+    "Testing",
+    "Performance",
+  ],
+  focusAreas: [
+    "Deep React internals and hook semantics",
+    "Performance optimization at scale",
+    "Accessible, production-grade UI",
+    "System design for real-time features",
+  ],
+  interviewEmphasis:
+    "Depth over trivia — expect tradeoff questions and experience-backed answers.",
+} as const;
+
+export const mockQuestionPlan = [
+  {
+    topic: "React & Hooks",
+    reason:
+      "JD stresses React depth; resume mentions custom dropdown and layout-sensitive UI work.",
+  },
+  {
+    topic: "Performance Optimization",
+    reason:
+      "Role requires scaling frontend performance; profile highlights LCP improvements.",
+  },
+  {
+    topic: "TypeScript",
+    reason:
+      "Senior bar expects type-safe API design; gap analysis flagged advanced generics.",
+  },
+  {
+    topic: "CSS & Accessibility",
+    reason:
+      "Stripe-style roles prioritize accessible product UI; modal/focus patterns are common.",
+  },
+  {
+    topic: "System Design",
+    reason:
+      "JD mentions collaboration features; resume claims real-time UI — verify depth.",
+  },
+  {
+    topic: "Testing Strategies",
+    reason:
+      "Senior ICs own quality; match form/async testing to your component-heavy background.",
+  },
+  {
+    topic: "React & Hooks",
+    reason:
+      "Second React question probes implementation skill (Intersection Observer) beyond theory.",
+  },
+] as const;
+
 export const mockQuestions: MockQuestion[] = [
   {
     id: 1,

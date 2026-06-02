@@ -52,7 +52,7 @@ export function ScreenCreateInterview({ onNext }: ScreenCreateInterviewProps) {
             <Upload className="size-8 text-muted-foreground" />
             <span className="font-medium text-sm">Drop resume here or browse</span>
             <span className="text-muted-foreground text-xs">
-              resume.pdf (mock)
+              alex-chen-resume.pdf (mock)
             </span>
           </button>
         </CardContent>
@@ -66,7 +66,7 @@ export function ScreenCreateInterview({ onNext }: ScreenCreateInterviewProps) {
           <Label htmlFor="job-description">Paste the role requirements</Label>
           <Textarea
             className="min-h-32"
-            defaultValue="Senior Frontend Engineer — React, TypeScript, Next.js, system design, mentoring..."
+            defaultValue="Senior Frontend Engineer at Stripe — React, TypeScript, Next.js, accessibility, testing, performance at scale, mentoring. Build customer-facing UI with high quality bar..."
             id="job-description"
             placeholder="Paste job description..."
           />
