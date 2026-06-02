@@ -2,6 +2,12 @@
 
 Quick map of learn-by-reading notes. For build specs, use [[../context/features-spec/00-index|features-spec index]] instead.
 
+## Documentation system
+
+| Topic | Note |
+| ----- | ---- |
+| AGENTS.md + Cursor rules + feature specs | [[agents-cursorrules-feature-specs]] |
+
 ## Stack & patterns
 
 | Topic | Note |
