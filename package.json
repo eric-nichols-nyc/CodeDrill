@@ -6,6 +6,7 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "dev:stack": "turbo dev --filter=./apps/api --filter=./apps/app",
+    "dev:interview": "turbo dev --filter=./apps/app --filter=./apps/interview",
     "dev:zones": "turbo dev --filter=with-zones --filter=with-arcjet --filter=with-optimization --filter=with-scalable --filter=render-lab",
     "check": "npx ultracite@latest check",
     "fix": "npx ultracite@latest fix",

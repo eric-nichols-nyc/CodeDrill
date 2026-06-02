@@ -7,6 +7,7 @@ import { cn } from "@repo/design-system/lib/utils";
 import Link from "next/link";
 import { AppBrandLink } from "@/components/app-brand-link";
 import { AppHeaderInner } from "@/components/app-header-inner";
+import { interviewZoneUrl } from "@/lib/interview-zone-url";
 
 export type LandingHeaderProps = {
   className?: string;
@@ -31,6 +32,9 @@ export function LandingHeader({ className }: LandingHeaderProps) {
         <nav className="flex items-center gap-1 sm:gap-2">
           <Button asChild className="hidden sm:inline-flex" variant="ghost">
             <Link href="/problems">Problems</Link>
+          </Button>
+          <Button asChild className="hidden sm:inline-flex" variant="ghost">
+            <a href={interviewZoneUrl}>Interview</a>
           </Button>
           <ModeToggle />
           <UserMenu />

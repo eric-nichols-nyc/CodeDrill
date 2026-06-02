@@ -7,4 +7,4 @@ Before implementing or refactoring in this app, read and follow:
 
 Use the read order and feature UI rules defined in `docs/AGENTS.md`.
 
-**Monorepo scope:** Only `apps/app/`, `apps/api/`, and `packages/design-system/` — never search or edit other `apps/*` or `packages/*` unless the user explicitly expands scope. See repo-root [`AGENTS.md`](../../AGENTS.md).
+**Monorepo scope:** `apps/app/`, `apps/api/`, `apps/interview/`, and `packages/design-system/` — never search or edit other `apps/*` or `packages/*` unless the user explicitly expands scope. See repo-root [`AGENTS.md`](../../AGENTS.md).

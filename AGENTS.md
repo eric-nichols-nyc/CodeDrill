@@ -8,6 +8,7 @@ Default in-scope paths:
 
 - `apps/app/`
 - `apps/api/`
+- `apps/interview/`
 - `packages/design-system/`
 
 Do not search, read, or edit other folders under `apps/` or `packages/` unless the user explicitly expands scope. Treat other apps and packages as out of scope to save token limits.
@@ -22,7 +23,8 @@ This repo is a **pnpm + Turborepo** monorepo. Shared workspace packages are impo
 
 | Path | Role |
 |------|------|
-| `apps/app` | Next.js UI (marketing, problems, workspace, admin) |
+| `apps/app` | Next.js UI (marketing, problems, workspace, admin) — multi-zone host |
+| `apps/interview` | AI Interview Coach zone (`basePath: /interview`, port 3012 in dev) |
 | `apps/api` | NestJS practice API (catalog, auth, Drizzle/Postgres) |
 | `packages/design-system` | shadcn/ui primitives for `@repo/design-system` |
 
@@ -49,6 +51,12 @@ For **API-only work** (`apps/api`):
 2. Align API changes with [`apps/app/docs/prd.md`](./apps/app/docs/prd.md) and context files when requirements are unclear.
 
 Agent reference docs (optional, task-specific): [`apps/app/docs/reference/`](./apps/app/docs/reference/).
+
+For **interview zone work** (`apps/interview`):
+
+1. Read [`apps/interview/AGENTS.md`](./apps/interview/AGENTS.md)
+2. Read [`apps/interview/docs/AGENTS.md`](./apps/interview/docs/AGENTS.md) and [`apps/interview/docs/prd.md`](./apps/interview/docs/prd.md)
+3. Read [`apps/interview/docs/context/progress-tracker.md`](./apps/interview/docs/context/progress-tracker.md)
 
 ## Rules
 
