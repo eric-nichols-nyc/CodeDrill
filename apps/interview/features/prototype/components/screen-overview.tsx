@@ -1,6 +1,6 @@
 "use client";
 
-import { mockInterview, mockQuestions } from "@/features/prototype/data/mock-data";
+import { mockInterview } from "@/features/prototype/data/mock-data";
 import { Badge } from "@repo/design-system/components/ui/badge";
 import { Button } from "@repo/design-system/components/ui/button";
 import {
@@ -32,20 +32,18 @@ export function ScreenOverview({ onNext }: ScreenOverviewProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>{mockInterview.role}</CardTitle>
+          <CardTitle>{mockInterview.jobTitle}</CardTitle>
           <CardDescription>{mockInterview.company}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <dl className="grid gap-3 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-muted-foreground">Questions</dt>
-              <dd className="font-medium">{mockQuestions.length}</dd>
+              <dd className="font-medium">{mockInterview.totalQuestions}</dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Estimated duration</dt>
-              <dd className="font-medium">
-                ~{mockInterview.estimatedMinutes} min
-              </dd>
+              <dd className="font-medium">{mockInterview.estimatedTime}</dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Difficulty</dt>

@@ -1,6 +1,7 @@
 "use client";
 
 import { mockFinalReport } from "@/features/prototype/data/mock-data";
+import { Badge } from "@repo/design-system/components/ui/badge";
 import { Button } from "@repo/design-system/components/ui/button";
 import {
   Card,
@@ -9,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/design-system/components/ui/card";
+import { Flag } from "lucide-react";
 
 type ScreenFinalReportProps = {
   onRetake: () => void;
@@ -29,7 +31,9 @@ export function ScreenFinalReport({ onRetake }: ScreenFinalReportProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Overall score: {mockFinalReport.overallScore}%</CardTitle>
+          <CardTitle>
+            Overall score: {mockFinalReport.overallScore}% ({mockFinalReport.grade})
+          </CardTitle>
           <CardDescription>Mock interview complete</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
@@ -46,24 +50,29 @@ export function ScreenFinalReport({ onRetake }: ScreenFinalReportProps) {
             </p>
           </div>
           <div>
-            <p className="mb-1 font-medium">Red flags</p>
-            <p className="text-muted-foreground">
-              {mockFinalReport.redFlags.join(" · ")}
-            </p>
-          </div>
-          <div>
-            <p className="mb-1 font-medium">Questions to revisit</p>
-            <p className="text-muted-foreground">
-              {mockFinalReport.questionsToRevisit.join(", ")}
-            </p>
-          </div>
-          <div>
-            <p className="mb-1 font-medium">Recommended study topics</p>
-            <ul className="list-inside list-disc text-muted-foreground">
-              {mockFinalReport.studyRecommendations.map((topic) => (
-                <li key={topic}>{topic}</li>
+            <p className="mb-2 font-medium">Question breakdown</p>
+            <ul className="space-y-2">
+              {mockFinalReport.questionSummary.map((item) => (
+                <li
+                  className="flex items-center justify-between gap-2 rounded-lg border bg-muted/30 px-3 py-2"
+                  key={item.id}
+                >
+                  <span className="text-foreground">{item.topic}</span>
+                  <span className="flex items-center gap-2">
+                    {item.flagged ? (
+                      <Flag className="size-3.5 text-amber-600" />
+                    ) : null}
+                    <Badge variant="secondary">{item.score}</Badge>
+                  </span>
+                </li>
               ))}
             </ul>
+          </div>
+          <div>
+            <p className="mb-1 font-medium">Recommendation</p>
+            <p className="text-muted-foreground leading-relaxed">
+              {mockFinalReport.recommendation}
+            </p>
           </div>
         </CardContent>
       </Card>
