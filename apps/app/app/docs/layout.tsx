@@ -1,11 +1,12 @@
+import type { ReactNode } from "react";
 import { DocsSidebar } from "@/features/docs/components/docs-sidebar";
 import { LandingHeader } from "@/features/landing/components/landing-header";
 
 export default function DocsLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
-}>) {
+  children: ReactNode;
+}>): ReactNode {
   return (
     <div className="flex min-h-screen flex-col bg-background lg:h-dvh lg:overflow-hidden">
       <LandingHeader />

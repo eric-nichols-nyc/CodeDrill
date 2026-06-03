@@ -1,10 +1,11 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 export default function UnauthenticatedLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
-}>) {
+  children: ReactNode;
+}>): ReactNode {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-border border-b">
