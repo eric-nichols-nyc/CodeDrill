@@ -8,6 +8,8 @@
 
 **Out of scope (this system):** Interview questions, candidate scoring, resume comparison, per-answer or final feedback — owned by Generator, Evaluation, and Final Report.
 
+**Implementation plan:** [03-job-analysis-implementation.md](../implementation/03-job-analysis-implementation.md)
+
 ---
 
 ## Purpose

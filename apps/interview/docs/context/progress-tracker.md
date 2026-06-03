@@ -31,6 +31,7 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
+- Job Analysis slice — follow [03-job-analysis-implementation.md](../implementation/03-job-analysis-implementation.md) (after Profile E2E on Neon)
 - Multi-zone rewrites on `apps/app` (single origin `/interview`)
 - Flesh out Screen 1 form UI (resume upload, JD textarea, difficulty)
 - Resolve PRD open questions via prototype review

@@ -16,6 +16,7 @@ Developer notes for **`apps/interview`** (AI Interview Coach zone).
 | Doc | Description |
 |-----|-------------|
 | [feature-specs/](./feature-specs/) | Per-system specs (profile, job analysis, generator, player, evaluation, report, AI flow) |
+| [implementation/03-job-analysis-implementation.md](./implementation/03-job-analysis-implementation.md) | Job Analysis vertical slice — phases, API, checklist |
 | [architecture/overview.md](./architecture/overview.md) | Systems, journey, MVP boundaries |
 | [architecture/ai-flow.md](./architecture/ai-flow.md) | Intelligent steps — inputs, outputs, consumers |
 | [architecture/data-contracts.md](./architecture/data-contracts.md) | TypeScript contracts between systems |
