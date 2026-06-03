@@ -24,3 +24,42 @@ export type CandidateProfile = ProfilePayload & {
   createdAt: string;
   updatedAt: string;
 };
+
+export type ConfidenceLevel = "Low" | "Medium" | "High";
+
+export type SeniorityLevel = {
+  level: string;
+  confidence: ConfidenceLevel;
+};
+
+export type HiddenExpectation = {
+  expectation: string;
+  reason: string;
+};
+
+export type SuggestedQuestionAngle = {
+  category: string;
+  angle: string;
+};
+
+export type JobAnalysisPayload = {
+  companyName: string;
+  roleTitle: string;
+  roleSummary: string;
+  requiredSkills: string[];
+  niceToHaveSkills: string[];
+  seniorityLevel: SeniorityLevel;
+  likelyInterviewCategories: string[];
+  mustProve: string[];
+  hiddenExpectations: HiddenExpectation[];
+  interviewSignals: string[];
+  suggestedQuestionAngles: SuggestedQuestionAngle[];
+};
+
+export type JobAnalysis = JobAnalysisPayload & {
+  id: string;
+  jobDescription: string;
+  jobUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+};

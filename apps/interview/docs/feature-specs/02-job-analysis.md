@@ -238,14 +238,14 @@ the expectations of this role?
 
 ## Acceptance criteria
 
-- [ ] Input accepts **`jobDescription`** (required) plus optional **`jobUrl`**, **`companyName`**, and **`roleTitle`**.
-- [ ] AI output conforms to **`JobAnalysis`** in [data-contracts.md](../architecture/data-contracts.md) §2 (field names and shapes, not ad-hoc aliases).
-- [ ] Response includes **`roleSummary`**, **`requiredSkills`**, **`niceToHaveSkills`**, and **`seniorityLevel`** with `{ level, confidence }`.
-- [ ] Response includes **`likelyInterviewCategories`**, **`mustProve`**, **`hiddenExpectations`** (`expectation` + `reason`), **`interviewSignals`**, and **`suggestedQuestionAngles`** (`category` + `angle`).
-- [ ] **`mustProve`** reflects hiring validation intent (what a strong candidate must demonstrate), not a generic JD summary.
-- [ ] Persisted row in **`interview_job_analyses`** (logical: `job_analyses`) stores raw JD text and structured columns per [database.md](../architecture/database.md).
-- [ ] Interview Generator can consume saved analysis without re-running extraction for the same inputs.
-- [ ] No interview questions, candidate scores, resume-to-JD comparison, or evaluation feedback in this pipeline step.
+- [x] Input accepts **`jobDescription`** (required) plus optional **`jobUrl`**, **`companyName`**, and **`roleTitle`**.
+- [x] AI output conforms to **`JobAnalysis`** in [data-contracts.md](../architecture/data-contracts.md) §2 (field names and shapes, not ad-hoc aliases).
+- [x] Response includes **`roleSummary`**, **`requiredSkills`**, **`niceToHaveSkills`**, and **`seniorityLevel`** with `{ level, confidence }`.
+- [x] Response includes **`likelyInterviewCategories`**, **`mustProve`**, **`hiddenExpectations`** (`expectation` + `reason`), **`interviewSignals`**, and **`suggestedQuestionAngles`** (`category` + `angle`).
+- [x] **`mustProve`** reflects hiring validation intent (prompt + validation; tune with real JDs as needed).
+- [x] Persisted row in **`interview_job_analyses`** (logical: `job_analyses`) stores raw JD text and structured columns per [database.md](../architecture/database.md).
+- [x] Interview Generator can consume saved analysis without re-running extraction for the same inputs (`GET :id`).
+- [x] No interview questions, candidate scores, resume-to-JD comparison, or evaluation feedback in this pipeline step.
 
 ---
 

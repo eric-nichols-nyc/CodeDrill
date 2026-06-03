@@ -78,6 +78,9 @@ export function AuthUserMenu() {
         <DropdownMenuItem asChild>
           <Link href="/profile">Profile</Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/job-analysis">Job analysis</Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={onSignOut}>Sign out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

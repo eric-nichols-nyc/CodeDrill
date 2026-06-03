@@ -35,4 +35,4 @@ Related: [database.md](./database.md), [data-contracts.md](./data-contracts.md).
 
 **Auth:** `ProblemsUserGuard` → Clerk `sub` as `user_id`.
 
-**Interview app (planned):** Server Actions in `features/job-analysis/actions.ts`; page `/job-analysis`.
+**Interview app:** Server Actions in `features/job-analysis/actions.ts`; page `/job-analysis`.

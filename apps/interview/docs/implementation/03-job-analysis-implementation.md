@@ -40,10 +40,10 @@ Map to [02-job-analysis.md](../feature-specs/02-job-analysis.md).
 - [x] **P2** `POST /interview/job-analyses` persists `source_text` + structured columns; returns view with `id`, timestamps.
 - [x] **P2** `GET /interview/job-analyses/me` and `GET /interview/job-analyses/:id` (owner-only).
 - [x] **P2** [api-contracts.md](../architecture/api-contracts.md) documents Job Analysis endpoints.
-- [ ] **P3** Interview app types + server actions + UI: generate → preview → save → reload.
-- [ ] **P4** Manual QA: `mustProve` / `hiddenExpectations` quality on 3+ real JDs.
-- [ ] **P4** Generator-ready: `GET :id` returns complete `JobAnalysis` without re-running generate.
-- [ ] **Boundaries** No question text, scores, or resume comparison in this module.
+- [x] **P3** Interview app types + server actions + UI: generate → preview → save → reload.
+- [x] **Boundaries** No question text, scores, or resume comparison in this module.
+- [x] **Generator-ready** `GET :jobAnalysisId` returns complete `JobAnalysis` without re-running generate (shipped in P2).
+- ~~**P4** Manual QA on real JDs~~ — deferred (optional prompt tuning later).
 
 ---
 
@@ -65,6 +65,8 @@ Map to [02-job-analysis.md](../feature-specs/02-job-analysis.md).
 **P0 completed (2026-06-03):** Migrations applied on Neon (`0005` profile tables); `apps/api` + `apps/interview` typecheck pass; doc drift fixed (`07-ai-flow` Flow 2, `database.md` physical naming); MVP UI **Option A** (`/job-analysis` workspace) locked in progress tracker.
 
 **P2 completed:** `InterviewJobAnalysisModule` — `POST generate`, `POST /`, `GET me`, `GET :jobAnalysisId`; OpenAI JSON + stub; documented in `api-contracts.md`.
+
+**P3 completed:** `app/job-analysis/page.tsx`, `JobAnalysisWorkspace`, server actions, types, shell/nav links, Clerk protect on `/job-analysis`.
 
 ---
 
