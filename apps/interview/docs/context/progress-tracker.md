@@ -4,18 +4,19 @@ Update this file after every meaningful implementation change.
 
 ## Current Phase
 
-- Job Analysis vertical slice **complete** (P0–P3)
+- Question Player **Gate 1** (voice: TTS + STT → textarea)
 
 ## Current Goal
 
-- Interview Generator (next system slice)
+- Sign off Gate 1 in browser, then Gate 2 (session API + submit/navigation)
 
 ## In Progress
 
-- (none)
+- Gate 1 voice UI — `/interviews/demo/play`, `features/interview-player/*`
 
 ## Session Notes
 
+- **Question Player Gate 1:** TTS listen, Record/Stop with Web Speech STT into textarea, re-record replaces, expected signals visible — demo route `/interviews/demo/play`.
 - **Job Analysis shipped:** DB `interview_job_analyses`, Nest API, `/job-analysis` UI — branches `feature/interview-job-analysis` / `-P2` / `-P3`.
 - **P3 complete:** `/job-analysis` page, workspace UI, server actions, nav + Clerk protect.
 - **P2 complete:** Nest `interview-job-analysis` module — generate, save, GET me/id; `api-contracts.md` updated.
@@ -39,6 +40,8 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
+- Gate 1 manual QA (Chrome/Safari mic + STT)
+- Gate 2: `interview_sessions` migration, seed API, submit + placeholder feedback
 - Interview Generator (`interview_sessions` + blueprint)
 - Wire Screen 1 create flow to saved profile + job analysis ids
 - Multi-zone rewrites on `apps/app` (single origin `/interview`)

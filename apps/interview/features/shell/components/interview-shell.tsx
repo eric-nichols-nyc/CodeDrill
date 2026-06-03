@@ -38,6 +38,12 @@ export function InterviewShell({ children, className }: InterviewShellProps) {
             >
               Interview
             </Link>
+            <Link
+              className="text-muted-foreground transition-colors hover:text-foreground"
+              href="/interviews/demo/play"
+            >
+              Play (demo)
+            </Link>
             <a
               className="text-muted-foreground transition-colors hover:text-foreground"
               href={
