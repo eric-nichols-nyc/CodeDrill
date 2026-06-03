@@ -91,6 +91,20 @@ Per-user tutor message history. **Clerk Bearer JWT** — no internal-secret bypa
 
 The authenticated user id is resolved by `ProblemsUserGuard` → `resolvePracticeUserId()` (`request.userId`).
 
+### Interview profiles (`InterviewProfileController`)
+
+Profile System vertical slice. **Clerk Bearer JWT** required on all routes.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/interview/profiles/generate` | Body: `{ "resumeText": string }`. AI structured profile (no DB write). |
+| `POST` | `/interview/profiles` | Body: `{ "resumeText", "summary", "coreSkills", "projects", "claimsToVerify", "strengthAreas", "potentialGapAreas" }`. Persists resume + profile. |
+| `GET` | `/interview/profiles/me` | Latest profile for user, or `null`. |
+| `GET` | `/interview/profiles/:profileId` | Profile by id (owner only). |
+| `PATCH` | `/interview/profiles/:profileId` | Update structured fields. |
+
+Tables: `interview_resumes`, `interview_candidate_profiles` (migration `0005_interview_profile_tables.sql`).
+
 ## curl examples
 
 ```bash

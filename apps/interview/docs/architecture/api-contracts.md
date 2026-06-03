@@ -1,15 +1,19 @@
 # API / Action Contracts
 
-> **Status:** Not started. Fill in per [planning-checklist.md](../planning-checklist.md) step 8, after [data-contracts.md](./data-contracts.md) and [database.md](./database.md).
+Interview Coach BFF calls **`apps/api`** with Clerk Bearer JWT (`apiAuthHeaders()`).
 
-For each action, document:
+## Profile System (implemented)
 
-- Name
-- Purpose
-- Input
-- Output
-- Errors
-- Auth requirement
-- Owning system
+| Action | HTTP | Purpose |
+|--------|------|---------|
+| `generateProfile` | `POST /interview/profiles/generate` | AI extraction from resume text (no save) |
+| `saveProfile` | `POST /interview/profiles` | Insert resume row + candidate profile |
+| `getLatestProfile` | `GET /interview/profiles/me` | Latest profile for user (`null` if none) |
+| `getProfile` | `GET /interview/profiles/:profileId` | Profile by id (owner only) |
+| `updateProfile` | `PATCH /interview/profiles/:profileId` | Replace structured fields |
 
-Related: [overview.md](./overview.md), [ai-flow.md](./ai-flow.md).
+**Auth:** `ProblemsUserGuard` → Clerk `sub` as `user_id`.
+
+**Interview app:** Server Actions in `features/profile/actions.ts`; page `/profile`.
+
+Related: [database.md](./database.md), [data-contracts.md](./data-contracts.md).

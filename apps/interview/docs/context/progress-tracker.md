@@ -4,15 +4,15 @@ Update this file after every meaningful implementation change.
 
 ## Current Phase
 
-- Static UI prototype (branch `interview-app`)
+- Profile vertical slice (DB + API + `/profile` UI)
 
 ## Current Goal
 
-- Profile vertical slice: resume text → AI → `interview_*` tables → review UI on `/profile`
+- Validate end-to-end: paste resume → generate → save → reload on `/profile`
 
 ## In Progress
 
-- Clerk wired in `apps/interview` (same app as host; `/profile` protected)
+- Run `pnpm db:migrate` in `apps/api` against Neon; confirm Clerk + API + interview dev servers
 
 ## Session Notes
 
@@ -22,7 +22,8 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
-- interview auth — Clerk in `apps/interview` (`ClerkProvider`, `proxy.ts`, `/sign-in`, `apiAuthHeaders`, `/profile` stub)
+- interview profile slice — `interview_resumes` + `interview_candidate_profiles` migration `0005`, Nest `interview/profiles/*`, `/profile` workspace UI
+- interview auth — Clerk in `apps/interview` (`ClerkProvider`, `proxy.ts`, `/sign-in`, `apiAuthHeaders`)
 - interview zone — app scaffold, design-system shell, static landing + 5 MVP screens
 - interview docs — `prd.md`, `AGENTS.md`, context overview / architecture / workflow rules
 - interview docs — `planning-checklist.md`, expanded `docs/README.md`, `architecture/api-contracts.md` stub (step 8)
@@ -33,8 +34,8 @@ Update this file after every meaningful implementation change.
 - Multi-zone rewrites on `apps/app` (single origin `/interview`)
 - Flesh out Screen 1 form UI (resume upload, JD textarea, difficulty)
 - Resolve PRD open questions via prototype review
-- Drizzle `interview_resumes` + `interview_candidate_profiles` + Nest endpoints
-- API action contracts for profile generate/save/get
+- Profile edit UI (inline PATCH) and file upload on `interview_resumes`
+- Flesh out `architecture/api-contracts.md` for remaining systems
 - Multi-zone rewrites on `apps/app` (single origin `/interview`)
 
 ## Open Questions

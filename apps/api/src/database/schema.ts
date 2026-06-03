@@ -339,6 +339,67 @@ export const problemChatThreads = pgTable(
   })
 );
 
+/** Pasted or extracted resume text (Profile System input). */
+export const interviewResumes = pgTable(
+  "interview_resumes",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    extractedText: text("extracted_text").notNull(),
+    createdAt: timestamptz("created_at").notNull().defaultNow(),
+    updatedAt: timestamptz("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    userCreatedIdx: index("interview_resumes_user_id_created_at_idx").on(
+      t.userId,
+      t.createdAt
+    ),
+  })
+);
+
+export type InterviewProjectExperience = {
+  name: string;
+  role: string;
+  claims: string[];
+};
+
+export type InterviewResumeClaim = {
+  claim: string;
+  questionAngle: string;
+};
+
+/** Structured candidate profile derived from a resume. */
+export const interviewCandidateProfiles = pgTable(
+  "interview_candidate_profiles",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    resumeId: uuid("resume_id")
+      .notNull()
+      .references(() => interviewResumes.id, { onDelete: "restrict" }),
+    summary: text("summary").notNull(),
+    coreSkills: text("core_skills").array().notNull(),
+    projects: jsonb("projects")
+      .notNull()
+      .$type<InterviewProjectExperience[]>(),
+    claimsToVerify: jsonb("claims_to_verify")
+      .notNull()
+      .$type<InterviewResumeClaim[]>(),
+    strengthAreas: text("strength_areas").array().notNull(),
+    potentialGapAreas: text("potential_gap_areas").array().notNull(),
+    createdAt: timestamptz("created_at").notNull().defaultNow(),
+    updatedAt: timestamptz("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    userUpdatedIdx: index(
+      "interview_candidate_profiles_user_id_updated_at_idx"
+    ).on(t.userId, t.updatedAt),
+    resumeIdx: index("interview_candidate_profiles_resume_id_idx").on(
+      t.resumeId
+    ),
+  })
+);
+
 export const problemChatMessages = pgTable(
   "problem_chat_message",
   {
@@ -380,4 +441,6 @@ export const schema = {
   submissionTestResults,
   problemChatThreads,
   problemChatMessages,
+  interviewResumes,
+  interviewCandidateProfiles,
 };
