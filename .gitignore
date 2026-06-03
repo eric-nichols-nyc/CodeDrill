@@ -278,3 +278,7 @@ packages/database/generated
 .content-collections
 .source
 .env*
+
+# Obsidian (interview docs vault)
+/.obsidian/
+apps/interview/**/.obsidian/

@@ -1,5 +1,7 @@
 # AI Workflow Rules
 
+Tactical rules for day-to-day work. For **which docs to create and in what order**, see **[planning-checklist.md](../planning-checklist.md)**.
+
 ## Approach
 
 Build incrementally using a spec-driven workflow. **`docs/prd.md`** defines what to build; context files define architecture and progress. Do not infer product behavior beyond the PRD.
@@ -29,7 +31,7 @@ After meaningful changes:
 
 1. Update `context/progress-tracker.md`
 2. Update `architecture.md` if boundaries or env changed
-3. Add feature specs under `context/features-spec/` when introducing new behavior (folder reserved for later)
+3. Add or update specs under `docs/feature-specs/` when introducing new behavior
 
 ## Verification
 

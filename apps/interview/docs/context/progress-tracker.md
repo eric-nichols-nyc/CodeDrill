@@ -24,6 +24,7 @@ Update this file after every meaningful implementation change.
 
 - interview zone — app scaffold, design-system shell, static landing + 5 MVP screens
 - interview docs — `prd.md`, `AGENTS.md`, context overview / architecture / workflow rules
+- interview docs — `planning-checklist.md`, expanded `docs/README.md`, `architecture/api-contracts.md` stub (step 8)
 - monorepo — `apps/interview` added to agent scope; `pnpm dev:interview` script
 
 ## Next Up

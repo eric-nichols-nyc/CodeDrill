@@ -11,6 +11,8 @@ Instructions for AI agents working in **`apps/interview`** (Next.js zone app). R
 
 Follow **[context/ai-workflow-rules.md](./context/ai-workflow-rules.md)** for scoping and doc updates.
 
+**Greenfield or new major system:** follow the phase order in **[planning-checklist.md](./planning-checklist.md)** (do not read every session).
+
 ## Scope
 
 | Area | Path | Role |
@@ -64,8 +66,11 @@ apps/interview/
   app/              # App Router (static prototype routes)
   features/         # Domain UI (shell, create, session, …)
   docs/
-    AGENTS.md       # This file
-    prd.md          # Product requirements
-    context/        # Overview, architecture, tracker, workflow rules
+    AGENTS.md              # This file
+    planning-checklist.md  # Planning pipeline + doc map
+    prd.md                 # Product requirements
+    feature-specs/         # Per-system specs
+    architecture/          # Overview, AI flow, contracts, DB, API (planned)
+    context/               # Overview, stack, tracker, workflow rules
   AGENTS.md         # Cursor stub → points here
 ```
