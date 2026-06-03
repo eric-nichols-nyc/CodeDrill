@@ -1,5 +1,15 @@
 # Job Analysis System
 
+**Goal:** Convert a raw job description (and optional metadata) into structured interview intelligence (`JobAnalysis`) for the Interview Generator.
+
+**Depends on:** Authenticated user session; optional `companyName` / `roleTitle` from UI.
+
+**Blocks:** Interview Generator (Stage 3).
+
+**Out of scope (this system):** Interview questions, candidate scoring, resume comparison, per-answer or final feedback — owned by Generator, Evaluation, and Final Report.
+
+---
+
 ## Purpose
 
 The Job Analysis System converts a raw job description into structured interview intelligence.
@@ -224,31 +234,29 @@ the expectations of this role?
 
 ---
 
-# MVP Scope
+## Acceptance criteria
 
-The MVP version should:
-
-1. Accept a job description
-2. Extract structured job intelligence
-3. Identify required skills
-4. Identify seniority level
-5. Identify interview categories
-6. Identify hidden expectations
-7. Identify what the candidate must prove
-8. Generate suggested question angles
-
-The MVP should not:
-
-* Generate interview questions
-* Score candidates
-* Compare against the resume
-* Create interview feedback
-
-Those responsibilities belong to other systems.
+- [ ] Input accepts **`jobDescription`** (required) plus optional **`jobUrl`**, **`companyName`**, and **`roleTitle`**.
+- [ ] AI output conforms to **`JobAnalysis`** in [data-contracts.md](../architecture/data-contracts.md) §2 (field names and shapes, not ad-hoc aliases).
+- [ ] Response includes **`roleSummary`**, **`requiredSkills`**, **`niceToHaveSkills`**, and **`seniorityLevel`** with `{ level, confidence }`.
+- [ ] Response includes **`likelyInterviewCategories`**, **`mustProve`**, **`hiddenExpectations`** (`expectation` + `reason`), **`interviewSignals`**, and **`suggestedQuestionAngles`** (`category` + `angle`).
+- [ ] **`mustProve`** reflects hiring validation intent (what a strong candidate must demonstrate), not a generic JD summary.
+- [ ] Persisted row in **`job_analyses`** stores raw JD text and structured JSON per [database.md](../architecture/database.md).
+- [ ] Interview Generator can consume saved analysis without re-running extraction for the same inputs.
+- [ ] No interview questions, candidate scores, resume-to-JD comparison, or evaluation feedback in this pipeline step.
 
 ---
 
-# Guiding Principle
+## Out of scope (other systems)
+
+- Interview question text — **Interview Generator**
+- Candidate scoring and answer grading — **Answer Evaluation**
+- Resume alignment / gap analysis vs JD — **Profile System** + **Final Report**
+- Session feedback and readiness narrative — **Final Report**
+
+---
+
+## Guiding Principle
 
 The Job Analysis System does not summarize jobs.
 
