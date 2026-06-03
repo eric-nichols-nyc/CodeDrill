@@ -4,11 +4,11 @@ Update this file after every meaningful implementation change.
 
 ## Current Phase
 
-- Job Analysis — Phase 2 (Nest API)
+- Job Analysis — Phase 3 (Interview app UI)
 
 ## Current Goal
 
-- `interview-job-analysis` module: DTOs, generate, save, GET me / GET by id
+- `/job-analysis` workspace: types, server actions, generate → preview → save → reload
 
 ## In Progress
 
@@ -16,6 +16,7 @@ Update this file after every meaningful implementation change.
 
 ## Session Notes
 
+- **P2 complete:** Nest `interview-job-analysis` module — generate, save, GET me/id; `api-contracts.md` updated.
 - **P1 complete:** `interview_job_analyses` in `schema.ts`, migration `0006` applied on Neon.
 - **P0 complete:** `pnpm db:migrate` in `apps/api` succeeded (Neon); profile tables `0005` applied. Doc drift fixed: `07-ai-flow` Flow 2 aligned to data-contracts §2; `database.md` physical `interview_*` mapping table added.
 - Initial scaffold: Next zone app at `apps/interview`, `basePath: /interview`, port 3012.
@@ -24,6 +25,7 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- job analysis P2 — `interview/job-analyses/*` API (generate, save, GET me, GET by id)
 - job analysis P1 — `interview_job_analyses` Drizzle + migration `0006`
 - job analysis P0 — decisions locked, doc alignment, migrate + typecheck verified on branch
 - interview profile slice — `interview_resumes` + `interview_candidate_profiles` migration `0005`, Nest `interview/profiles/*`, `/profile` workspace UI
@@ -36,7 +38,6 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
-- Phase 2 — Nest `interview-job-analysis` module + `api-contracts.md`
 - Phase 3 — `/job-analysis` UI + server actions
 - Manual Profile E2E in browser (paste → generate → save → reload on `/profile`) if not yet signed off
 - Multi-zone rewrites on `apps/app` (single origin `/interview`)

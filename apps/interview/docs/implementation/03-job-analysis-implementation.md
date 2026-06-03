@@ -35,11 +35,11 @@ Map to [02-job-analysis.md](../feature-specs/02-job-analysis.md).
 
 - [x] **P0** Table naming + `companyName`/`roleTitle` rule recorded (this doc + progress tracker).
 - [x] **P1** Migration `0006` + Drizzle `interview_job_analyses` in `apps/api/src/database/schema.ts`.
-- [ ] **P1** `JobAnalysisPayloadDto` validates all contract fields (nested DTOs, array bounds) — Phase 2.
-- [ ] **P2** `POST /interview/job-analyses/generate` returns valid payload (AI or stub).
-- [ ] **P2** `POST /interview/job-analyses` persists `source_text` + structured columns; returns view with `id`, timestamps.
-- [ ] **P2** `GET /interview/job-analyses/me` and `GET /interview/job-analyses/:id` (owner-only).
-- [ ] **P2** [api-contracts.md](../architecture/api-contracts.md) documents Job Analysis endpoints.
+- [x] **P1** `JobAnalysisPayloadDto` validates all contract fields (nested DTOs, array bounds).
+- [x] **P2** `POST /interview/job-analyses/generate` returns valid payload (AI or stub).
+- [x] **P2** `POST /interview/job-analyses` persists `source_text` + structured columns; returns view with `id`, timestamps.
+- [x] **P2** `GET /interview/job-analyses/me` and `GET /interview/job-analyses/:id` (owner-only).
+- [x] **P2** [api-contracts.md](../architecture/api-contracts.md) documents Job Analysis endpoints.
 - [ ] **P3** Interview app types + server actions + UI: generate → preview → save → reload.
 - [ ] **P4** Manual QA: `mustProve` / `hiddenExpectations` quality on 3+ real JDs.
 - [ ] **P4** Generator-ready: `GET :id` returns complete `JobAnalysis` without re-running generate.
@@ -63,6 +63,8 @@ Map to [02-job-analysis.md](../feature-specs/02-job-analysis.md).
 **Exit:** Profile pattern understood; decisions table above agreed.
 
 **P0 completed (2026-06-03):** Migrations applied on Neon (`0005` profile tables); `apps/api` + `apps/interview` typecheck pass; doc drift fixed (`07-ai-flow` Flow 2, `database.md` physical naming); MVP UI **Option A** (`/job-analysis` workspace) locked in progress tracker.
+
+**P2 completed:** `InterviewJobAnalysisModule` — `POST generate`, `POST /`, `GET me`, `GET :jobAnalysisId`; OpenAI JSON + stub; documented in `api-contracts.md`.
 
 ---
 
