@@ -4,7 +4,7 @@
 
 **User stories (source of truth):** [04-question-player.md](../feature-specs/04-question-player.md) — US-1 through US-8.
 
-**Status:** **Gate 1 in progress** — voice UI at `/interviews/demo/play` (demo session; API in Gate 2).
+**Status:** **Gate 1 complete** (voice sign-off). **Gate 2 next** — persistence + submit + navigation.
 
 **Feature spec:** [04-question-player.md](../feature-specs/04-question-player.md)
 
@@ -154,9 +154,9 @@ apps/interview/features/interview-player/
 - [x] **Record** again after Stop **clears** textarea and replaces with new take (not append).
 - [x] No `sampleTranscript` typing animation; no mock hooks from prototype `screen-question.tsx` recording block.
 - [x] TTS stops when Record starts; Listen disabled while recording.
-- [ ] Manual test: Chrome + Safari (if available); document Firefox “type only” fallback — **your sign-off**.
+- [x] Manual test — Gate 1 signed off in browser.
 
-**Exit Gate 1:** You sign off voice UX in browser — then proceed to Gate 2.
+**Exit Gate 1:** Done — proceed to Gate 2.
 
 ---
 

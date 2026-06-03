@@ -4,19 +4,19 @@ Update this file after every meaningful implementation change.
 
 ## Current Phase
 
-- Question Player **Gate 1** (voice: TTS + STT → textarea)
+- Question Player **Gate 2** (session API, submit, navigation)
 
 ## Current Goal
 
-- Sign off Gate 1 in browser, then Gate 2 (session API + submit/navigation)
+- Persist answers and complete the player slice after Gate 1 voice sign-off
 
 ## In Progress
 
-- Gate 1 voice UI — `/interviews/demo/play`, `features/interview-player/*`
+- (none)
 
 ## Session Notes
 
-- **Question Player Gate 1:** TTS listen, Record/Stop with Web Speech STT into textarea, re-record replaces, expected signals visible — demo route `/interviews/demo/play`.
+- **Question Player Gate 1 signed off:** TTS + STT voice flow works in browser (`/interviews/demo/play`).
 - **Job Analysis shipped:** DB `interview_job_analyses`, Nest API, `/job-analysis` UI — branches `feature/interview-job-analysis` / `-P2` / `-P3`.
 - **P3 complete:** `/job-analysis` page, workspace UI, server actions, nav + Clerk protect.
 - **P2 complete:** Nest `interview-job-analysis` module — generate, save, GET me/id; `api-contracts.md` updated.
@@ -27,6 +27,7 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- question player Gate 1 — TTS question, STT → textarea, mic permission, re-record replace (`features/interview-player`)
 - job analysis vertical slice — full stack P0–P3 (no formal P4 prompt QA pass)
 - job analysis P3 — `/job-analysis` UI + `features/job-analysis/actions.ts`
 - job analysis P2 — `interview/job-analyses/*` API (generate, save, GET me, GET by id)
@@ -40,8 +41,7 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
-- Gate 1 manual QA (Chrome/Safari mic + STT)
-- Gate 2: `interview_sessions` migration, seed API, submit + placeholder feedback
+- Gate 2: `interview_sessions` migration, dev seed, session API, submit + placeholder feedback + multi-question nav
 - Interview Generator (`interview_sessions` + blueprint)
 - Wire Screen 1 create flow to saved profile + job analysis ids
 - Multi-zone rewrites on `apps/app` (single origin `/interview`)
