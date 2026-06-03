@@ -21,7 +21,7 @@ Follow **[context/ai-workflow-rules.md](./context/ai-workflow-rules.md)** for sc
 | **Host app** | `apps/app` | CodeDrill main app; links here via `NEXT_PUBLIC_INTERVIEW_URL` |
 | **Design system** | `packages/design-system` | shadcn/ui primitives — do not fork under `apps/interview` |
 
-**Current phase:** Static UI prototype only. No Clerk, API, DB, or AI until specs say otherwise.
+**Current phase:** Static UI prototype + Clerk on interview origin. No DB or AI until specs say otherwise.
 
 ### Monorepo scope
 

@@ -13,7 +13,7 @@
 | ----- | ---------- | ---- |
 | Framework | Next.js 16 + TypeScript | Zone app UI |
 | UI | Tailwind 4 + `@repo/design-system` | Shared shadcn primitives |
-| Auth | Clerk (planned) | Shared with `apps/app` — not wired yet |
+| Auth | Clerk (`@clerk/nextjs`) | Same Clerk app as `apps/app`; sign in on `:3012` for interview origin |
 | Database | Postgres via Drizzle (planned) | Sessions, answers, feedback |
 | AI | TBD | Resume/JD analysis, question gen, evaluation |
 
@@ -35,11 +35,12 @@
 ## Invariants
 
 1. This product is a **guided interview coach**, not a conversational chatbot (see PRD).
-2. Do not add auth or persistence without updating specs and progress tracker.
+2. Persistence and AI require explicit spec authorization; Clerk is wired for profile slice work.
 3. UI primitives come from `@repo/design-system`, not copied into this app.
 
 ## Future integration
 
-- **Clerk:** Same application as `apps/app`; session on one origin after multi-zone
-- **Identity API:** Reuse `nest-clerk-api` pattern when auth lands
+- **Clerk:** Same application as `apps/app`; `lib/auth/api-auth-headers.ts` → `apps/api` Bearer JWT
+- **Multi-zone:** Single-origin session after host rewrites — not required for dev
+- **Identity API:** `nest-clerk-api` only if interview needs Neon user rows beyond `apps/api`
 - **Data:** New tables or service owned explicitly in a feature spec before implementation

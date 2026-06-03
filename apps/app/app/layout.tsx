@@ -1,12 +1,12 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
+import { ThemeProvider } from "@repo/design-system/providers/theme";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import { ClerkAuthProvider } from "@/features/auth/components/clerk-auth-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
-import { ThemeProvider } from "@repo/design-system/providers/theme";
+import { ClerkAuthProvider } from "@/features/auth/components/clerk-auth-provider";
 import "./styles.css";
 
 const geistSans = Geist({
@@ -78,7 +78,7 @@ export default async function RootLayout({
   }
 
   return (
-    <ClerkProvider>
+    <ClerkProvider allowedRedirectOrigins={["http://localhost:3012"]}>
       <html lang="en" suppressHydrationWarning>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -86,21 +86,19 @@ export default async function RootLayout({
           <ThemeProvider defaultTheme="dark">
             <ClerkAuthProvider initialUserId={userId ?? null}>
               <QueryProvider>
-              {process.env.NODE_ENV === "development" ? (
-                <Link
-                  className="fixed bottom-3 left-3 z-50 rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 font-mono text-amber-950 text-xs shadow-sm hover:bg-amber-500/20 dark:text-amber-100"
-                  href="/admin"
-                >
-                  Admin (dev)
-                </Link>
-              ) : null}
-              {children}
+                {process.env.NODE_ENV === "development" ? (
+                  <Link
+                    className="fixed bottom-3 left-3 z-50 rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 font-mono text-amber-950 text-xs shadow-sm hover:bg-amber-500/20 dark:text-amber-100"
+                    href="/admin"
+                  >
+                    Admin (dev)
+                  </Link>
+                ) : null}
+                {children}
               </QueryProvider>
             </ClerkAuthProvider>
           </ThemeProvider>
-          {process.env.NODE_ENV === "development" ? (
-            <TanStackDevtools />
-          ) : null}
+          {process.env.NODE_ENV === "development" ? <TanStackDevtools /> : null}
         </body>
       </html>
     </ClerkProvider>

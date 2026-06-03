@@ -8,11 +8,11 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Validate MVP screen flow and copy with static pages before auth / AI / DB
+- Profile vertical slice: resume text → AI → `interview_*` tables → review UI on `/profile`
 
 ## In Progress
 
-- _(none)_
+- Clerk wired in `apps/interview` (same app as host; `/profile` protected)
 
 ## Session Notes
 
@@ -22,6 +22,7 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- interview auth — Clerk in `apps/interview` (`ClerkProvider`, `proxy.ts`, `/sign-in`, `apiAuthHeaders`, `/profile` stub)
 - interview zone — app scaffold, design-system shell, static landing + 5 MVP screens
 - interview docs — `prd.md`, `AGENTS.md`, context overview / architecture / workflow rules
 - interview docs — `planning-checklist.md`, expanded `docs/README.md`, `architecture/api-contracts.md` stub (step 8)
@@ -32,8 +33,9 @@ Update this file after every meaningful implementation change.
 - Multi-zone rewrites on `apps/app` (single origin `/interview`)
 - Flesh out Screen 1 form UI (resume upload, JD textarea, difficulty)
 - Resolve PRD open questions via prototype review
-- Clerk + shared auth (after multi-zone or same-origin dev)
-- API + persistence design spec
+- Drizzle `interview_resumes` + `interview_candidate_profiles` + Nest endpoints
+- API action contracts for profile generate/save/get
+- Multi-zone rewrites on `apps/app` (single origin `/interview`)
 
 ## Open Questions
 
@@ -49,4 +51,4 @@ From [prd.md](../prd.md):
 ## Architecture Decisions
 
 - **Zone app** at `apps/interview` with `basePath: /interview` (not nested under `apps/app`)
-- **Prototype-first** — no Clerk/DB/AI until static flow is approved
+- **Prototype-first** — `/interview` mock flow stays public; `/profile` is the authenticated slice entry

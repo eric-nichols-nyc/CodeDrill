@@ -22,4 +22,4 @@ Open [http://localhost:3012](http://localhost:3012) (landing) or [http://localho
 
 ## Status
 
-Static UI prototype — five MVP screens with mock content. No auth, database, or AI yet.
+Static UI prototype with **Clerk auth** on the interview origin (`:3012`). Copy Clerk keys from `apps/app` into `.env.local` (see `.env.example`). Sign in on this app before `/profile`; prototype `/interview` stays public. Database and AI pipelines are not implemented yet.
