@@ -20,7 +20,7 @@ export default function HomePage() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
             <Button asChild size="lg">
-              <Link href="/interview">Start interview</Link>
+              <Link href="/interviews">Start interview</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
               <a href="http://localhost:3010">Back to CodeDrill</a>

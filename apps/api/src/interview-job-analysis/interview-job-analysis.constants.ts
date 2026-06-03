@@ -16,10 +16,10 @@ Return a single JSON object with exactly these keys (camelCase):
 - mustProve: string[] — what a strong candidate must DEMONSTRATE to get hired (competencies/behaviors, not JD bullet paraphrases)
 - hiddenExpectations: array of { expectation, reason } — implied requirements not stated plainly, each with a short reason
 - interviewSignals: string[] — traits interviewers likely evaluate (depth, ownership, communication, etc.)
-- suggestedQuestionAngles: array of { category, angle } — directional probes only; do NOT write full interview questions
+- suggestedQuestionAngles: array of { category, angle } — short probes for question writers (not final interview scripts)
 
 Rules:
 - mustProve entries should be validation-oriented ("Can design…", "Has led…"), not copy-pasted requirements.
-- suggestedQuestionAngles are angles, not scripted questions.
+- suggestedQuestionAngles.angle: use natural question phrasing when possible (How…, Tell me…, Walk me through…). Do NOT use interviewer-note phrasing like "Explore experience with…" or "Ask about…".
 - Be factual to the JD; do not invent employers or tools not implied.
 - No markdown fences.`;

@@ -4,19 +4,21 @@ Update this file after every meaningful implementation change.
 
 ## Current Phase
 
-- Question Player **Gate 2** (session API, submit, navigation)
+- **Interview Generator** — P0 planning (spec: [03-interview-generation.md](../feature-specs/03-interview-generation.md))
 
 ## Current Goal
 
-- Persist answers and complete the player slice after Gate 1 voice sign-off
+- Replace dev seed with AI-backed `POST /interview/sessions` (profile + job analysis → blueprint + 5–10 questions + expected signals)
 
 ## In Progress
 
-- (none)
+- Interview Generator P0 — lock API contract, AI prompt shape, and implementation phases (mirror job-analysis slice)
 
 ## Session Notes
 
-- **Question Player Gate 1 signed off:** TTS + STT voice flow works in browser (`/interviews/demo/play`).
+- **Routes:** prototype mock at `/prototype` (public); real flow at `/interviews` → `/interviews/start` → `/interviews/[id]/play|complete` (Clerk-protected).
+- **Question Player Gate 2 signed off:** seed → play → complete E2E; dev seed via `POST /interview/sessions/seed` on `/interviews/start`.
+- **Question Player Gate 1 signed off:** TTS + STT voice flow works in browser.
 - **Job Analysis shipped:** DB `interview_job_analyses`, Nest API, `/job-analysis` UI — branches `feature/interview-job-analysis` / `-P2` / `-P3`.
 - **P3 complete:** `/job-analysis` page, workspace UI, server actions, nav + Clerk protect.
 - **P2 complete:** Nest `interview-job-analysis` module — generate, save, GET me/id; `api-contracts.md` updated.
@@ -27,6 +29,8 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- route cleanup — `/prototype` for mock flow; `/interviews/*` for player; orphaned empty route dirs removed
+- question player Gate 2 — session tables, Nest `interview/sessions/*`, player submit/nav/complete UI, `/interviews/start` seed entry
 - question player Gate 1 — TTS question, STT → textarea, mic permission, re-record replace (`features/interview-player`)
 - job analysis vertical slice — full stack P0–P3 (no formal P4 prompt QA pass)
 - job analysis P3 — `/job-analysis` UI + `features/job-analysis/actions.ts`
@@ -41,10 +45,18 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
-- Gate 2: `interview_sessions` migration, dev seed, session API, submit + placeholder feedback + multi-question nav
-- Interview Generator (`interview_sessions` + blueprint)
-- Wire Screen 1 create flow to saved profile + job analysis ids
-- Multi-zone rewrites on `apps/app` (single origin `/interview`)
+### Interview Generator (current)
+
+1. **P0** — Decisions: `POST /interview/sessions/generate` (preview) + `POST /interview/sessions` (persist), or single-step create; reuse existing `interview_sessions` / `interview_questions` columns; stub vs OpenAI (follow job-analysis pattern).
+2. **P1** — Schema/migration only if new columns needed (e.g. `follow_up_opportunities`, blueprint JSON).
+3. **P2** — Nest `interview-session-generate.service.ts` + controller routes; structured output validation.
+4. **P3** — `/interviews/start` UI: replace seed button with generate → overview → start play (wire prototype Screen 1 / overview).
+
+### Later
+
+- Answer Evaluation (Gate 3 for question player)
+- Final Report
+- Multi-zone rewrites on `apps/app` (single origin)
 - Profile edit UI (inline PATCH) and file upload on `interview_resumes`
 
 ## Open Questions
@@ -61,7 +73,7 @@ From [prd.md](../prd.md):
 ## Architecture Decisions
 
 - **Zone app** at `apps/interview` (not nested under `apps/app`)
-- **Prototype-first** — `/interview` mock flow public; `/profile` and `/job-analysis` authenticated
+- **Prototype-first** — `/prototype` mock flow public; `/profile`, `/job-analysis`, and `/interviews/*` authenticated
 - **Job Analysis table** — physical `interview_job_analyses`; logical `job_analyses` in architecture docs
 - **Job Analysis API** — `/interview/job-analyses`; contract from data-contracts §2
 - **Job Analysis company/role** — AI extract on generate; optional UI override before save

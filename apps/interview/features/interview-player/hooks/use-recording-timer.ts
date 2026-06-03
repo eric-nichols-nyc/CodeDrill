@@ -31,6 +31,7 @@ export function useRecordingTimer() {
 
   return {
     label: formatTimer(seconds),
+    seconds,
     start,
     stop,
     reset,

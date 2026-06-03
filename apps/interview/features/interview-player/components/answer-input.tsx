@@ -31,6 +31,7 @@ type AnswerInputProps = {
   onTranscriptChange: (value: string) => void;
   onUsedVoice: () => void;
   onRecordStart: () => void;
+  onRecordStop?: (durationSeconds: number) => void;
   onListeningChange?: (listening: boolean) => void;
   disabled?: boolean;
 };
@@ -40,6 +41,7 @@ export function AnswerInput({
   onTranscriptChange,
   onUsedVoice,
   onRecordStart,
+  onRecordStop,
   onListeningChange,
   disabled,
 }: AnswerInputProps) {
@@ -65,6 +67,7 @@ export function AnswerInput({
   const handleStop = () => {
     stop();
     timer.stop();
+    onRecordStop?.(timer.seconds);
   };
 
   const errorMessage = sttErrorMessage(errorCode);

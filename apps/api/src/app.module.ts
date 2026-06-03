@@ -4,6 +4,7 @@ import { AppService } from "./app.service";
 import { DatabaseModule } from "./database/database.module";
 import { InterviewJobAnalysisModule } from "./interview-job-analysis/interview-job-analysis.module";
 import { InterviewProfileModule } from "./interview-profile/interview-profile.module";
+import { InterviewSessionModule } from "./interview-session/interview-session.module";
 import { ProblemChatModule } from "./problem-chat/problem-chat.module";
 import { ProblemNotesModule } from "./problem-notes/problem-notes.module";
 import { ProblemProgressModule } from "./problem-progress/problem-progress.module";
@@ -16,6 +17,7 @@ import { SessionController } from "./session.controller";
     DatabaseModule,
     InterviewProfileModule,
     InterviewJobAnalysisModule,
+    InterviewSessionModule,
     ProblemChatModule,
     ProblemNotesModule,
     ProblemProgressModule,

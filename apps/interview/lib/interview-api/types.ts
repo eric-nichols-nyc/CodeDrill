@@ -63,3 +63,57 @@ export type JobAnalysis = JobAnalysisPayload & {
   createdAt: string;
   updatedAt: string;
 };
+
+export type InterviewSessionStatus =
+  | "draft"
+  | "ready"
+  | "in_progress"
+  | "completed"
+  | "abandoned";
+
+export type AnswerMode = "voice" | "text";
+
+export type QuestionAnswer = {
+  answerMode: AnswerMode;
+  transcript: string;
+  durationSeconds: number | null;
+  submittedAt: string;
+};
+
+export type InterviewQuestion = {
+  id: string;
+  order: number;
+  category: string;
+  difficulty: string;
+  question: string;
+  expectedSignals: string[];
+  answer: QuestionAnswer | null;
+};
+
+export type InterviewJobContext = {
+  companyName: string;
+  roleTitle: string;
+  roleSummary: string;
+};
+
+export type InterviewSession = {
+  id: string;
+  interviewTitle: string;
+  estimatedDurationMinutes: number;
+  questionCount: number;
+  categories: string[];
+  status: InterviewSessionStatus;
+  startedAt: string | null;
+  completedAt: string | null;
+  profileId: string;
+  jobAnalysisId: string;
+  jobContext: InterviewJobContext;
+  questions: InterviewQuestion[];
+};
+
+export type SeedInterviewResult = {
+  interviewId: string;
+  interviewTitle: string;
+  companyName: string;
+  roleTitle: string;
+};

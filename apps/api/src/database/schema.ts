@@ -416,6 +416,105 @@ export const interviewCandidateProfiles = pgTable(
 );
 
 /** Raw JD + structured job intelligence (Job Analysis System). */
+export type InterviewSessionStatus =
+  | "draft"
+  | "ready"
+  | "in_progress"
+  | "completed"
+  | "abandoned";
+
+export type InterviewAnswerMode = "voice" | "text";
+
+/** Interview run root (Question Player + Generator). */
+export const interviewSessions = pgTable(
+  "interview_sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    profileId: uuid("profile_id")
+      .notNull()
+      .references(() => interviewCandidateProfiles.id, { onDelete: "restrict" }),
+    jobAnalysisId: uuid("job_analysis_id")
+      .notNull()
+      .references(() => interviewJobAnalyses.id, { onDelete: "restrict" }),
+    interviewTitle: text("interview_title").notNull(),
+    estimatedDurationMinutes: integer("estimated_duration_minutes").notNull(),
+    questionCount: integer("question_count").notNull(),
+    categories: text("categories").array().notNull(),
+    status: text("status").notNull().$type<InterviewSessionStatus>(),
+    generatedAt: timestamptz("generated_at").notNull().defaultNow(),
+    startedAt: timestamptz("started_at"),
+    completedAt: timestamptz("completed_at"),
+    createdAt: timestamptz("created_at").notNull().defaultNow(),
+    updatedAt: timestamptz("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    statusCheck: check(
+      "interview_sessions_status_check",
+      sql`${t.status} in ('draft', 'ready', 'in_progress', 'completed', 'abandoned')`
+    ),
+    questionCountCheck: check(
+      "interview_sessions_question_count_check",
+      sql`${t.questionCount} >= 1`
+    ),
+    userStatusUpdatedIdx: index(
+      "interview_sessions_user_id_status_updated_at_idx"
+    ).on(t.userId, t.status, t.updatedAt),
+  })
+);
+
+/** Question snapshot + answer + evaluation per row. */
+export const interviewQuestions = pgTable(
+  "interview_questions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => interviewSessions.id, { onDelete: "cascade" }),
+    displayOrder: integer("display_order").notNull(),
+    category: text("category").notNull(),
+    difficulty: text("difficulty").notNull(),
+    questionText: text("question_text").notNull(),
+    expectedSignals: text("expected_signals").array().notNull(),
+    followUpOpportunities: text("follow_up_opportunities").array().notNull(),
+    answerMode: text("answer_mode").$type<InterviewAnswerMode>(),
+    transcript: text("transcript"),
+    durationSeconds: integer("duration_seconds"),
+    submittedAt: timestamptz("submitted_at"),
+    score: integer("score"),
+    strengths: text("strengths").array(),
+    weaknesses: text("weaknesses").array(),
+    missingSignals: text("missing_signals").array(),
+    confidenceLevel: text("confidence_level").$type<
+      "Low" | "Medium" | "High"
+    >(),
+    suggestedAnswer: text("suggested_answer"),
+    recommendedTopics: text("recommended_topics").array(),
+    evaluatedAt: timestamptz("evaluated_at"),
+  },
+  (t) => ({
+    displayOrderCheck: check(
+      "interview_questions_display_order_check",
+      sql`${t.displayOrder} >= 1`
+    ),
+    answerModeCheck: check(
+      "interview_questions_answer_mode_check",
+      sql`${t.answerMode} is null or ${t.answerMode} in ('voice', 'text')`
+    ),
+    scoreCheck: check(
+      "interview_questions_score_check",
+      sql`${t.score} is null or (${t.score} >= 0 and ${t.score} <= 100)`
+    ),
+    confidenceCheck: check(
+      "interview_questions_confidence_level_check",
+      sql`${t.confidenceLevel} is null or ${t.confidenceLevel} in ('Low', 'Medium', 'High')`
+    ),
+    sessionOrderIdx: uniqueIndex(
+      "interview_questions_session_id_display_order_idx"
+    ).on(t.sessionId, t.displayOrder),
+  })
+);
+
 export const interviewJobAnalyses = pgTable(
   "interview_job_analyses",
   {
@@ -497,4 +596,6 @@ export const schema = {
   interviewResumes,
   interviewCandidateProfiles,
   interviewJobAnalyses,
+  interviewSessions,
+  interviewQuestions,
 };

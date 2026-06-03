@@ -1,11 +1,11 @@
 "use client";
 
-import type { PlayerQuestion } from "@/features/interview-player/types";
+import type { InterviewQuestion } from "@/features/interview-player/types";
 import { Button } from "@repo/design-system/components/ui/button";
 import { Tag, Volume2, VolumeX } from "lucide-react";
 
 type QuestionCardProps = {
-  question: PlayerQuestion;
+  question: InterviewQuestion;
   listenDisabled?: boolean;
   ttsSupported: boolean;
   isSpeaking: boolean;

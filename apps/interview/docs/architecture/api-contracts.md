@@ -36,3 +36,21 @@ Related: [database.md](./database.md), [data-contracts.md](./data-contracts.md).
 **Auth:** `ProblemsUserGuard` → Clerk `sub` as `user_id`.
 
 **Interview app:** Server Actions in `features/job-analysis/actions.ts`; page `/job-analysis`.
+
+## Question Player / Interview Sessions (implemented)
+
+| Action | HTTP | Purpose |
+|--------|------|---------|
+| `seedInterviewSession` | `POST /interview/sessions/seed` | Demo session + 3 questions (latest profile + job analysis) |
+| `getInterviewSession` | `GET /interview/sessions/:interviewId` | Session + ordered questions + answers |
+| `startInterviewSession` | `POST /interview/sessions/:interviewId/start` | `ready` → `in_progress` |
+| `submitAnswer` | `POST /interview/sessions/:interviewId/questions/:questionId/answer` | Save transcript + `answerMode` |
+| `completeInterviewSession` | `POST /interview/sessions/:interviewId/complete` | All questions answered → `completed` |
+
+**Submit body:** `{ transcript, answerMode: "voice" | "text", durationSeconds? }` — transcript min 10 chars trimmed.
+
+**Response:** `InterviewSession` — `id`, `interviewTitle`, `estimatedDurationMinutes`, `questionCount`, `categories`, `status`, `startedAt`, `completedAt`, `questions[]` with optional `answer`.
+
+**Auth:** `ProblemsUserGuard` → Clerk `sub` as `user_id`.
+
+**Interview app:** Server Actions in `features/interview-player/actions.ts`; routes `/interviews/start` (seed), `/interviews/[interviewId]/play`, `/interviews/[interviewId]/complete`.
