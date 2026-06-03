@@ -22,6 +22,21 @@ The shared Postgres instance already holds CodeDrill practice data (`problems`, 
 
 No changes to existing practice tables are required for MVP.
 
+### Physical table names (`apps/api`)
+
+Drizzle migrations use an **`interview_` prefix** on Postgres table names. Logical names in this doc map as follows:
+
+| Logical (this doc) | Physical table (implemented / planned) | Status |
+|--------------------|----------------------------------------|--------|
+| `resumes` | `interview_resumes` | Implemented (`0005`) |
+| `candidate_profiles` | `interview_candidate_profiles` | Implemented (`0005`) |
+| `job_analyses` | `interview_job_analyses` | Implemented (`0006`) |
+| `interview_sessions` | `interview_sessions` | Planned |
+| `interview_questions` | `interview_questions` | Planned |
+| `interview_reports` | `interview_reports` | Planned |
+
+API responses and [data-contracts.md](./data-contracts.md) use camelCase contract fields; the API layer maps to/from snake_case columns.
+
 ---
 
 ## High-level entity relationship overview
@@ -149,7 +164,7 @@ Persisted structured representation of a candidate derived from a resume (`Candi
 
 ---
 
-### 3. `job_analyses`
+### 3. `job_analyses` (physical: `interview_job_analyses`)
 
 #### Purpose
 

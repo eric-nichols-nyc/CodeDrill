@@ -368,6 +368,21 @@ export type InterviewResumeClaim = {
   questionAngle: string;
 };
 
+export type InterviewSeniorityLevel = {
+  level: string;
+  confidence: "Low" | "Medium" | "High";
+};
+
+export type InterviewHiddenExpectation = {
+  expectation: string;
+  reason: string;
+};
+
+export type InterviewSuggestedQuestionAngle = {
+  category: string;
+  angle: string;
+};
+
 /** Structured candidate profile derived from a resume. */
 export const interviewCandidateProfiles = pgTable(
   "interview_candidate_profiles",
@@ -396,6 +411,44 @@ export const interviewCandidateProfiles = pgTable(
     ).on(t.userId, t.updatedAt),
     resumeIdx: index("interview_candidate_profiles_resume_id_idx").on(
       t.resumeId
+    ),
+  })
+);
+
+/** Raw JD + structured job intelligence (Job Analysis System). */
+export const interviewJobAnalyses = pgTable(
+  "interview_job_analyses",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    sourceText: text("source_text").notNull(),
+    sourceUrl: text("source_url"),
+    companyName: text("company_name").notNull(),
+    roleTitle: text("role_title").notNull(),
+    roleSummary: text("role_summary").notNull(),
+    requiredSkills: text("required_skills").array().notNull(),
+    niceToHaveSkills: text("nice_to_have_skills").array().notNull(),
+    seniorityLevel: jsonb("seniority_level")
+      .notNull()
+      .$type<InterviewSeniorityLevel>(),
+    likelyInterviewCategories: text("likely_interview_categories")
+      .array()
+      .notNull(),
+    mustProve: text("must_prove").array().notNull(),
+    hiddenExpectations: jsonb("hidden_expectations")
+      .notNull()
+      .$type<InterviewHiddenExpectation[]>(),
+    interviewSignals: text("interview_signals").array().notNull(),
+    suggestedQuestionAngles: jsonb("suggested_question_angles")
+      .notNull()
+      .$type<InterviewSuggestedQuestionAngle[]>(),
+    createdAt: timestamptz("created_at").notNull().defaultNow(),
+    updatedAt: timestamptz("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    userCreatedIdx: index("interview_job_analyses_user_id_created_at_idx").on(
+      t.userId,
+      t.createdAt
     ),
   })
 );
@@ -443,4 +496,5 @@ export const schema = {
   problemChatMessages,
   interviewResumes,
   interviewCandidateProfiles,
+  interviewJobAnalyses,
 };

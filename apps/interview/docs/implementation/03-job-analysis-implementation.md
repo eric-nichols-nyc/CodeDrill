@@ -33,9 +33,9 @@
 
 Map to [02-job-analysis.md](../feature-specs/02-job-analysis.md).
 
-- [ ] **P0** Table naming + `companyName`/`roleTitle` rule recorded (this doc + progress tracker).
-- [ ] **P1** Migration `0006` + Drizzle `interview_job_analyses` in `apps/api/src/database/schema.ts`.
-- [ ] **P1** `JobAnalysisPayloadDto` validates all contract fields (nested DTOs, array bounds).
+- [x] **P0** Table naming + `companyName`/`roleTitle` rule recorded (this doc + progress tracker).
+- [x] **P1** Migration `0006` + Drizzle `interview_job_analyses` in `apps/api/src/database/schema.ts`.
+- [ ] **P1** `JobAnalysisPayloadDto` validates all contract fields (nested DTOs, array bounds) — Phase 2.
 - [ ] **P2** `POST /interview/job-analyses/generate` returns valid payload (AI or stub).
 - [ ] **P2** `POST /interview/job-analyses` persists `source_text` + structured columns; returns view with `id`, timestamps.
 - [ ] **P2** `GET /interview/job-analyses/me` and `GET /interview/job-analyses/:id` (owner-only).
@@ -61,6 +61,8 @@ Map to [02-job-analysis.md](../feature-specs/02-job-analysis.md).
    - Note in [database.md](../architecture/database.md) that physical tables use `interview_*` prefix (logical `job_analyses` → `interview_job_analyses`).
 
 **Exit:** Profile pattern understood; decisions table above agreed.
+
+**P0 completed (2026-06-03):** Migrations applied on Neon (`0005` profile tables); `apps/api` + `apps/interview` typecheck pass; doc drift fixed (`07-ai-flow` Flow 2, `database.md` physical naming); MVP UI **Option A** (`/job-analysis` workspace) locked in progress tracker.
 
 ---
 
@@ -245,11 +247,13 @@ Add link from shell / profile area if using Option A; document in progress track
 
 ---
 
-## Open questions (resolve in Phase 0)
+## Open questions (resolved in Phase 0)
 
-1. **UI Option A vs B** — Dedicated `/job-analysis` vs only Screen 1?
-2. **Require company/role in form** — Or AI-only with optional override (default: AI + override)?
-3. **History list in MVP** — Default no; add endpoint only if product needs picker before Generator.
+| Question | Decision |
+|----------|----------|
+| UI Option A vs B | **Option A** — `/job-analysis` workspace (parity with `/profile`); wire Screen 1 after slice is green |
+| Company / role in form | **Optional** — AI extracts on generate; user may override before save; reject save if empty |
+| History list in MVP | **No** — `GET .../me` only; defer list endpoint and picker UI |
 
 ---
 

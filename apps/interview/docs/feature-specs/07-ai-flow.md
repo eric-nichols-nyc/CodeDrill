@@ -94,13 +94,20 @@ type CandidateProfile = {
 
 ## Flow 2: Job Analysis
 
+> **Contract:** Full shape in [data-contracts.md](../architecture/data-contracts.md) §2. Persistence: physical table `interview_job_analyses` ([database.md](../architecture/database.md)).
+
 ### Job analysis input
 
 ```json
 {
-  "jobDescription": "..."
+  "jobDescription": "...",
+  "jobUrl": "https://...",
+  "companyName": "Acme Corp",
+  "roleTitle": "Senior Frontend Engineer"
 }
 ```
+
+`jobDescription` is required. `jobUrl`, `companyName`, and `roleTitle` are optional on generate; when omitted, the model should infer company and role from the JD before save.
 
 ---
 
@@ -108,28 +115,37 @@ type CandidateProfile = {
 
 Analyze the job description and identify:
 
-* Required skills
-* Nice-to-have skills
-* Seniority level
-* Hidden expectations
-* Interview categories
-* What the candidate must prove
+* Role summary and seniority (with confidence)
+* Required and nice-to-have skills
+* Likely interview categories
+* What the candidate must prove (hiring validation, not JD paraphrase)
+* Hidden expectations (with reasons)
+* Interview signals interviewers likely probe
+* Suggested question angles (directions only — not full questions)
 
 ---
 
 ### Job analysis output
 
 ```ts
+type ConfidenceLevel = "Low" | "Medium" | "High"
+
 type JobAnalysis = {
+  companyName: string
+  roleTitle: string
   roleSummary: string
   requiredSkills: string[]
   niceToHaveSkills: string[]
-  seniorityLevel: string
-  interviewCategories: string[]
-  hiddenExpectations: string[]
+  seniorityLevel: { level: string; confidence: ConfidenceLevel }
+  likelyInterviewCategories: string[]
   mustProve: string[]
+  hiddenExpectations: { expectation: string; reason: string }[]
+  interviewSignals: string[]
+  suggestedQuestionAngles: { category: string; angle: string }[]
 }
 ```
+
+Persisted rows include `id`, `createdAt`, and `updatedAt` — see data-contracts §2.
 
 ---
 

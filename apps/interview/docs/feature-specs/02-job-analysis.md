@@ -243,7 +243,7 @@ the expectations of this role?
 - [ ] Response includes **`roleSummary`**, **`requiredSkills`**, **`niceToHaveSkills`**, and **`seniorityLevel`** with `{ level, confidence }`.
 - [ ] Response includes **`likelyInterviewCategories`**, **`mustProve`**, **`hiddenExpectations`** (`expectation` + `reason`), **`interviewSignals`**, and **`suggestedQuestionAngles`** (`category` + `angle`).
 - [ ] **`mustProve`** reflects hiring validation intent (what a strong candidate must demonstrate), not a generic JD summary.
-- [ ] Persisted row in **`job_analyses`** stores raw JD text and structured JSON per [database.md](../architecture/database.md).
+- [ ] Persisted row in **`interview_job_analyses`** (logical: `job_analyses`) stores raw JD text and structured columns per [database.md](../architecture/database.md).
 - [ ] Interview Generator can consume saved analysis without re-running extraction for the same inputs.
 - [ ] No interview questions, candidate scores, resume-to-JD comparison, or evaluation feedback in this pipeline step.
 
