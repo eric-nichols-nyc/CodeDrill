@@ -1,4 +1,4 @@
-import { SessionNotFound } from "@/features/interview-player/components/session-not-found";
+import { InterviewStartPanel } from "@/features/interview-player/components/interview-start-panel";
 import { InterviewShell } from "@/features/shell/components/interview-shell";
 import { InterviewApiError, interviewApiFetch } from "@/lib/interview-api/server";
 import type { CandidateProfile, JobAnalysis } from "@/lib/interview-api/types";
@@ -41,7 +41,7 @@ export default async function InterviewStartPage() {
         {!user ? (
           <p className="text-muted-foreground text-sm">Sign in to start an interview.</p>
         ) : (
-          <SessionNotFound jobAnalysis={jobAnalysis} profile={profile} />
+          <InterviewStartPanel jobAnalysis={jobAnalysis} profile={profile} />
         )}
       </section>
     </InterviewShell>

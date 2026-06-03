@@ -117,3 +117,36 @@ export type SeedInterviewResult = {
   companyName: string;
   roleTitle: string;
 };
+
+export type InterviewBlueprintQuestion = {
+  order: number;
+  category: string;
+  difficulty: string;
+  question: string;
+  expectedSignals: string[];
+  followUpOpportunities: string[];
+};
+
+export type InterviewBlueprintPreview = {
+  profileId: string;
+  jobAnalysisId: string;
+  companyName: string;
+  roleTitle: string;
+  roleSummary: string;
+  interviewTitle: string;
+  estimatedDurationMinutes: number;
+  questionCount: number;
+  categories: string[];
+  questions: InterviewBlueprintQuestion[];
+};
+
+export type CreateInterviewSessionInput = {
+  profileId: string;
+  jobAnalysisId: string;
+  blueprint: {
+    interviewTitle: string;
+    estimatedDurationMinutes: number;
+    categories: string[];
+    questions: InterviewBlueprintQuestion[];
+  };
+};

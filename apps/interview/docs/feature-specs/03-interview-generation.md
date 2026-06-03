@@ -15,6 +15,8 @@ The Interview Generator does not score candidates.
 
 The Interview Generator creates the interview plan.
 
+**Implementation flow (diagrams):** [03-interview-generation-implementation.md § Flow overview](../implementation/03-interview-generation-implementation.md#flow-overview-read-this-first)
+
 ---
 
 # Inputs

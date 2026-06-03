@@ -305,6 +305,9 @@ importers:
       react-dom:
         specifier: 19.2.1
         version: 19.2.1(react@19.2.1)
+      recharts:
+        specifier: ^2.15.4
+        version: 2.15.4(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -24460,6 +24463,18 @@ snapshots:
       lightningcss: 1.30.2
       postcss: 8.5.6
 
+  terser-webpack-plugin@5.6.1(esbuild@0.27.1)(lightningcss@1.30.2)(postcss@8.5.6)(webpack@5.107.2(esbuild@0.27.1)(lightningcss@1.30.2)(postcss@8.5.6)):
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.31
+      jest-worker: 27.5.1
+      schema-utils: 4.3.3
+      terser: 5.39.0
+      webpack: 5.107.2(esbuild@0.27.1)(lightningcss@1.30.2)(postcss@8.5.6)
+    optionalDependencies:
+      esbuild: 0.27.1
+      lightningcss: 1.30.2
+      postcss: 8.5.6
+
   terser@5.39.0:
     dependencies:
       '@jridgewell/source-map': 0.3.6
@@ -25394,7 +25409,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.3
-      terser-webpack-plugin: 5.6.1(esbuild@0.27.1)(lightningcss@1.30.2)(postcss@8.5.6)(webpack@5.107.2(esbuild@0.27.1)(lightningcss@1.30.2)(postcss@8.5.3))
+      terser-webpack-plugin: 5.6.1(esbuild@0.27.1)(lightningcss@1.30.2)(postcss@8.5.6)(webpack@5.107.2(esbuild@0.27.1)(lightningcss@1.30.2)(postcss@8.5.6))
       watchpack: 2.5.1
       webpack-sources: 3.5.0
     transitivePeerDependencies:

@@ -37,11 +37,26 @@ Related: [database.md](./database.md), [data-contracts.md](./data-contracts.md).
 
 **Interview app:** Server Actions in `features/job-analysis/actions.ts`; page `/job-analysis`.
 
+## Interview Generator / Sessions (implemented)
+
+| Action | HTTP | Purpose |
+|--------|------|---------|
+| `generateInterviewBlueprint` | `POST /interview/sessions/generate` | AI blueprint preview (no save); latest profile + job analysis |
+| `createInterviewSession` | `POST /interview/sessions` | Persist blueprint → playable session (`ready`) |
+| `seedInterviewSession` | `POST /interview/sessions/seed` | Dev-only quick session (3 questions) |
+
+**Generate body (optional):** `{ profileId?, jobAnalysisId? }` — defaults to latest for user.
+
+**Create body:** `{ profileId, jobAnalysisId, blueprint: { interviewTitle, estimatedDurationMinutes, categories, questions[] } }` — 5–10 questions; each question has `order`, `category`, `difficulty`, `question`, `expectedSignals`, `followUpOpportunities`.
+
+**Generate response:** `InterviewBlueprintPreview` — ids, title, duration, categories, `questions[]`, `questionCount`.
+
+**Create response:** `{ interviewId, interviewTitle, companyName, roleTitle }`
+
 ## Question Player / Interview Sessions (implemented)
 
 | Action | HTTP | Purpose |
 |--------|------|---------|
-| `seedInterviewSession` | `POST /interview/sessions/seed` | Demo session + 3 questions (latest profile + job analysis) |
 | `getInterviewSession` | `GET /interview/sessions/:interviewId` | Session + ordered questions + answers |
 | `startInterviewSession` | `POST /interview/sessions/:interviewId/start` | `ready` → `in_progress` |
 | `submitAnswer` | `POST /interview/sessions/:interviewId/questions/:questionId/answer` | Save transcript + `answerMode` |
@@ -53,4 +68,4 @@ Related: [database.md](./database.md), [data-contracts.md](./data-contracts.md).
 
 **Auth:** `ProblemsUserGuard` → Clerk `sub` as `user_id`.
 
-**Interview app:** Server Actions in `features/interview-player/actions.ts`; routes `/interviews/start` (seed), `/interviews/[interviewId]/play`, `/interviews/[interviewId]/complete`.
+**Interview app:** Server Actions in `features/interview-player/actions.ts`; routes `/interviews/start` (generate → create), `/interviews/[interviewId]/play`, `/interviews/[interviewId]/complete`.

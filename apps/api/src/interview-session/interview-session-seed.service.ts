@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Inject,
   Injectable,
-  NotFoundException,
 } from "@nestjs/common";
 import { desc, eq } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
@@ -12,12 +11,12 @@ import {
   buildSeedCategories,
 } from "./interview-session-seed.builder";
 import { SEED_ESTIMATED_DURATION_MINUTES } from "./interview-session-seed.constants";
+// biome-ignore lint/style/useImportType: Nest uses emitted constructor param metadata
+import { InterviewSessionPersistService } from "./interview-session-persist.service";
 import type { SeedSessionResult } from "./interview-session.types";
 import {
   interviewCandidateProfiles,
   interviewJobAnalyses,
-  interviewQuestions,
-  interviewSessions,
   schema,
 } from "../database/schema";
 
@@ -26,9 +25,14 @@ type AppDb = NeonHttpDatabase<typeof schema>;
 @Injectable()
 export class InterviewSessionSeedService {
   private readonly db: AppDb;
+  private readonly persistService: InterviewSessionPersistService;
 
-  constructor(@Inject("DRIZZLE") db: AppDb) {
+  constructor(
+    @Inject("DRIZZLE") db: AppDb,
+    persistService: InterviewSessionPersistService
+  ) {
     this.db = db;
+    this.persistService = persistService;
   }
 
   async seedDemoSessionForUser(userId: string): Promise<SeedSessionResult> {
@@ -53,46 +57,16 @@ export class InterviewSessionSeedService {
       jobAnalysis.roleTitle
     );
     const categories = buildSeedCategories(jobAnalysis, questions);
-    const now = new Date();
 
-    const [session] = await this.db
-      .insert(interviewSessions)
-      .values({
-        userId,
-        profileId: profile.id,
-        jobAnalysisId: jobAnalysis.id,
-        interviewTitle,
-        estimatedDurationMinutes: SEED_ESTIMATED_DURATION_MINUTES,
-        questionCount: questions.length,
-        categories,
-        status: "ready",
-        generatedAt: now,
-        updatedAt: now,
-      })
-      .returning({ id: interviewSessions.id });
-
-    if (!session) {
-      throw new NotFoundException("Failed to create interview session");
-    }
-
-    await this.db.insert(interviewQuestions).values(
-      questions.map((fixture) => ({
-        sessionId: session.id,
-        displayOrder: fixture.displayOrder,
-        category: fixture.category,
-        difficulty: fixture.difficulty,
-        questionText: fixture.questionText,
-        expectedSignals: fixture.expectedSignals,
-        followUpOpportunities: fixture.followUpOpportunities,
-      }))
-    );
-
-    return {
-      interviewId: session.id,
+    return this.persistService.createFromFixtures({
+      userId,
+      profileId: profile.id,
+      jobAnalysisId: jobAnalysis.id,
       interviewTitle,
-      companyName: jobAnalysis.companyName,
-      roleTitle: jobAnalysis.roleTitle,
-    };
+      estimatedDurationMinutes: SEED_ESTIMATED_DURATION_MINUTES,
+      categories,
+      questions,
+    });
   }
 
   private async getLatestProfile(userId: string) {

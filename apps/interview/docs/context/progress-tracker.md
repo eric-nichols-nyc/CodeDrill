@@ -4,18 +4,19 @@ Update this file after every meaningful implementation change.
 
 ## Current Phase
 
-- **Interview Generator** — P0 planning (spec: [03-interview-generation.md](../feature-specs/03-interview-generation.md))
+- **Answer Evaluation** — next (spec: [05-answer-evaluation.md](../feature-specs/05-answer-evaluation.md))
 
 ## Current Goal
 
-- Replace dev seed with AI-backed `POST /interview/sessions` (profile + job analysis → blueprint + 5–10 questions + expected signals)
+- Answer Evaluation (spec 05) — P0 planning
 
 ## In Progress
 
-- Interview Generator P0 — lock API contract, AI prompt shape, and implementation phases (mirror job-analysis slice)
+- (none)
 
 ## Session Notes
 
+- **Interview Generator signed off (code + smoke spec):** generate → preview → persist → play; smoke test doc + `interview-session-generator.smoke.spec.ts`.
 - **Routes:** prototype mock at `/prototype` (public); real flow at `/interviews` → `/interviews/start` → `/interviews/[id]/play|complete` (Clerk-protected).
 - **Question Player Gate 2 signed off:** seed → play → complete E2E; dev seed via `POST /interview/sessions/seed` on `/interviews/start`.
 - **Question Player Gate 1 signed off:** TTS + STT voice flow works in browser.
@@ -29,6 +30,7 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- interview generator MVP — generate preview, persist session, start panel UI, smoke test ([03-interview-generation-implementation.md](../implementation/03-interview-generation-implementation.md), [03-interview-generator-smoke-test.md](../testing/03-interview-generator-smoke-test.md))
 - route cleanup — `/prototype` for mock flow; `/interviews/*` for player; orphaned empty route dirs removed
 - question player Gate 2 — session tables, Nest `interview/sessions/*`, player submit/nav/complete UI, `/interviews/start` seed entry
 - question player Gate 1 — TTS question, STT → textarea, mic permission, re-record replace (`features/interview-player`)
@@ -44,13 +46,6 @@ Update this file after every meaningful implementation change.
 - monorepo — `apps/interview` in agent scope; `pnpm dev:interview` script
 
 ## Next Up
-
-### Interview Generator (current)
-
-1. **P0** — Decisions: `POST /interview/sessions/generate` (preview) + `POST /interview/sessions` (persist), or single-step create; reuse existing `interview_sessions` / `interview_questions` columns; stub vs OpenAI (follow job-analysis pattern).
-2. **P1** — Schema/migration only if new columns needed (e.g. `follow_up_opportunities`, blueprint JSON).
-3. **P2** — Nest `interview-session-generate.service.ts` + controller routes; structured output validation.
-4. **P3** — `/interviews/start` UI: replace seed button with generate → overview → start play (wire prototype Screen 1 / overview).
 
 ### Later
 

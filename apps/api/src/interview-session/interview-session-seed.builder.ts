@@ -29,6 +29,14 @@ type JobAnalysisSeedInput = {
   suggestedQuestionAngles: InterviewSuggestedQuestionAngle[];
 };
 
+export type ProfileSeedInput = {
+  summary: string;
+  claimsToVerify: Array<{ claim: string; questionAngle: string }>;
+  projects: Array<{ name: string; role: string; claims: string[] }>;
+};
+
+const STUB_TARGET_QUESTIONS = 6;
+
 export function buildInterviewTitle(
   companyName: string,
   roleTitle: string
@@ -51,6 +59,84 @@ export function buildSeedCategories(
   }
   const fromQuestions = [...new Set(questions.map((q) => q.category))];
   return fromQuestions.length > 0 ? fromQuestions : [...SEED_CATEGORIES];
+}
+
+/** Dev stub / fallback: 5–6 questions from profile + job (not just 3 angles). */
+export function buildStubBlueprintQuestions(
+  profile: ProfileSeedInput,
+  job: JobAnalysisSeedInput
+): SeedQuestionFixture[] {
+  const difficulty = job.seniorityLevel.level?.trim() || "Senior";
+  const signalPool = [...job.mustProve, ...job.requiredSkills].filter(Boolean);
+  const drafts: SeedQuestionFixture[] = [];
+  let order = 1;
+
+  const push = (fixture: Omit<SeedQuestionFixture, "displayOrder">) => {
+    drafts.push({ ...fixture, displayOrder: order });
+    order += 1;
+  };
+
+  for (const angle of job.suggestedQuestionAngles.slice(0, 4)) {
+    push({
+      category: angle.category.trim() || "Role fit",
+      difficulty,
+      questionText: angleToInterviewQuestion(angle.angle, angle.category),
+      expectedSignals: pickSignals(signalPool, drafts.length, 4),
+      followUpOpportunities: [],
+    });
+  }
+
+  for (const claim of profile.claimsToVerify.slice(0, 2)) {
+    const probe = claim.questionAngle.trim() || claim.claim.trim();
+    if (!probe) {
+      continue;
+    }
+    push({
+      category: "Resume Deep Dive",
+      difficulty,
+      questionText: angleToInterviewQuestion(probe, "Resume Deep Dive"),
+      expectedSignals: pickSignals(
+        [...signalPool, claim.claim],
+        drafts.length,
+        4
+      ),
+      followUpOpportunities: [],
+    });
+  }
+
+  const project = profile.projects[0];
+  if (project?.name.trim()) {
+    push({
+      category: "Resume Deep Dive",
+      difficulty,
+      questionText: `Tell me about your work on ${project.name.trim()} and the impact you had as ${project.role.trim() || "a contributor"}.`,
+      expectedSignals: pickSignals(signalPool, drafts.length, 4),
+      followUpOpportunities: [],
+    });
+  }
+
+  for (const fixture of SEED_QUESTIONS) {
+    if (drafts.length >= STUB_TARGET_QUESTIONS) {
+      break;
+    }
+    const duplicate = drafts.some(
+      (q) => q.questionText === fixture.questionText
+    );
+    if (!duplicate) {
+      push({
+        category: fixture.category,
+        difficulty: fixture.difficulty,
+        questionText: fixture.questionText,
+        expectedSignals: fixture.expectedSignals,
+        followUpOpportunities: fixture.followUpOpportunities,
+      });
+    }
+  }
+
+  return drafts.slice(0, STUB_TARGET_QUESTIONS).map((q, index) => ({
+    ...q,
+    displayOrder: index + 1,
+  }));
 }
 
 export function buildQuestionsFromJobAnalysis(

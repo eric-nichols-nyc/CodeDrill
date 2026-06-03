@@ -44,3 +44,26 @@ export type SeedSessionResult = {
   companyName: string;
   roleTitle: string;
 };
+
+export type InterviewBlueprintQuestionPreview = {
+  order: number;
+  category: string;
+  difficulty: string;
+  question: string;
+  expectedSignals: string[];
+  followUpOpportunities: string[];
+};
+
+/** Transient blueprint from POST /interview/sessions/generate */
+export type InterviewBlueprintPreview = {
+  profileId: string;
+  jobAnalysisId: string;
+  companyName: string;
+  roleTitle: string;
+  roleSummary: string;
+  interviewTitle: string;
+  estimatedDurationMinutes: number;
+  questionCount: number;
+  categories: string[];
+  questions: InterviewBlueprintQuestionPreview[];
+};
