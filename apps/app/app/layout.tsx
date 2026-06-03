@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { ThemeProvider } from "@repo/design-system/providers/theme";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { QueryProvider } from "@/components/providers/query-provider";
@@ -65,8 +66,8 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
-}>) {
+  children: ReactNode;
+}>): Promise<ReactNode> {
   // The root layout also renders for 404s/static-asset misses that the proxy
   // matcher intentionally excludes, so `auth()` can run on a request that never
   // hit clerkMiddleware(). Fall back to null instead of crashing the render.
